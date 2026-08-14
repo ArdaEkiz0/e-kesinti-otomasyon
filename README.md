@@ -89,5 +89,3 @@ Sayfa açmadan, sahte sürücü ile tüm akışın çalıştığını doğrular.
 ## 👨‍💻 Geliştirici
 
 **Arda M. Ekiz** — GitHub: [ArdaEkiz0](https://github.com/ArdaEkiz0)
-
-> ⚠️ **Gizlilik Notu:** Excel dosyaların gerçek TC kimlik numaraları içerdiğinden **asla** bu depoya yüklenmemelidir (`.gitignore` ile korunur).

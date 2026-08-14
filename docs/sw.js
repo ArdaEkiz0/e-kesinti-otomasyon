@@ -3,7 +3,12 @@ var VARLIKLAR = ["/e-kesinti-otomasyon/"];
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(KAS_ISMI).then(function (k) { return k.addAll(VARLIKLAR); }));
-  self.skipWaiting();
+});
+
+self.addEventListener("message", function (e) {
+  if (e.data && e.data.tip === "atla") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", function (e) {

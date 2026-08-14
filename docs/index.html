@@ -1,17 +1,31 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-tema="koyu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SGK Tarımsal Kesinti Botu</title>
-<meta name="description" content="SGK Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştiren ücretsiz Selenium botu. Tek tıkla kurulum, otomatik güncelleme, işlem raporu.">
-<meta name="keywords" content="sgk, bağkur, tarım, tarımsal kesinti, otomasyon, bot, selenium, python">
+<title>SGK Tarımsal Kesinti Botu — E-Kesinti Otomasyon</title>
+<meta name="description" content="SGK Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştiren ücretsiz Selenium botu. Tek tıkla kurulum, otomatik güncelleme, hata tekrar deneme.">
+<meta name="keywords" content="sgk, bağkur, tarım, tarımsal kesinti, otomasyon, bot, selenium, python, e-kesinti">
 <meta property="og:title" content="SGK Tarımsal Kesinti Botu">
 <meta property="og:description" content="Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin. Tek tıkla kurulum, otomatik güncelleme, ücretsiz.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ardaekiz0.github.io/e-kesinti-otomasyon/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SGK Tarımsal Kesinti Botu",
+  "description": "SGK Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştiren ücretsiz Selenium botu.",
+  "operatingSystem": "Windows",
+  "applicationCategory": "BusinessApplication",
+  "url": "https://ardaekiz0.github.io/e-kesinti-otomasyon/",
+  "downloadUrl": "https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "TRY"},
+  "author": {"@type": "Person", "name": "Arda M. Ekiz", "url": "https://github.com/ArdaEkiz0"}
+}
+</script>
 <style>
   :root {
     --yesil: #22c55e;
@@ -21,8 +35,20 @@
     --sari: #eab308;
     --arka: #0f172a;
     --kart: #1e293b;
+    --cizgi: #334155;
     --metin: #e2e8f0;
     --soluk: #94a3b8;
+    --nav-arka: rgba(15, 23, 42, 0.92);
+    --header-arka: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+  }
+  html[data-tema="acik"] {
+    --arka: #f8fafc;
+    --kart: #ffffff;
+    --cizgi: #e2e8f0;
+    --metin: #0f172a;
+    --soluk: #475569;
+    --nav-arka: rgba(248, 250, 252, 0.92);
+    --header-arka: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #ede9fe 100%);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -31,6 +57,7 @@
     background: var(--arka);
     color: var(--metin);
     line-height: 1.6;
+    transition: background 0.3s, color 0.3s;
   }
   .kapsayici { max-width: 900px; margin: 0 auto; padding: 0 20px; }
 
@@ -39,9 +66,10 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(15, 23, 42, 0.92);
+    background: var(--nav-arka);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #334155;
+    border-bottom: 1px solid var(--cizgi);
+    transition: background 0.3s;
   }
   .nav-ic {
     max-width: 900px;
@@ -49,7 +77,7 @@
     padding: 0 20px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     height: 60px;
   }
   .nav-logo { font-weight: 800; font-size: 17px; text-decoration: none; color: var(--metin); white-space: nowrap; }
@@ -69,33 +97,33 @@
     white-space: nowrap;
   }
   .nav-buton:hover { filter: brightness(1.1); }
-  #dil-buton {
+  #dil-buton, #tema-buton {
     background: var(--kart);
     color: var(--metin);
-    border: 1px solid #334155;
+    border: 1px solid var(--cizgi);
     border-radius: 8px;
     padding: 7px 12px;
     font-weight: 700;
     font-size: 13px;
     cursor: pointer;
   }
-  #dil-buton:hover { border-color: var(--turkuaz); }
-  @media (max-width: 600px) {
+  #dil-buton:hover, #tema-buton:hover { border-color: var(--turkuaz); }
+  @media (max-width: 640px) {
     .nav-linkler { display: none; }
     .nav-ic { justify-content: space-between; }
   }
 
   /* ---------- Giriş (hero) ---------- */
   header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
-    border-bottom: 1px solid #334155;
+    background: var(--header-arka);
+    border-bottom: 1px solid var(--cizgi);
     padding: 70px 0 50px;
     text-align: center;
   }
   .rozet {
     display: inline-block;
     background: var(--kart);
-    border: 1px solid #334155;
+    border: 1px solid var(--cizgi);
     border-radius: 999px;
     padding: 6px 16px;
     font-size: 14px;
@@ -129,7 +157,7 @@
     gap: 10px;
     margin-top: 18px;
     background: var(--kart);
-    border: 1px solid #334155;
+    border: 1px solid var(--cizgi);
     border-radius: 999px;
     padding: 8px 18px;
     font-size: 13px;
@@ -139,24 +167,11 @@
   .canli-surum .sayac { color: var(--turkuaz); font-weight: 700; }
 
   /* ---------- Bölümler ---------- */
-  section { padding: 50px 0; border-bottom: 1px solid #1e293b; scroll-margin-top: 70px; }
-  h2 {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 26px;
-  }
+  section { padding: 50px 0; border-bottom: 1px solid var(--cizgi); scroll-margin-top: 70px; }
+  h2 { font-size: 26px; font-weight: 700; margin-bottom: 26px; }
   h2::before { content: "🌾 "; }
-  .ozellikler {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
-  }
-  .kart {
-    background: var(--kart);
-    border: 1px solid #334155;
-    border-radius: 14px;
-    padding: 20px;
-  }
+  .ozellikler { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .kart { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 20px; transition: background 0.3s; }
   .kart .sembol { font-size: 26px; }
   .kart h3 { font-size: 17px; margin: 10px 0 6px; }
   .kart p { color: var(--soluk); font-size: 14px; }
@@ -166,11 +181,12 @@
     display: flex;
     gap: 16px;
     background: var(--kart);
-    border: 1px solid #334155;
+    border: 1px solid var(--cizgi);
     border-radius: 12px;
     padding: 16px 20px;
     margin-bottom: 12px;
     counter-increment: adim;
+    transition: background 0.3s;
   }
   .adim .numara {
     flex: 0 0 38px;
@@ -189,40 +205,97 @@
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 10px 14px; font-size: 14px; }
   th { background: var(--kart); color: var(--turkuaz); }
-  tr:nth-child(even) td { background: #172033; }
-  td { border-bottom: 1px solid #1e293b; }
+  tr:nth-child(even) td { background: var(--arka); }
+  td { border-bottom: 1px solid var(--cizgi); }
+
+  /* ---------- Terminal (uygulama görüntüsü) ---------- */
+  .terminal {
+    background: #0b1120;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .terminal-baslik {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e293b;
+    padding: 10px 14px;
+  }
+  .nokta { width: 12px; height: 12px; border-radius: 50%; }
+  .nokta.kirmizi { background: #ef4444; }
+  .nokta.sari { background: #eab308; }
+  .nokta.yesil { background: #22c55e; }
+  .terminal-ad { color: #94a3b8; font-size: 12px; margin-left: 8px; font-family: Consolas, monospace; }
+  .terminal-icerik {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+    line-height: 1.5;
+    padding: 18px;
+    color: #e2e8f0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .t-yesil { color: #22c55e; }
+  .t-kirmizi { color: #ef4444; }
+  .t-sari { color: #eab308; }
+  .t-turkuaz { color: #06b6d4; }
+  .t-mavi { color: #60a5fa; }
+  .t-mor { color: #a855f7; }
+  .t-bold { font-weight: 700; }
+  .terminal-alt { text-align: center; color: var(--soluk); font-size: 13px; margin-top: 14px; }
+
+  /* ---------- Sürüm geçmişi ---------- */
+  .surum-kayit {
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    transition: background 0.3s;
+  }
+  .surum-ust { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .surum-etiket {
+    background: var(--yesil);
+    color: #052e16;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 3px 12px;
+    border-radius: 999px;
+  }
+  .surum-tarih { color: var(--soluk); font-size: 13px; }
+  .surum-not { color: var(--metin); font-size: 14px; margin-top: 8px; white-space: pre-line; }
+  .surum-bos { color: var(--soluk); font-style: italic; }
+
+  /* ---------- Geri bildirim ---------- */
+  .geri-bildirim { text-align: center; }
+  .geri-bildirim p { color: var(--soluk); margin-bottom: 20px; max-width: 560px; margin-left: auto; margin-right: auto; }
+  .hata-buton {
+    display: inline-block;
+    background: var(--kart);
+    color: var(--metin);
+    border: 1px solid var(--cizgi);
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .hata-buton:hover { border-color: var(--turkuaz); color: var(--turkuaz); }
 
   /* ---------- Açılır SSS ---------- */
-  .sss {
-    background: var(--kart);
-    border: 1px solid #334155;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-  .sss summary {
-    cursor: pointer;
-    padding: 16px 20px;
-    font-weight: 600;
-    font-size: 15px;
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
+  .sss { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: background 0.3s; }
+  .sss summary { cursor: pointer; padding: 16px 20px; font-weight: 600; font-size: 15px; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .sss summary::-webkit-details-marker { display: none; }
   .sss summary::after { content: "▾"; color: var(--turkuaz); transition: transform 0.2s; }
   .sss[open] summary::after { transform: rotate(180deg); }
   .sss p { padding: 0 20px 16px; color: var(--soluk); font-size: 14px; }
 
   /* ---------- Alt bilgi ---------- */
-  footer {
-    text-align: center;
-    padding: 30px 20px;
-    color: var(--soluk);
-    font-size: 14px;
-  }
+  footer { text-align: center; padding: 30px 20px; color: var(--soluk); font-size: 14px; }
   footer a { color: var(--turkuaz); text-decoration: none; }
 
   /* ---------- Animasyonlar ---------- */
@@ -245,18 +318,20 @@
     <a class="nav-logo" href="#baslangic">🌾 SGK Bot</a>
     <div class="nav-linkler">
       <a href="#ozellikler" data-i18n="nav-ozellikler">Özellikler</a>
+      <a href="#uygulama" data-i18n="nav-uygulama">Uygulama</a>
       <a href="#kullanim" data-i18n="nav-kullanim">Kullanım</a>
+      <a href="#surumler" data-i18n="nav-surumgecmisi">Sürümler</a>
       <a href="#sss" data-i18n="nav-sss">SSS</a>
-      <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="nav-surumler">Sürümler</a>
     </div>
     <a class="nav-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
+    <button id="tema-buton" title="Tema">🌙</button>
     <button id="dil-buton" title="English">EN</button>
   </div>
 </nav>
 
 <header id="baslangic">
   <div class="kapsayici">
-    <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows</span>
+    <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows &middot; 💰 Ücretsiz</span>
     <h1>SGK Tarımsal Kesinti Botu</h1>
     <p class="alt-baslik" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
     <a class="indir" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir</a>
@@ -288,6 +363,71 @@
   </div>
 </section>
 
+<section id="uygulama">
+  <div class="kapsayici">
+    <h2 data-i18n="bolum-uygulama">Uygulama Nasıl Görünüyor?</h2>
+    <div class="terminal animasyon">
+      <div class="terminal-baslik">
+        <span class="nokta kirmizi"></span><span class="nokta sari"></span><span class="nokta yesil"></span>
+        <span class="terminal-ad" data-i18n="terminal-ad">SGK Bot — Test Modu (gerçek çıktı)</span>
+      </div>
+      <pre class="terminal-icerik">============================================================
+<span class="t-bold">🤖 SGK TARIMSAL KESİNTİ OTOMASYONU BOT</span>
+   Kullanıcı Dostu Arayüz v1.1
+   <span class="t-mor">Developer: Arda M. Ekiz</span>
+============================================================
+
+📊 Excel dosyası okunuyor...
+<span class="t-yesil">✅ Excel'den 4 kayıt okundu</span>
+
+🧪 TEST MODU: Tarayıcı açılmadan akış simüle ediliyor...
+
+📝 Kayıtlar işleniyor...
+
+<span class="t-bold t-mavi">📍 Kayıt 1/4</span>
+   <span class="t-turkuaz">[░░░░░░░░░░░░░░░░░░░░]   0% (0/4)</span>  TC=12345678901
+   <span class="t-yesil">✅ TC yazıldı: 12345678901</span>
+   <span class="t-yesil">✅ Tarih yazıldı: 31.07.2026</span>
+   <span class="t-sari">⚠️ Hata (1. deneme): simüle hata</span>
+   <span class="t-turkuaz">🔄 2. deneme yapılıyor...</span>
+   <span class="t-yesil">✅ TC yazıldı: 12345678901</span>
+   <span class="t-kirmizi">❌ Hata (3 deneme): simüle hata</span>
+
+<span class="t-bold t-mavi">📍 Kayıt 2/4</span>
+   <span class="t-turkuaz">[█████░░░░░░░░░░░░░░░]  25% (1/4)</span>  TC=23456789012
+   <span class="t-yesil">✅ TC yazıldı: 23456789012</span>
+   <span class="t-yesil">✅ Tarih yazıldı: 31.07.2026</span>
+   <span class="t-yesil">✅ 'Alım Gerceklesti' seçildi (YEŞİL)</span>
+   <span class="t-turkuaz">🔎 Ara tıklanıyor...</span>
+   <span class="t-yesil">✅ Üretici bilgileri yüklendi</span>
+   <span class="t-yesil">💰 Matrah yazıldı: 54216.00 (RENK DEĞİŞTİ)</span>
+   🔢 Kesinti Tutarı: 10843.2
+   <span class="t-turkuaz">➕ EKLE tıklanıyor...</span>
+   <span class="t-yesil t-bold">✅ TC başarıyla işlendi!</span>
+
+<span class="t-bold t-mavi">📍 Kayıt 4/4</span>
+   <span class="t-turkuaz">[███████████████░░░░░]  75% (3/4)</span>  TC=45678901234
+   <span class="t-yesil">✅ TC yazıldı: 45678901234</span>
+   <span class="t-turkuaz">🔎 Ara tıklanıyor...</span>
+   <span class="t-yesil">✅ Üretici bilgileri yüklendi</span>
+   <span class="t-yesil">💰 Matrah yazıldı: 19000.05 (RENK DEĞİŞTİ)</span>
+   <span class="t-turkuaz">➕ EKLE tıklanıyor...</span>
+   <span class="t-yesil t-bold">✅ TC başarıyla işlendi!</span>
+
+============================================================
+<span class="t-bold t-yesil">✅ İŞLEM TAMAMLANDI!</span>
+   <span class="t-bold">Başarılı: 3/4</span>   Süre: 0 dk 29 sn
+   <span class="t-kirmizi">Başarısız: 1</span>
+
+   <span class="t-kirmizi t-bold">❌ HATA ALAN KAYITLAR:</span>
+     • TC=12345678901: simüle hata
+============================================================
+<span class="t-mor">Developer: Arda M. Ekiz</span></pre>
+    </div>
+    <p class="terminal-alt" data-i18n="uygulama-metin">↑ Bu, uygulamanın test modunun gerçek çıktısıdır — renkler, ilerleme çubuğu, hata tekrar deneme ve özet raporu görünüyor.</p>
+  </div>
+</section>
+
 <section id="kullanim">
   <div class="kapsayici">
     <h2 data-i18n="bolum-kullanim">Nasıl Kullanılır?</h2>
@@ -309,6 +449,15 @@
   </div>
 </section>
 
+<section id="surumler">
+  <div class="kapsayici">
+    <h2 data-i18n="bolum-surumgecmisi">Sürüm Geçmişi</h2>
+    <div class="surum-listesi">
+      <div class="surum-bos" data-i18n="surumler-bos">Yükleniyor...</div>
+    </div>
+  </div>
+</section>
+
 <section id="sss">
   <div class="kapsayici">
     <h2 data-i18n="bolum-sss">Sık Sorulan Sorular</h2>
@@ -321,19 +470,27 @@
   </div>
 </section>
 
+<section id="iletisim">
+  <div class="kapsayici geri-bildirim">
+    <h2 data-i18n="bolum-iletisim">Geri Bildirim</h2>
+    <p data-i18n="iletisim-metin">Bir sorun mu buldun? Aklına bir öneri mi geldi? GitHub Issues üzerinden bildir — önceden doldurulmuş şablonla saniyeler sürer.</p>
+    <a class="hata-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues/new?title=%F0%9F%90%9E%20Hata%20Bildirimi&body=%2A%2AUygulama%20s%C3%BCr%C3%BCm%C3%BC:%2A%2A%20%0A%0A%0A%2A%2AWindows%20s%C3%BCr%C3%BCm%C3%BC:%2A%2A%20%0A%0A%0A%2A%2ANe%20yapmaya%20%C3%A7al%C4%B1%C5%9Ft%C4%B1n%C4%B1z:%2A%2A%20%0A%0A%0A%2A%2ANe%20oldu%20%2F%20hata%20mesaj%C4%B1:%2A%2A%20%0A%0A%0A%2A%2AEkran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC:%2A%2A%20" data-i18n="iletisim-buton">🐞 Hata Bildir</a>
+  </div>
+</section>
+
 <footer>
-  <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="footer-surumler">Sürümler</a></p>
+  <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues" data-i18n="footer-issues">Sorunlar</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="footer-surumler">Sürümler</a></p>
   <p style="margin-top:8px;font-size:12px;" data-i18n="footer-not">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
 </footer>
 
 <script>
-// ---------- Türkçe / İngilizce ----------
 var DILLER = {
   tr: {
     "nav-ozellikler": "Özellikler",
+    "nav-uygulama": "Uygulama",
     "nav-kullanim": "Kullanım",
+    "nav-surumgecmisi": "Sürümler",
     "nav-sss": "SSS",
-    "nav-surumler": "Sürümler",
     "nav-indir": "⬇️ İndir",
     "hero-alt": "Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.",
     "hero-indir": "⬇️ KURULUM.exe'yi İndir",
@@ -348,6 +505,9 @@ var DILLER = {
     "oz4-baslik": "Hata Tekrar Deneme", "oz4-metin": "Hatalı kayıtlar 3 kez denenir — site yavaş olduğunda başarı oranı artar.",
     "oz5-baslik": "Windows Bildirimi", "oz5-metin": "İşlem bitince ekrana bakmadan bildirimle sonucu öğrenirsiniz.",
     "oz6-baslik": "Her Excel'i Kullan", "oz6-metin": "Dosya adı ne olursa olsun seçin ya da başlatıcının üzerine sürükleyin.",
+    "bolum-uygulama": "Uygulama Nasıl Görünüyor?",
+    "terminal-ad": "SGK Bot — Test Modu (gerçek çıktı)",
+    "uygulama-metin": "↑ Bu, uygulamanın test modunun gerçek çıktısıdır — renkler, ilerleme çubuğu, hata tekrar deneme ve özet raporu görünüyor.",
     "bolum-kullanim": "Nasıl Kullanılır?",
     "adim1-baslik": "KURULUM.exe'yi çalıştırın.", "adim1-metin": "Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.",
     "adim2-baslik": "Excel dosyasını doldurun.", "adim2-metin": "Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).",
@@ -359,6 +519,10 @@ var DILLER = {
     "tablo-tc": "TC Kimlik No", "tablo-tc-aciklama": "11 haneli TC kimlik numarası",
     "tablo-matrah": "Matrah", "tablo-matrah-aciklama": "Alım bedeli",
     "tablo-bagkur": "Bağ-Kur", "tablo-bagkur-aciklama": "Kesinti tutarı (hesaplanır)",
+    "bolum-surumgecmisi": "Sürüm Geçmişi",
+    "surumler-bos": "Yükleniyor...",
+    "surumler-hata": "Sürüm geçmişi yüklenemedi.",
+    "surum-tarih": "yayın:",
     "bolum-sss": "Sık Sorulan Sorular",
     "sss1-soru": "Bot açılmıyor / sürücü hatası veriyor", "sss1-cevap": "Chrome güncellenmiş olabilir — KURULUM.exe'yi yeniden çalıştırın, uyumlu sürücüyü otomatik kurar.",
     "sss2-soru": "Kuruşlar yanlış yazılıyor (ör: 13014,90)", "sss2-cevap": "Bu, eski sürümlerde görülen bir sorundu. Güncel sürümde kuruş her zaman 2 haneli (09) yazılır ve doğrulama yapılır.",
@@ -366,16 +530,21 @@ var DILLER = {
     "sss4-soru": "Güncellemeler ücretsiz mi?", "sss4-cevap": "Evet. Uygulama tamamen ücretsizdir; tüm sürümler ve güncellemeler GitHub'dan otomatik indirilir.",
     "sss5-soru": "İnternet bağlantım zayıf, bot yine de çalışır mı?", "sss5-cevap": "Çalışır. Hata olan kayıtlar 3 kez otomatik denenir; internet kesilirse hatalı kayıtlar ekranda ve özette listelenir.",
     "sss6-soru": "Kaç kaydı aynı anda işleyebilirim?", "sss6-cevap": "Sınır yoktur. Excel'deki tüm satırlar sırayla işlenir; ilerleme çubuğundan durumu takip edebilirsiniz.",
+    "bolum-iletisim": "Geri Bildirim",
+    "iletisim-metin": "Bir sorun mu buldun? Aklına bir öneri mi geldi? GitHub Issues üzerinden bildir — önceden doldurulmuş şablonla saniyeler sürer.",
+    "iletisim-buton": "🐞 Hata Bildir",
     "footer-gelistirici": "Geliştirici:",
     "footer-kaynak": "Kaynak Kod",
+    "footer-issues": "Sorunlar",
     "footer-surumler": "Sürümler",
     "footer-not": "⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir."
   },
   en: {
     "nav-ozellikler": "Features",
+    "nav-uygulama": "The App",
     "nav-kullanim": "Usage",
+    "nav-surumgecmisi": "Releases",
     "nav-sss": "FAQ",
-    "nav-surumler": "Releases",
     "nav-indir": "⬇️ Download",
     "hero-alt": "Automate your Bağ-Kur agricultural activity notifications — no more manual data entry.",
     "hero-indir": "⬇️ Download KURULUM.exe",
@@ -390,6 +559,9 @@ var DILLER = {
     "oz4-baslik": "Auto Retry", "oz4-metin": "Failed records are retried 3 times — success rate increases when the site is slow.",
     "oz5-baslik": "Windows Notification", "oz5-metin": "Get notified when the job finishes — no need to watch the screen.",
     "oz6-baslik": "Use Any Excel File", "oz6-metin": "Pick any Excel file, whatever its name, or drag-and-drop it onto the launcher.",
+    "bolum-uygulama": "What Does the App Look Like?",
+    "terminal-ad": "SGK Bot — Test Mode (real output)",
+    "uygulama-metin": "↑ This is the real output of the app's test mode — colors, progress bar, auto-retry and the summary report.",
     "bolum-kullanim": "How to Use?",
     "adim1-baslik": "Run KURULUM.exe.", "adim1-metin": "Python, Chrome and chromedriver are prepared; a template Excel file is created.",
     "adim2-baslik": "Fill in the Excel file.", "adim2-metin": "Enter Title, TC ID Number, Base Amount and Bağ-Kur columns (template included).",
@@ -401,6 +573,10 @@ var DILLER = {
     "tablo-tc": "TC ID Number", "tablo-tc-aciklama": "11-digit Turkish ID number",
     "tablo-matrah": "Base Amount", "tablo-matrah-aciklama": "Purchase amount",
     "tablo-bagkur": "Bağ-Kur", "tablo-bagkur-aciklama": "Deduction amount (calculated)",
+    "bolum-surumgecmisi": "Version History",
+    "surumler-bos": "Loading...",
+    "surumler-hata": "Could not load version history.",
+    "surum-tarih": "released:",
     "bolum-sss": "Frequently Asked Questions",
     "sss1-soru": "Bot won't start / driver error", "sss1-cevap": "Chrome may have been updated — run KURULUM.exe again, it installs the matching driver automatically.",
     "sss2-soru": "Cents are written wrong (e.g. 13014,90)", "sss2-cevap": "This was an issue in old versions. Current versions always write cents with 2 digits (09) and verify the value.",
@@ -408,13 +584,18 @@ var DILLER = {
     "sss4-soru": "Are updates free?", "sss4-cevap": "Yes. The app is completely free; all versions and updates are downloaded automatically from GitHub.",
     "sss5-soru": "My internet is weak, will the bot still work?", "sss5-cevap": "Yes. Failed records are retried 3 times automatically; if the connection drops, failures are listed on screen and in the summary.",
     "sss6-soru": "How many records can I process at once?", "sss6-cevap": "No limit. All rows in the Excel file are processed in order; track progress with the progress bar.",
+    "bolum-iletisim": "Feedback",
+    "iletisim-metin": "Found a bug? Have a suggestion? Report it via GitHub Issues — the pre-filled template takes seconds.",
+    "iletisim-buton": "🐞 Report a Bug",
     "footer-gelistirici": "Developer:",
     "footer-kaynak": "Source Code",
+    "footer-issues": "Issues",
     "footer-surumler": "Releases",
     "footer-not": "⚠️ Excel files contain real Turkish ID numbers, so they must never be uploaded to the repository."
   }
 };
 
+// ---------- Dil ----------
 function dilUygula(dil) {
   var sozluk = DILLER[dil] || DILLER.tr;
   document.documentElement.lang = dil;
@@ -425,10 +606,20 @@ function dilUygula(dil) {
   document.getElementById("dil-buton").textContent = dil === "tr" ? "EN" : "TR";
   try { localStorage.setItem("sgk-dil", dil); } catch (e) {}
 }
-
 document.getElementById("dil-buton").addEventListener("click", function () {
   var suanki = document.documentElement.lang === "en" ? "en" : "tr";
   dilUygula(suanki === "tr" ? "en" : "tr");
+});
+
+// ---------- Tema ----------
+function temaUygula(tema) {
+  document.documentElement.setAttribute("data-tema", tema);
+  document.getElementById("tema-buton").textContent = tema === "koyu" ? "🌙" : "☀️";
+  try { localStorage.setItem("sgk-tema", tema); } catch (e) {}
+}
+document.getElementById("tema-buton").addEventListener("click", function () {
+  var suanki = document.documentElement.getAttribute("data-tema") === "acik" ? "acik" : "koyu";
+  temaUygula(suanki === "koyu" ? "acik" : "koyu");
 });
 
 // ---------- Canlı sürüm + indirme sayacı ----------
@@ -448,6 +639,37 @@ function surumBilgisi() {
     .catch(function () {});
 }
 
+// ---------- Sürüm geçmişi ----------
+function surumGecmisi() {
+  var liste = document.querySelector(".surum-listesi");
+  fetch("https://api.github.com/repos/ArdaEkiz0/e-kesinti-otomasyon/releases?per_page=6")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (surumler) {
+      if (!surumler || !surumler.length) {
+        liste.textContent = DILLER[document.documentElement.lang].surumler_bos;
+        return;
+      }
+      var html = "";
+      surumler.forEach(function (s) {
+        var not = (s.body || "").replace(/^#+.*$/gm, "").trim();
+        if (!not) not = "—";
+        var tarih = new Date(s.published_at).toLocaleDateString(document.documentElement.lang === "en" ? "en-GB" : "tr-TR");
+        html += '<div class="surum-kayit">' +
+          '<div class="surum-ust"><span class="surum-etiket">' + s.tag_name + '</span>' +
+          '<span class="surum-tarih">' + DILLER[document.documentElement.lang].surum_tarih + " " + tarih + '</span></div>' +
+          '<div class="surum-not"></div>' +
+        '</div>';
+        var gecici = document.createElement("div");
+        gecici.innerHTML = html;
+        gecici.querySelector(".surum-not").textContent = not;
+        liste.appendChild(gecici.querySelector(".surum-kayit"));
+      });
+    })
+    .catch(function () {
+      liste.textContent = DILLER[document.documentElement.lang].surumler_hata;
+    });
+}
+
 // ---------- Kaydırma animasyonları ----------
 var gozlemci = new IntersectionObserver(function (girisler) {
   girisler.forEach(function (g) {
@@ -461,10 +683,16 @@ document.querySelectorAll(".animasyon").forEach(function (el) { gozlemci.observe
 
 // ---------- Başlangıç ----------
 (function baslat() {
-  var kayitli = null;
-  try { kayitli = localStorage.getItem("sgk-dil"); } catch (e) {}
-  dilUygula(kayitli === "en" ? "en" : "tr");
+  var kayitliDil = null, kayitliTema = null;
+  try {
+    kayitliDil = localStorage.getItem("sgk-dil");
+    kayitliTema = localStorage.getItem("sgk-tema");
+  } catch (e) {}
+  var varsayilanTema = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "acik" : "koyu";
+  temaUygula(kayitliTema === "acik" || kayitliTema === "koyu" ? kayitliTema : varsayilanTema);
+  dilUygula(kayitliDil === "en" ? "en" : "tr");
   surumBilgisi();
+  surumGecmisi();
 })();
 </script>
 

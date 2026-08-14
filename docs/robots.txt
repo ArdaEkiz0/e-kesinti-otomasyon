@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ardaekiz0.github.io/e-kesinti-otomasyon/sitemap.xml

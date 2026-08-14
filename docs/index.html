@@ -187,15 +187,21 @@
   .canli-surum {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 18px;
     margin-top: 18px;
     background: var(--kart);
     border: 1px solid var(--cizgi);
     border-radius: 999px;
-    padding: 8px 18px;
+    padding: 10px 26px;
     font-size: 13px;
     color: var(--soluk);
+    flex-wrap: wrap;
+    justify-content: center;
   }
+  .istatistik { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
+  .istatistik .i-sayi { font-size: 21px; font-weight: 800; color: var(--turkuaz); }
+  .istatistik .i-etiket { font-size: 11.5px; color: var(--soluk); }
+  .i-ayrac { color: var(--cizgi); }
   .canli-surum .v { color: var(--yesil); font-weight: 700; }
   .canli-surum .sayac { color: var(--turkuaz); font-weight: 700; }
   .v-etiketi { font-size: 14px; opacity: 0.85; }
@@ -533,6 +539,56 @@
   /* ---------- Kopyala butonu ---------- */
   .paylas a.kopyala-aktif { border-color: var(--yesil); color: var(--yesil); }
 
+  /* ---------- Son CTA ---------- */
+  .son-cta-kutu {
+    text-align: center;
+    background: var(--header-arka);
+    border: 1px solid var(--cizgi);
+    border-radius: 20px;
+    padding: 48px 24px;
+    box-shadow: 0 16px 44px rgba(0,0,0,0.18);
+  }
+  .son-cta-kutu h2 { font-size: 30px; }
+  .son-cta-kutu p { color: var(--soluk); font-size: 16px; max-width: 560px; margin: 0 auto 26px; }
+  .soncta-guven { margin-top: 18px !important; font-size: 13.5px !important; }
+  .v-etiketi-son { font-size: 14px; opacity: 0.85; }
+
+  /* ---------- Sürüm güncelleme banner'ı ---------- */
+  #guncelleme-banner {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-14px);
+    z-index: 65;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--kart);
+    border: 1px solid var(--turkuaz);
+    border-radius: 999px;
+    padding: 8px 10px 8px 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s, transform 0.35s, visibility 0.35s;
+  }
+  #guncelleme-banner.gorunur { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+  #guncelleme-banner button {
+    background: var(--turkuaz);
+    color: #082f35;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #guncelleme-banner #guncelleme-kapat { background: none; color: var(--soluk); padding: 2px 8px; font-size: 15px; }
+  #guncelleme-banner #guncelleme-kapat:hover { color: var(--metin); }
+
   /* ---------- Ekran görüntüleri galerisi ---------- */
   .galeri { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 24px; }
   .galeri figure { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 10px; transition: border-color 0.25s, transform 0.25s; }
@@ -552,7 +608,7 @@
   /* ---------- Yazdırılabilir kılavuz ---------- */
   .print-yalniz { display: none; }
   @media print {
-    nav, header, section, footer, #ilerleme-cubugu, #yukari-buton, #yukle-buton { display: none !important; }
+    nav, header, section, footer, #ilerleme-cubugu, #yukari-buton, #yukle-buton, #guncelleme-banner, #kutlama { display: none !important; }
     .print-yalniz { display: block !important; }
     body { background: #fff !important; color: #000 !important; }
     .print-yalniz h1 { font-size: 22px; margin-bottom: 6px; }
@@ -609,14 +665,11 @@
     <a class="indir giris-anim g4" id="indir-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi"></span></a>
     <span class="indir-notu giris-anim g5" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
     <div class="canli-surum">
-      <span data-i18n="canli-etiket">En son sürüm:</span>
-      <span class="v">…</span>
-      <span>·</span>
-      <span data-i18n="canli-tarih">yayın:</span>
-      <span class="tarih">…</span>
-      <span>·</span>
-      <span class="sayac">…</span>
-      <span data-i18n="canli-indirme">indirme</span>
+      <div class="istatistik"><span class="i-sayi" id="ist-surum">…</span><span class="i-etiket" data-i18n="canli-etiket">En son sürüm:</span></div>
+      <span class="i-ayrac">·</span>
+      <div class="istatistik"><span class="i-sayi" id="ist-tarih">…</span><span class="i-etiket" data-i18n="canli-tarih">yayın:</span></div>
+      <span class="i-ayrac">·</span>
+      <div class="istatistik"><span class="i-sayi" id="ist-indirme">0</span><span class="i-etiket" data-i18n="canli-indirme">indirme</span></div>
     </div>
     <div class="istatistikler">
       <img src="https://img.shields.io/github/stars/ArdaEkiz0/e-kesinti-otomasyon?label=%E2%AD%90%20Y%C4%B1ld%C4%B1z&color=yellow" alt="Yıldız">
@@ -823,6 +876,17 @@
   </div>
 </section>
 
+<section id="son-cta">
+  <div class="kapsayici">
+    <div class="son-cta-kutu animasyon">
+      <h2 data-i18n="soncta-baslik">Hazır mısınız?</h2>
+      <p data-i18n="soncta-metin">500 kaydı saatlerce elle girmek yerine botla dakikalar içinde bitirin — tek tıkla kurulum, gerisini araç halletsin.</p>
+      <a class="indir" id="indir-buton-son" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi-son"></span></a>
+      <p class="soncta-guven" data-i18n="soncta-guven">🔒 Verileriniz bilgisayarınızda kalır · 💰 Tamamen ücretsiz · 🔄 Otomatik güncelleme</p>
+    </div>
+  </div>
+</section>
+
 <footer>
   <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues" data-i18n="footer-issues">Sorunlar</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="footer-surumler">Sürümler</a></p>
   <p style="margin-top:8px;font-size:12px;" data-i18n="footer-not">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
@@ -882,6 +946,11 @@ var DILLER = {
     "canli-etiket": "En son sürüm:",
     "canli-tarih": "yayın:",
     "canli-indirme": "indirme",
+    "guncelleme-metin": "⚡ Yeni sürüm hazır!",
+    "guncelleme-yenile": "🔄 Yenile",
+    "soncta-baslik": "Hazır mısınız?",
+    "soncta-metin": "500 kaydı saatlerce elle girmek yerine botla dakikalar içinde bitirin — tek tıkla kurulum, gerisini araç halletsin.",
+    "soncta-guven": "🔒 Verileriniz bilgisayarınızda kalır · 💰 Tamamen ücretsiz · 🔄 Otomatik güncelleme",
     "paylas-etiket": "Paylaş:",
     "kopyala": "🔗 Kopyala",
     "kutlama-baslik": "✅ İndirme başladı!", "kutlama-adim1": "1) KURULUM.exe'yi çalıştırın", "kutlama-adim2": "2) Kurulum bittiğinde Excel'i doldurun", "kutlama-adim3": "3) BOT_BAŞLAT.bat'a çift tıklayın",
@@ -957,6 +1026,11 @@ var DILLER = {
     "canli-etiket": "Latest version:",
     "canli-tarih": "released:",
     "canli-indirme": "downloads",
+    "guncelleme-metin": "⚡ A new version is ready!",
+    "guncelleme-yenile": "🔄 Refresh",
+    "soncta-baslik": "Ready to start?",
+    "soncta-metin": "Skip hours of manual entry for 500 records — one-click setup, the tool does the rest in minutes.",
+    "soncta-guven": "🔒 Your data stays on your PC · 💰 Completely free · 🔄 Automatic updates",
     "paylas-etiket": "Share:",
     "kopyala": "🔗 Copy",
     "kutlama-baslik": "✅ Download started!", "kutlama-adim1": "1) Run KURULUM.exe", "kutlama-adim2": "2) Fill in the Excel after setup", "kutlama-adim3": "3) Double-click BOT_BAŞLAT.bat",
@@ -1050,22 +1124,41 @@ document.getElementById("tema-buton").addEventListener("click", function () {
 });
 
 // ---------- Canlı sürüm + indirme sayacı ----------
+function sayacAnimasyon(el, hedef) {
+  if (!el) return;
+  if ((window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) || !hedef) {
+    el.textContent = hedef;
+    return;
+  }
+  var baslangic = null;
+  function adim(zaman) {
+    if (!baslangic) baslangic = zaman;
+    var ilerleme = Math.min((zaman - baslangic) / 900, 1);
+    el.textContent = Math.floor(hedef * (1 - Math.pow(1 - ilerleme, 3)));
+    if (ilerleme < 1) requestAnimationFrame(adim);
+    else el.textContent = hedef;
+  }
+  requestAnimationFrame(adim);
+}
+
 function surumBilgisi() {
   fetch("https://api.github.com/repos/ArdaEkiz0/e-kesinti-otomasyon/releases/latest")
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (v) {
       if (!v) return;
       if (v.tag_name) {
-        document.querySelector(".canli-surum .v").textContent = v.tag_name;
+        document.getElementById("ist-surum").textContent = v.tag_name;
         var etiket = document.querySelector(".v-etiketi");
         if (etiket) etiket.textContent = " (v" + v.tag_name + ")";
+        var etiketSon = document.querySelector(".v-etiketi-son");
+        if (etiketSon) etiketSon.textContent = " (v" + v.tag_name + ")";
       }
       if (v.published_at) {
-        document.querySelector(".canli-surum .tarih").textContent =
+        document.getElementById("ist-tarih").textContent =
           new Date(v.published_at).toLocaleDateString(document.documentElement.lang === "en" ? "en-GB" : "tr-TR");
       }
       var indirme = (v.assets || []).reduce(function (toplam, a) { return toplam + (a.download_count || 0); }, 0);
-      if (indirme > 0) document.querySelector(".canli-surum .sayac").textContent = indirme;
+      sayacAnimasyon(document.getElementById("ist-indirme"), indirme);
     })
     .catch(function () {});
 }
@@ -1153,7 +1246,41 @@ yukleButon.addEventListener("click", function () {
   if (yukleOlayi) yukleOlayi.prompt();
 });
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js").catch(function () {});
+  navigator.serviceWorker.register("sw.js")
+    .then(function (kayit) {
+      kayit.addEventListener("updatefound", function () {
+        var yeni = kayit.installing;
+        if (!yeni) return;
+        yeni.addEventListener("statechange", function () {
+          if (yeni.state === "installed" && navigator.serviceWorker.controller) {
+            var banner = document.getElementById("guncelleme-banner");
+            if (banner) banner.classList.add("gorunur");
+          }
+        });
+      });
+    })
+    .catch(function () {});
+  var yenileniyor = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (yenileniyor) return;
+    yenileniyor = true;
+    window.location.reload();
+  });
+  var guncellemeYenile = document.getElementById("guncelleme-yenile");
+  if (guncellemeYenile) {
+    guncellemeYenile.addEventListener("click", function () {
+      navigator.serviceWorker.ready.then(function (kayit) {
+        if (kayit.active) kayit.active.postMessage({ tip: "atla" });
+      });
+    });
+  }
+  var guncellemeKapat = document.getElementById("guncelleme-kapat");
+  if (guncellemeKapat) {
+    guncellemeKapat.addEventListener("click", function () {
+      var banner = document.getElementById("guncelleme-banner");
+      if (banner) banner.classList.remove("gorunur");
+    });
+  }
 }
 
 // ---------- Kaydırma ilerlemesi, nav gölgesi, yukarı çık ----------
@@ -1201,7 +1328,7 @@ function kutlamaGoster() {
   kutlama.classList.add("gorunur");
   kutlamaZamanlayici = setTimeout(function () { kutlama.classList.remove("gorunur"); }, 8000);
 }
-document.querySelectorAll("#indir-buton, #nav-indir").forEach(function (el) {
+document.querySelectorAll("#indir-buton, #nav-indir, #indir-buton-son").forEach(function (el) {
   el.addEventListener("click", kutlamaGoster);
 });
 var kutlamaKapat = document.getElementById("kutlama-kapat");
@@ -1310,6 +1437,12 @@ karsilastirmalar.forEach(function (k) { barGozlemci.observe(k); });
 </script>
 
 <button id="yukari-buton" title="↑">↑</button>
+
+<div id="guncelleme-banner" role="status" aria-live="polite">
+  <span data-i18n="guncelleme-metin">⚡ Yeni sürüm hazır!</span>
+  <button id="guncelleme-yenile" data-i18n="guncelleme-yenile">🔄 Yenile</button>
+  <button id="guncelleme-kapat" aria-label="Kapat">✕</button>
+</div>
 
 <div id="kutlama" role="status" aria-live="polite">
   <button class="k-kapat" id="kutlama-kapat" aria-label="Kapat">✕</button>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGK Tarımsal Kesinti Botu</title>
+<style>
+  :root {
+    --yesil: #22c55e;
+    --mavi: #3b82f6;
+    --turkuaz: #06b6d4;
+    --mor: #a855f7;
+    --sari: #eab308;
+    --arka: #0f172a;
+    --kart: #1e293b;
+    --metin: #e2e8f0;
+    --soluk: #94a3b8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--arka);
+    color: var(--metin);
+    line-height: 1.6;
+  }
+  .kapsayici { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+    border-bottom: 1px solid #334155;
+    padding: 60px 0 40px;
+    text-align: center;
+  }
+  .rozet {
+    display: inline-block;
+    background: var(--kart);
+    border: 1px solid #334155;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 14px;
+    color: var(--soluk);
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: 42px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--yesil), var(--turkuaz));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .alt-baslik { color: var(--soluk); font-size: 18px; margin: 14px 0 28px; }
+  .indir {
+    display: inline-block;
+    background: var(--yesil);
+    color: #052e16;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 14px 36px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .indir:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
+  .indir-notu { display: block; color: var(--soluk); font-size: 13px; margin-top: 12px; }
+  section { padding: 40px 0; border-bottom: 1px solid #1e293b; }
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--metin);
+  }
+  h2::before { content: "🌾 "; }
+  .ozellikler {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  .kart {
+    background: var(--kart);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .kart .sembol { font-size: 26px; }
+  .kart h3 { font-size: 17px; margin: 10px 0 6px; }
+  .kart p { color: var(--soluk); font-size: 14px; }
+  .adimlar { counter-reset: adim; }
+  .adim {
+    display: flex;
+    gap: 16px;
+    background: var(--kart);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    counter-increment: adim;
+  }
+  .adim .numara {
+    flex: 0 0 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--mavi), var(--mor));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .adim p { color: var(--soluk); font-size: 15px; }
+  .adim strong { color: var(--metin); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 14px; font-size: 14px; }
+  th { background: var(--kart); color: var(--turkuaz); }
+  tr:nth-child(even) td { background: #172033; }
+  td { border-bottom: 1px solid #1e293b; }
+  .sorun { background: var(--kart); border-left: 4px solid var(--sari); padding: 14px 18px; border-radius: 8px; margin-bottom: 12px; }
+  .sorun strong { color: var(--sari); }
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--soluk);
+    font-size: 14px;
+  }
+  footer a { color: var(--turkuaz); text-decoration: none; }
+  @media (max-width: 600px) {
+    h1 { font-size: 32px; }
+    .ozellikler { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kapsayici">
+    <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows</span>
+    <h1>SGK Tarımsal Kesinti Botu</h1>
+    <p class="alt-baslik">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
+    <a class="indir" href="https://github.com/ArdaEkiz0/sgk-bot/releases/latest/download/KURULUM.exe">⬇️ KURULUM.exe'yi İndir</a>
+    <span class="indir-notu">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
+  </div>
+</header>
+
+<section>
+  <div class="kapsayici">
+    <h2>Özellikler</h2>
+    <div class="ozellikler">
+      <div class="kart"><div class="sembol">⚡</div><h3>Tek Tık Kurulum</h3><p>KURULUM.exe eksik her şeyi kendisi kurar; kurulum sonrası bot hazırdır.</p></div>
+      <div class="kart"><div class="sembol">🔄</div><h3>Otomatik Güncelleme</h3><p>Yeni sürüm çıkınca bot uyarır, kurulum aracı kendini günceller.</p></div>
+      <div class="kart"><div class="sembol">📊</div><h3>Renkli Arayüz</h3><p>Her kayıt için ilerleme çubuğu, yeşil/kırmızı durum mesajları ve işlem özeti.</p></div>
+      <div class="kart"><div class="sembol">🔁</div><h3>Hata Tekrar Deneme</h3><p>Hatalı kayıtlar 3 kez denenir — site yavaş olduğunda başarı oranı artar.</p></div>
+      <div class="kart"><div class="sembol">🔔</div><h3>Windows Bildirimi</h3><p>İşlem bitince ekrana bakmadan bildirimle sonucu öğrenirsiniz.</p></div>
+      <div class="kart"><div class="sembol">📁</div><h3>Her Excel'i Kullan</h3><p>Dosya adı ne olursa olsun seçin ya da başlatıcının üzerine sürükleyin.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="kapsayici">
+    <h2>Nasıl Kullanılır?</h2>
+    <div class="adimlar">
+      <div class="adim"><div class="numara">1</div><div><strong>KURULUM.exe'yi çalıştırın.</strong><p>Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.</p></div></div>
+      <div class="adim"><div class="numara">2</div><div><strong>Excel dosyasını doldurun.</strong><p>Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).</p></div></div>
+      <div class="adim"><div class="numara">3</div><div><strong>BOT_BAŞLAT.bat'a çift tıklayın</strong><p>Ya da Excel dosyanızı doğrudan BOT_BAŞLAT.bat üzerine sürükleyip bırakın.</p></div></div>
+      <div class="adim"><div class="numara">4</div><div><strong>Bot işlesin, siz bekleyin.</strong><p>Kayıtlar tek tek işlenir; bitince Windows bildirimi gelir.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="kapsayici">
+    <h2>Excel Formatı</h2>
+    <table>
+      <tr><th>Sütun</th><th>İçerik</th></tr>
+      <tr><td><strong>Ünvan</strong></td><td>Üretici adı (zorunlu değil)</td></tr>
+      <tr><td><strong>TC Kimlik No</strong></td><td>11 haneli TC kimlik numarası</td></tr>
+      <tr><td><strong>Matrah</strong></td><td>Alım bedeli (örn: <code>13014,09</code>)</td></tr>
+      <tr><td><strong>Bağ-Kur</strong></td><td>Kesinti tutarı (hesaplanır)</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="kapsayici">
+    <h2>Sık Karşılaşılan Sorunlar</h2>
+    <div class="sorun"><strong>Bot açılmıyor / sürücü hatası</strong><p>Chrome güncellenmiş olabilir — KURULUM.exe'yi yeniden çalıştırın.</p></div>
+    <div class="sorun"><strong>Kuruş yanlış yazılıyor (13014,90)</strong><p>Eski sürüm sorunudur; güncel sürümde kuruş her zaman 2 haneli yazılır.</p></div>
+    <div class="sorun"><strong>Sayfa elemanı bulunamadı</strong><p>SGK sitesi değişmiş olabilir — yeni sürümü kontrol edin.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p>👨‍💻 Geliştirici: <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot/releases">Sürümler</a></p>
+  <p style="margin-top:8px;font-size:12px;">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
+</footer>
+
+</body>
+</html>

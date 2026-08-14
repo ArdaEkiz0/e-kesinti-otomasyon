@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.0.2"  # GitHub release etiketiyle karşılaştırılır
+BOT_SURUM = "1.0.3"  # GitHub release etiketiyle karşılaştırılır
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -198,6 +198,7 @@ class TestSurucu:
 class SGKBot:
     def __init__(self, surucu=None, test_modu=False):
         self.test_modu = test_modu
+        self.kooperatif_adi = None
         if surucu is not None:
             self.driver = surucu
         else:
@@ -263,8 +264,27 @@ class SGKBot:
         last_day = first_day - timedelta(days=1)
         return last_day.month, last_day.year
 
+    @staticmethod
+    def _kooperatif_adi_oku(file_path):
+        """Excel'in ilk satırındaki (A1) kooperatif adını okur. Bulunamazsa None döner."""
+        try:
+            import openpyxl
+            wb = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
+            ilk_sayfa = wb[wb.sheetnames[0]]
+            deger = ilk_sayfa.cell(row=1, column=1).value
+            wb.close()
+            if deger and str(deger).strip():
+                ad = str(deger).strip()
+                # Şablon başlığı gibi görünen değerleri kooperatif adı sanma
+                if ad not in ("Ünvan", "Unvan", "TC Kimlik No", "Matrah", "Bağ-Kur", "Bağkur"):
+                    return ad
+        except Exception:
+            pass
+        return None
+
     def load_excel_data(self, file_path):
         try:
+            self.kooperatif_adi = self._kooperatif_adi_oku(file_path)
             df = pd.read_excel(file_path)
             data = []
             for idx, row in df.iterrows():
@@ -276,6 +296,8 @@ class SGKBot:
                         data.append({'tc': tc_no, 'matrah': matrah, 'kesinti': kesinti})
                     except:
                         continue
+            if self.kooperatif_adi:
+                print(f"   🏢 Kooperatif: {renkli(self.kooperatif_adi, Renk.SARI, kalin=True)}")
             print(f"✅ Excel'den {len(data)} kayıt okundu")
             return data
         except Exception as e:

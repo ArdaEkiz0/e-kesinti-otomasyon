@@ -1,5 +1,6 @@
-"""KURULUM - SGK Bot Otomatik Kurulum Aracı (v2.0)
+"""KURULUM - SGK Bot Otomatik Kurulum Aracı (v2.1)
 Bu program bilgisayardaki gereksinimleri kontrol eder, eksikleri otomatik kurar:
+  0. GitHub'da yeni sürüm olup olmadığını kontrol eder (varsa kendini günceller)
   1. Python  (yoksa indirir + sessiz kurar)
   2. Gerekli Python paketleri (selenium, pandas, openpyxl, webdriver-manager)
   3. Google Chrome (yoksa indirir + kurar)
@@ -13,6 +14,7 @@ import re
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -43,6 +45,10 @@ BASE_DIR = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else
 PYTHON_INDIR = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe"
 CHROME_INDIR = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
 PAKETLER = ["selenium", "pandas", "openpyxl", "webdriver-manager"]
+
+SURUM = "1.0.0"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
+GITHUB_REPO = "ArdaEkiz0/sgk-bot"
+GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # ---------- Renkli çıktı yardımcıları ----------
 
@@ -106,6 +112,81 @@ def indir(url, hedef):
             if toplam:
                 print(f"\r   %3d%%" % (yazilan * 100 // toplam), end="", flush=True)
     print("")
+
+
+# ---------- 0. Güncelleme kontrolü ----------
+
+def surum_karsilastir(a, b):
+    """Sürüm dizgelerini karşılaştırır: a > b ise 1, a == b ise 0, a < b ise -1."""
+    def anahtar(s):
+        return [int(x) for x in re.findall(r"\d+", s)]
+    ka, kb = anahtar(a), anahtar(b)
+    uzunluk = max(len(ka), len(kb))
+    ka += [0] * (uzunluk - len(ka))
+    kb += [0] * (uzunluk - len(kb))
+    return (ka > kb) - (ka < kb)
+
+
+def guncelleme_kontrol():
+    """GitHub'daki en son sürümü kontrol eder.
+
+    Yeni sürüm varsa indirme adresini, yoksa None döner."""
+    try:
+        istek = urllib.request.Request(
+            GITHUB_API, headers={"User-Agent": "KURULUM", "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(istek, timeout=15) as r:
+            veri = json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            yaz("   ℹ️  Henüz yayınlanmış sürüm yok — en güncel sürümdesiniz.", Renk.YESIL)
+        else:
+            yaz(f"   ⚠️  Güncelleme kontrol edilemedi (HTTP {e.code}).", Renk.SARI)
+        return None
+    except Exception as e:
+        yaz(f"   ⚠️  Güncelleme kontrol edilemedi: {e}", Renk.SARI)
+        return None
+
+    uzak_surum = str(veri.get("tag_name", "")).lstrip("v")
+    indirme = None
+    for a in veri.get("assets", []):
+        if a.get("name", "").lower() == "kurulum.exe":
+            indirme = a.get("browser_download_url")
+    if not uzak_surum or not indirme:
+        yaz("   ⚠️  Sürüm bilgisi eksik, güncelleme kontrol edilemedi.", Renk.SARI)
+        return None
+
+    if surum_karsilastir(SURUM, uzak_surum) >= 0:
+        yaz(f"   ✅ En güncel sürümdesiniz (v{SURUM}).", Renk.YESIL)
+        return None
+
+    yaz(f"   🔄 Yeni sürüm bulundu: v{SURUM} -> v{uzak_surum}", Renk.SARI, kalin=True)
+    return indirme
+
+
+def guncelle_uygula(url):
+    """Yeni KURULUM.exe'yi indirir ve eski dosyayla değiştirir."""
+    if not getattr(sys, "frozen", False):
+        yaz("   📄 Kaynaktan çalışıyorsunuz — güncel dosyaları (KURULUM.py ve KURULUM.exe)"
+            " elle değiştirmeniz gerekir.", Renk.SARI)
+        return
+    eski = os.path.abspath(sys.argv[0])
+    klasor = os.path.dirname(eski)
+    yeni = os.path.join(klasor, "KURULUM_yeni.exe")
+    indir(url, yeni)
+    yaz(f"   ✅ Yeni sürüm indirildi: {yeni}", Renk.YESIL)
+    bat = os.path.join(klasor, "_guncelle.bat")
+    with open(bat, "w", encoding="utf-8") as f:
+        f.write(
+            "@echo off\r\n"
+            "timeout /t 3 /nobreak >nul\r\n"
+            f'del "{eski}"\r\n'
+            f'ren "{yeni}" "KURULUM.exe"\r\n'
+            'del "%~f0"\r\n'
+            f'start "" "{os.path.join(klasor, "KURULUM.exe")}"\r\n'
+        )
+    yaz("   🚀 Güncelleme uygulanıyor, yeni sürüm açılıyor...", Renk.TURKUAZ)
+    os.startfile(bat)
+    sys.exit(0)
 
 
 # ---------- 1. Python kontrolü ve kurulumu ----------
@@ -348,6 +429,15 @@ def botu_dogrula(py):
 
 def ana():
     baslik()
+    yaz("\n🔄 GÜNCELLEME KONTROLÜ", Renk.TURKUAZ, kalin=True)
+    yeni_url = guncelleme_kontrol()
+    if yeni_url:
+        try:
+            cevap = input("   Güncellemeyi şimdi uygula? (E/H): ").strip().lower()
+        except EOFError:
+            cevap = "h"
+        if cevap in ("e", "evet", ""):
+            guncelle_uygula(yeni_url)
     try:
         py = python_hazirla()
         paketleri_kur(py[0])

@@ -7,9 +7,9 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 ![Platform](https://img.shields.io/badge/Platform-Windows-green)
 ![Otomasyon](https://img.shields.io/badge/Otomasyon-Selenium-orange?logo=selenium)
 ![Lisans](https://img.shields.io/badge/Lisans-MIT-brightgreen)
-[![Sürüm](https://img.shields.io/github/v/release/ArdaEkiz0/sgk-bot?color=purple&label=S%C3%BCr%C3%BCm)](https://github.com/ArdaEkiz0/sgk-bot/releases)
-[![Derleme](https://github.com/ArdaEkiz0/sgk-bot/actions/workflows/release.yml/badge.svg)](https://github.com/ArdaEkiz0/sgk-bot/actions)
-[![Tanıtım Sayfası](https://img.shields.io/badge/Tan%C4%B1t%C4%B1m-Site-blueviolet)](https://ardaekiz0.github.io/sgk-bot/)
+[![Sürüm](https://img.shields.io/github/v/release/ArdaEkiz0/e-kesinti-otomasyon?color=purple&label=S%C3%BCr%C3%BCm)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases)
+[![Derleme](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/actions/workflows/release.yml/badge.svg)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/actions)
+[![Tanıtım Sayfası](https://img.shields.io/badge/Tan%C4%B1t%C4%B1m-Site-blueviolet)](https://ardaekiz0.github.io/e-kesinti-otomasyon/)
 
 ---
 
@@ -41,8 +41,8 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 ### Seçenek 2: Kaynaktan çalıştırma
 
 ```bat
-git clone https://github.com/ArdaEkiz0/sgk-bot.git
-cd sgk-bot
+git clone https://github.com/ArdaEkiz0/e-kesinti-otomasyon.git
+cd e-kesinti-otomasyon
 python KURULUM.py
 ```
 

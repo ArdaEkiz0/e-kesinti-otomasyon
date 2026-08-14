@@ -9,7 +9,7 @@
 <meta property="og:title" content="SGK Tarımsal Kesinti Botu">
 <meta property="og:description" content="Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin. Tek tıkla kurulum, otomatik güncelleme, ücretsiz.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://ardaekiz0.github.io/sgk-bot/">
+<meta property="og:url" content="https://ardaekiz0.github.io/e-kesinti-otomasyon/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
 <style>
@@ -247,9 +247,9 @@
       <a href="#ozellikler" data-i18n="nav-ozellikler">Özellikler</a>
       <a href="#kullanim" data-i18n="nav-kullanim">Kullanım</a>
       <a href="#sss" data-i18n="nav-sss">SSS</a>
-      <a href="https://github.com/ArdaEkiz0/sgk-bot/releases" data-i18n="nav-surumler">Sürümler</a>
+      <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="nav-surumler">Sürümler</a>
     </div>
-    <a class="nav-buton" href="https://github.com/ArdaEkiz0/sgk-bot/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
+    <a class="nav-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
     <button id="dil-buton" title="English">EN</button>
   </div>
 </nav>
@@ -259,7 +259,7 @@
     <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows</span>
     <h1>SGK Tarımsal Kesinti Botu</h1>
     <p class="alt-baslik" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
-    <a class="indir" href="https://github.com/ArdaEkiz0/sgk-bot/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir</a>
+    <a class="indir" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir</a>
     <span class="indir-notu" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
     <div class="canli-surum">
       <span data-i18n="canli-etiket">En son sürüm:</span>
@@ -322,7 +322,7 @@
 </section>
 
 <footer>
-  <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot/releases" data-i18n="footer-surumler">Sürümler</a></p>
+  <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="footer-surumler">Sürümler</a></p>
   <p style="margin-top:8px;font-size:12px;" data-i18n="footer-not">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
 </footer>
 
@@ -433,7 +433,7 @@ document.getElementById("dil-buton").addEventListener("click", function () {
 
 // ---------- Canlı sürüm + indirme sayacı ----------
 function surumBilgisi() {
-  fetch("https://api.github.com/repos/ArdaEkiz0/sgk-bot/releases/latest")
+  fetch("https://api.github.com/repos/ArdaEkiz0/e-kesinti-otomasyon/releases/latest")
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (v) {
       if (!v) return;

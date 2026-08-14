@@ -17,8 +17,8 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.0.1"  # GitHub release etiketiyle karşılaştırılır
-GITHUB_REPO = "ArdaEkiz0/sgk-bot"
+BOT_SURUM = "1.0.2"  # GitHub release etiketiyle karşılaştırılır
+GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # Türkçe karakterler ve emojiler hangi konsolda olursa olsun yazılabilsin

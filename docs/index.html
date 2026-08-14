@@ -208,6 +208,40 @@
   .kart h3 { font-size: 17px; margin: 10px 0 6px; }
   .kart p { color: var(--soluk); font-size: 14px; }
 
+  /* ---------- Zaman tasarrufu (hesaplayıcı + karşılaştırma) ---------- */
+  .zaman-giris, .guven-giris { color: var(--soluk); font-size: 15px; margin-bottom: 26px; }
+  .karsilastirma { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+  .karsilastirma-satir { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .karsilastirma-etiket { font-size: 15px; font-weight: 600; white-space: nowrap; }
+  .karsilastirma-bar-arka { background: var(--arka); border: 1px solid var(--cizgi); border-radius: 10px; height: 34px; overflow: hidden; position: relative; }
+  .karsilastirma-bar { height: 100%; width: 0; transition: width 1.2s ease; border-radius: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; box-sizing: border-box; }
+  .karsilastirma-bar.kirmizi { background: linear-gradient(90deg, #7f1d1d, #ef4444); }
+  .karsilastirma-bar.yesil { background: linear-gradient(90deg, #14532d, #22c55e); }
+  .karsilastirma-sure { color: #fff; font-size: 13px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  .karsilastirma-not { color: var(--soluk); font-size: 13px; margin-top: 6px; }
+
+  .hesap { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 22px; }
+  .hesap h3 { font-size: 18px; margin-bottom: 16px; }
+  .hesap-satir { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .hesap-satir input[type="range"] { flex: 1; min-width: 200px; accent-color: var(--turkuaz); }
+  .hesap-satir strong { font-size: 18px; color: var(--turkuaz); min-width: 50px; text-align: right; }
+  .hesap-kutular { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .hesap-kutu { border-radius: 12px; padding: 16px; border: 1px solid var(--cizgi); text-align: center; }
+  .hesap-kutu.elle { background: rgba(239, 68, 68, 0.08); }
+  .hesap-kutu.bot { background: rgba(34, 197, 94, 0.08); }
+  .hesap-kutu.tasarruf { background: rgba(20, 184, 166, 0.08); }
+  .hesap-kutu h4 { font-size: 14px; margin: 8px 0; }
+  .hesap-kutu .sonuc { font-size: 22px; font-weight: 700; }
+  .hesap-kutu.elle .sonuc { color: #ef4444; }
+  .hesap-kutu.bot .sonuc { color: #22c55e; }
+  .hesap-kutu.tasarruf .sonuc { color: var(--turkuaz); }
+
+  /* ---------- Güven ve gizlilik ---------- */
+  .guven-kutular { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .guven-kutu { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 20px; transition: background 0.3s; }
+  .guven-kutu h3 { font-size: 17px; margin: 10px 0 6px; }
+  .guven-kutu p { color: var(--soluk); font-size: 14px; }
+
   .adimlar { counter-reset: adim; }
   .adim {
     display: flex;
@@ -428,6 +462,39 @@
   </div>
 </section>
 
+<section id="zaman">
+  <div class="kapsayici">
+    <h2 data-i18n="bolum-zaman">Ne Kadar Zaman Kazandırır?</h2>
+    <p class="zaman-giris" data-i18n="zaman-metin">500 kayıtlık bir listede bot, elle girişin ~%75'ini size geri verir. İki katmanı da kendiniz görün:</p>
+
+    <div class="karsilastirma animasyon">
+      <div class="karsilastirma-satir">
+        <div class="karsilastirma-etiket">✍️ <span data-i18n="karsilastirma-elle">Elle giriş</span></div>
+        <div class="karsilastirma-bar-arka"><div class="karsilastirma-bar kirmizi" data-genislik="100"><span class="karsilastirma-sure">≈ 12.5 saat</span></div></div>
+      </div>
+      <div class="karsilastirma-satir">
+        <div class="karsilastirma-etiket">🤖 <span data-i18n="karsilastirma-bot">Bot ile</span></div>
+        <div class="karsilastirma-bar-arka"><div class="karsilastirma-bar yesil" data-genislik="22"><span class="karsilastirma-sure">≈ 2.8 saat</span></div></div>
+      </div>
+      <p class="karsilastirma-not" data-i18n="karsilastirma-not">500 kayıt için: elle yaklaşık 1.5 dk/kayıt, bot yaklaşık 20 sn/kayıt (otomatik tekrar deneme dahil).</p>
+    </div>
+
+    <div class="hesap animasyon">
+      <h3 data-i18n="hesap-baslik">Kendi listenizi hesaplayın</h3>
+      <div class="hesap-satir">
+        <span data-i18n="hesap-etiket">Kayıt sayısı:</span>
+        <input type="range" id="kayit-sayisi" min="10" max="2000" step="10" value="500" aria-label="Kayıt sayısı">
+        <strong id="kayit-goster">500</strong>
+      </div>
+      <div class="hesap-kutular">
+        <div class="hesap-kutu elle"><div class="sembol">✍️</div><h4 data-i18n="hesap-elle">Elle giriş</h4><div class="sonuc" id="elle-sure">—</div></div>
+        <div class="hesap-kutu bot"><div class="sembol">🤖</div><h4 data-i18n="hesap-bot">Bot ile</h4><div class="sonuc" id="bot-sure">—</div></div>
+        <div class="hesap-kutu tasarruf"><div class="sembol">🎁</div><h4 data-i18n="hesap-tasarruf">Kazandığın</h4><div class="sonuc" id="tasarruf">—</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="uygulama">
   <div class="kapsayici">
     <h2 data-i18n="bolum-uygulama">Uygulama Nasıl Görünüyor?</h2>
@@ -494,6 +561,19 @@
   </div>
 </section>
 
+<section id="guven">
+  <div class="kapsayici">
+    <h2 data-i18n="bolum-guven">Güven ve Gizlilik</h2>
+    <p class="guven-giris" data-i18n="guven-metin">Tarımsal kesinti girişi hassas verilerle çalışır. Bu yüzden bot şu ilkelerle tasarlandı:</p>
+    <div class="guven-kutular">
+      <div class="guven-kutu animasyon"><div class="sembol">🔒</div><h3 data-i18n="guven1-baslik">Verilerin bilgisayarında kalır</h3><p data-i18n="guven1-metin">TC kimlik numaraları ve matrah bilgileri yalnızca sizin bilgisayarınızda işlenir; hiçbir sunucuya veya üçüncü tarafa gönderilmez.</p></div>
+      <div class="guven-kutu animasyon"><div class="sembol">🔍</div><h3 data-i18n="guven2-baslik">Açık kaynak kod</h3><p data-i18n="guven2-metin">Kodun tamamı GitHub'da herkesin incelemesine açıktır; istediğiniz uzmana kendinize doğrulatabilirsiniz.</p></div>
+      <div class="guven-kutu animasyon"><div class="sembol">📦</div><h3 data-i18n="guven3-baslik">Yalnızca resmi kaynaklar</h3><p data-i18n="guven3-metin">Kurulum aracı indirmeleri yalnızca resmi adreslerden yapar (python.org, Google, GitHub); başka hiçbir yerden yazılım çekmez.</p></div>
+      <div class="guven-kutu animasyon"><div class="sembol">💚</div><h3 data-i18n="guven4-baslik">Tamamen ücretsiz</h3><p data-i18n="guven4-metin">Sürüm, güncelleme veya özellik için asla ücret istenmez; bot kendini ücretsiz günceller.</p></div>
+    </div>
+  </div>
+</section>
+
 <section id="kullanim">
   <div class="kapsayici">
     <h2 data-i18n="bolum-kullanim">Nasıl Kullanılır?</h2>
@@ -533,6 +613,8 @@
     <details class="sss animasyon"><summary><span data-i18n="sss4-soru">Güncellemeler ücretsiz mi?</span></summary><p data-i18n="sss4-cevap">Evet. Uygulama tamamen ücretsizdir; tüm sürümler ve güncellemeler GitHub'dan otomatik indirilir.</p></details>
     <details class="sss animasyon"><summary><span data-i18n="sss5-soru">İnternet bağlantım zayıf, bot yine de çalışır mı?</span></summary><p data-i18n="sss5-cevap">Çalışır. Hata olan kayıtlar 3 kez otomatik denenir; internet kesilirse hatalı kayıtlar ekranda ve özette listelenir.</p></details>
     <details class="sss animasyon"><summary><span data-i18n="sss6-soru">Kaç kaydı aynı anda işleyebilirim?</span></summary><p data-i18n="sss6-cevap">Sınır yoktur. Excel'deki tüm satırlar sırayla işlenir; ilerleme çubuğundan durumu takip edebilirsiniz.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss7-soru">Windows "Bilinmeyen yayımcı" uyarısı veriyor, sorun mu var?</span></summary><p data-i18n="sss7-cevap">Sorun yok — bu, her imzasız programda görünen normal bir Windows korumasıdır. KURULUM.exe yalnızca bu sayfadaki indir butonundan veya GitHub Releases'ten iner. Uyarıda "Diğer bilgiler → Yine de çalıştır" deyip devam edebilirsiniz.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss8-soru">TC kimlik numaralarım güvende mi?</span></summary><p data-i18n="sss8-cevap">Güvende. Bot verileri yalnızca sizin bilgisayarınızda işler; hiçbir sunucuya göndermez. Kodun tamamı açık kaynaktır ve incelenebilir — detaylar "Güven ve Gizlilik" bölümünde.</p></details>
   </div>
 </section>
 
@@ -574,8 +656,15 @@ var DILLER = {
     "oz4-baslik": "Hata Tekrar Deneme", "oz4-metin": "Hatalı kayıtlar 3 kez denenir — site yavaş olduğunda başarı oranı artar.",
     "oz5-baslik": "Windows Bildirimi", "oz5-metin": "İşlem bitince ekrana bakmadan bildirimle sonucu öğrenirsiniz.",
     "oz6-baslik": "Her Excel'i Kullan", "oz6-metin": "Dosya adı ne olursa olsun seçin ya da başlatıcının üzerine sürükleyin.",
-    "bolum-uygulama": "Uygulama Nasıl Görünüyor?",
-    "terminal-ad": "SGK Bot — Test Modu (gerçek çıktı)",
+    "bolum-zaman": "Ne Kadar Zaman Kazandırır?", "zaman-metin": "500 kayıtlık bir listede bot, elle girişin ~%75'ini size geri verir. İki katmanı da kendiniz görün:",
+    "karsilastirma-elle": "Elle giriş", "karsilastirma-bot": "Bot ile", "karsilastirma-not": "500 kayıt için: elle yaklaşık 1.5 dk/kayıt, bot yaklaşık 20 sn/kayıt (otomatik tekrar deneme dahil).",
+    "hesap-baslik": "Kendi listenizi hesaplayın", "hesap-etiket": "Kayıt sayısı:", "hesap-elle": "Elle giriş", "hesap-bot": "Bot ile", "hesap-tasarruf": "Kazandığın",
+    "bolum-guven": "Güven ve Gizlilik", "guven-metin": "Tarımsal kesinti girişi hassas verilerle çalışır. Bu yüzden bot şu ilkelerle tasarlandı:",
+    "guven1-baslik": "Verilerin bilgisayarında kalır", "guven1-metin": "TC kimlik numaraları ve matrah bilgileri yalnızca sizin bilgisayarınızda işlenir; hiçbir sunucuya veya üçüncü tarafa gönderilmez.",
+    "guven2-baslik": "Açık kaynak kod", "guven2-metin": "Kodun tamamı GitHub'da herkesin incelemesine açıktır; istediğiniz uzmana kendinize doğrulatabilirsiniz.",
+    "guven3-baslik": "Yalnızca resmi kaynaklar", "guven3-metin": "Kurulum aracı indirmeleri yalnızca resmi adreslerden yapar (python.org, Google, GitHub); başka hiçbir yerden yazılım çekmez.",
+    "guven4-baslik": "Tamamen ücretsiz", "guven4-metin": "Sürüm, güncelleme veya özellik için asla ücret istenmez; bot kendini ücretsiz günceller.",
+    "bolum-uygulama": "Uygulama Nasıl Görünüyor?",    "terminal-ad": "SGK Bot — Test Modu (gerçek çıktı)",
     "uygulama-metin": "↑ Bu, uygulamanın test modunun gerçek çıktısıdır — renkler, ilerleme çubuğu, hata tekrar deneme ve özet raporu görünüyor.",
     "bolum-kullanim": "Nasıl Kullanılır?",
     "adim1-baslik": "KURULUM.exe'yi çalıştırın.", "adim1-metin": "Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.",
@@ -599,6 +688,8 @@ var DILLER = {
     "sss4-soru": "Güncellemeler ücretsiz mi?", "sss4-cevap": "Evet. Uygulama tamamen ücretsizdir; tüm sürümler ve güncellemeler GitHub'dan otomatik indirilir.",
     "sss5-soru": "İnternet bağlantım zayıf, bot yine de çalışır mı?", "sss5-cevap": "Çalışır. Hata olan kayıtlar 3 kez otomatik denenir; internet kesilirse hatalı kayıtlar ekranda ve özette listelenir.",
     "sss6-soru": "Kaç kaydı aynı anda işleyebilirim?", "sss6-cevap": "Sınır yoktur. Excel'deki tüm satırlar sırayla işlenir; ilerleme çubuğundan durumu takip edebilirsiniz.",
+    "sss7-soru": "Windows \"Bilinmeyen yayımcı\" uyarısı veriyor, sorun mu var?", "sss7-cevap": "Sorun yok — bu, her imzasız programda görünen normal bir Windows korumasıdır. KURULUM.exe yalnızca bu sayfadaki indir butonundan veya GitHub Releases'ten iner. Uyarıda \"Diğer bilgiler → Yine de çalıştır\" deyip devam edebilirsiniz.",
+    "sss8-soru": "TC kimlik numaralarım güvende mi?", "sss8-cevap": "Güvende. Bot verileri yalnızca sizin bilgisayarınızda işler; hiçbir sunucuya göndermez. Kodun tamamı açık kaynaktır ve incelenebilir — detaylar \"Güven ve Gizlilik\" bölümünde.",
     "bolum-iletisim": "Geri Bildirim",
     "iletisim-metin": "Bir sorun mu buldun? Aklına bir öneri mi geldi? GitHub Issues üzerinden bildir — önceden doldurulmuş şablonla saniyeler sürer.",
     "iletisim-buton": "🐞 Hata Bildir",
@@ -631,6 +722,14 @@ var DILLER = {
     "oz4-baslik": "Auto Retry", "oz4-metin": "Failed records are retried 3 times — success rate increases when the site is slow.",
     "oz5-baslik": "Windows Notification", "oz5-metin": "Get notified when the job finishes — no need to watch the screen.",
     "oz6-baslik": "Use Any Excel File", "oz6-metin": "Pick any Excel file, whatever its name, or drag-and-drop it onto the launcher.",
+    "bolum-zaman": "How Much Time Does It Save?", "zaman-metin": "For a 500-record list, the bot gives back ~75% of the manual entry time. See both sides yourself:",
+    "karsilastirma-elle": "Manual entry", "karsilastirma-bot": "With the bot", "karsilastirma-not": "For 500 records: manual ~1.5 min/record, bot ~20 sec/record (including automatic retries).",
+    "hesap-baslik": "Calculate with your own list", "hesap-etiket": "Number of records:", "hesap-elle": "Manual entry", "hesap-bot": "With the bot", "hesap-tasarruf": "You save",
+    "bolum-guven": "Trust & Privacy", "guven-metin": "Agricultural deduction entry works with sensitive data. That's why the bot is built on these principles:",
+    "guven1-baslik": "Your data stays on your computer", "guven1-metin": "TC ID numbers and amounts are processed only on your computer; nothing is sent to any server or third party.",
+    "guven2-baslik": "Open-source code", "guven2-metin": "The full code is open for anyone to review on GitHub; you can have any expert verify it for you.",
+    "guven3-baslik": "Official sources only", "guven3-metin": "The installer downloads only from official addresses (python.org, Google, GitHub); it never fetches software from anywhere else.",
+    "guven4-baslik": "Completely free", "guven4-metin": "No charge is ever requested for versions, updates or features; the bot updates itself for free.",
     "bolum-uygulama": "What Does the App Look Like?",
     "terminal-ad": "SGK Bot — Test Mode (real output)",
     "uygulama-metin": "↑ This is the real output of the app's test mode — colors, progress bar, auto-retry and the summary report.",
@@ -656,6 +755,8 @@ var DILLER = {
     "sss4-soru": "Are updates free?", "sss4-cevap": "Yes. The app is completely free; all versions and updates are downloaded automatically from GitHub.",
     "sss5-soru": "My internet is weak, will the bot still work?", "sss5-cevap": "Yes. Failed records are retried 3 times automatically; if the connection drops, failures are listed on screen and in the summary.",
     "sss6-soru": "How many records can I process at once?", "sss6-cevap": "No limit. All rows in the Excel file are processed in order; track progress with the progress bar.",
+    "sss7-soru": "Windows shows an \"Unknown publisher\" warning, is something wrong?", "sss7-cevap": "Nothing is wrong — this is a normal Windows protection shown for every unsigned program. KURULUM.exe only comes from the download button on this page or GitHub Releases. Click \"More info → Run anyway\" and continue.",
+    "sss8-soru": "Are my TC ID numbers safe?", "sss8-cevap": "Yes. The bot only processes data on your own computer and never sends it to any server. The full code is open source and can be reviewed — see the \"Trust & Privacy\" section for details.",
     "bolum-iletisim": "Feedback",
     "iletisim-metin": "Found a bug? Have a suggestion? Report it via GitHub Issues — the pre-filled template takes seconds.",
     "iletisim-buton": "🐞 Report a Bug",
@@ -811,6 +912,41 @@ var gozlemci = new IntersectionObserver(function (girisler) {
   });
 }, { threshold: 0.15 });
 document.querySelectorAll(".animasyon").forEach(function (el) { gozlemci.observe(el); });
+
+// ---------- Zaman hesaplayıcı ----------
+function sureBiçimle(saniye) {
+  var saat = Math.floor(saniye / 3600);
+  var dk = Math.round((saniye % 3600) / 60);
+  if (saat < 1 && dk < 1) dk = 1;
+  return saat + " sa " + dk + " dk";
+}
+function hesapGuncelle() {
+  var kayit = parseInt(document.getElementById("kayit-sayisi").value, 10);
+  document.getElementById("kayit-goster").textContent = kayit;
+  var elleSn = kayit * 90;
+  var botSn = kayit * 20;
+  document.getElementById("elle-sure").textContent = sureBiçimle(elleSn);
+  document.getElementById("bot-sure").textContent = sureBiçimle(botSn);
+  document.getElementById("tasarruf").textContent = sureBiçimle(elleSn - botSn);
+}
+var kayitKaydirici = document.getElementById("kayit-sayisi");
+if (kayitKaydirici) {
+  kayitKaydirici.addEventListener("input", hesapGuncelle);
+  hesapGuncelle();
+}
+
+// ---------- Karşılaştırma çubukları ----------
+var barGozlemci = new IntersectionObserver(function (girisler) {
+  girisler.forEach(function (g) {
+    if (g.isIntersecting) {
+      var bar = g.target.querySelector(".karsilastirma-bar");
+      if (bar) bar.style.width = bar.getAttribute("data-genislik") + "%";
+      barGozlemci.unobserve(g.target);
+    }
+  });
+}, { threshold: 0.3 });
+var karsilastirmalar = document.querySelectorAll(".karsilastirma");
+karsilastirmalar.forEach(function (k) { barGozlemci.observe(k); });
 
 // ---------- Başlangıç ----------
 (function baslat() {

@@ -10,8 +10,10 @@
 <meta property="og:description" content="Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin. Tek tıkla kurulum, otomatik güncelleme, ücretsiz.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ardaekiz0.github.io/e-kesinti-otomasyon/">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+<meta property="og:image" content="https://ardaekiz0.github.io/e-kesinti-otomasyon/og-gorsel.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ardaekiz0.github.io/e-kesinti-otomasyon/og-gorsel.png">
+<link rel="icon" href="favicon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#0f172a">
@@ -475,6 +477,33 @@
   #yukari-buton.gorunur { opacity: 1; visibility: visible; transform: none; }
   #yukari-buton:hover { border-color: var(--turkuaz); }
 
+  /* ---------- Ekran görüntüleri galerisi ---------- */
+  .galeri { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 24px; }
+  .galeri figure { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 10px; transition: border-color 0.25s, transform 0.25s; }
+  .galeri figure:hover { border-color: var(--turkuaz); transform: translateY(-3px); }
+  .galeri img { width: 100%; border-radius: 10px; display: block; }
+  .galeri figcaption { color: var(--soluk); font-size: 13px; text-align: center; padding: 10px 4px 4px; }
+
+  /* ---------- QR ---------- */
+  .qr-kutu { margin-top: 34px; display: flex; align-items: center; gap: 22px; justify-content: center; flex-wrap: wrap; background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 20px; max-width: 560px; margin-left: auto; margin-right: auto; }
+  .qr-kutu img { border-radius: 10px; background: #fff; padding: 6px; }
+  .qr-kutu p { color: var(--soluk); font-size: 14px; max-width: 300px; text-align: left; }
+
+  /* ---------- Scrollspy ---------- */
+  .nav-linkler a.aktif { color: var(--turkuaz); }
+  .nav-linkler a.aktif::after { transform: scaleX(1); }
+
+  /* ---------- Yazdırılabilir kılavuz ---------- */
+  .print-yalniz { display: none; }
+  @media print {
+    nav, header, section, footer, #ilerleme-cubugu, #yukari-buton, #yukle-buton { display: none !important; }
+    .print-yalniz { display: block !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .print-yalniz h1 { font-size: 22px; margin-bottom: 6px; }
+    .print-yalniz h2 { font-size: 16px; margin: 18px 0 8px; }
+    .print-yalniz ol, .print-yalniz ul { margin: 0 0 14px 22px; font-size: 13.5px; line-height: 1.7; }
+  }
+
   /* ---------- Animasyonlar ---------- */
   .animasyon { opacity: 0; transform: translateY(26px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .animasyon.gorunur { opacity: 1; transform: none; }
@@ -657,6 +686,10 @@
 <span class="t-mor">Developer: Arda M. Ekiz</span></pre>
     </div>
     <p class="terminal-alt" data-i18n="uygulama-metin">↑ Bu, uygulamanın test modunun gerçek çıktısıdır — renkler, ilerleme çubuğu, hata tekrar deneme ve özet raporu görünüyor.</p>
+    <div class="galeri">
+      <figure class="animasyon"><a href="ekran-bot.png" target="_blank" rel="noopener"><img src="ekran-bot.png" alt="SGK Bot arayüzü" loading="lazy"></a><figcaption data-i18n="galeri-bot">🤖 Bot ekranı — ilerleme çubuğu, hata tekrar deneme, özet raporu</figcaption></figure>
+      <figure class="animasyon"><a href="ekran-kurulum.png" target="_blank" rel="noopener"><img src="ekran-kurulum.png" alt="Kurulum aracı" loading="lazy"></a><figcaption data-i18n="galeri-kurulum">🚀 Kurulum aracı — 5 adım + işlem bitti bildirimi</figcaption></figure>
+    </div>
   </div>
 </section>
 
@@ -681,6 +714,10 @@
       <div class="adim animasyon"><div class="numara">2</div><div><strong data-i18n="adim2-baslik">Excel dosyasını doldurun.</strong><p data-i18n="adim2-metin">Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).</p></div></div>
       <div class="adim animasyon"><div class="numara">3</div><div><strong data-i18n="adim3-baslik">BOT_BAŞLAT.bat'a çift tıklayın</strong><p data-i18n="adim3-metin">Ya da Excel dosyanızı doğrudan BOT_BAŞLAT.bat üzerine sürükleyip bırakın.</p></div></div>
       <div class="adim animasyon"><div class="numara">4</div><div><strong data-i18n="adim4-baslik">Bot işlesin, siz bekleyin.</strong><p data-i18n="adim4-metin">Kayıtlar tek tek işlenir; bitince Windows bildirimi gelir.</p></div></div>
+    </div>
+
+    <div style="text-align:center; margin-top:22px;">
+      <button id="yazdir-buton" class="hata-buton" data-i18n="yazdir-buton">🖨️ Kılavuzu Yazdır / PDF Kaydet</button>
     </div>
 
     <h2 style="margin-top:40px" data-i18n="bolum-format">Excel Formatı</h2>
@@ -722,6 +759,10 @@
     <h2 data-i18n="bolum-iletisim">Geri Bildirim</h2>
     <p data-i18n="iletisim-metin">Bir sorun mu buldun? Aklına bir öneri mi geldi? GitHub Issues üzerinden bildir — önceden doldurulmuş şablonla saniyeler sürer.</p>
     <a class="hata-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues/new?title=%F0%9F%90%9E%20Hata%20Bildirimi&body=%2A%2AUygulama%20s%C3%BCr%C3%BCm%C3%BC:%2A%2A%20%0A%0A%0A%2A%2AWindows%20s%C3%BCr%C3%BCm%C3%BC:%2A%2A%20%0A%0A%0A%2A%2ANe%20yapmaya%20%C3%A7al%C4%B1%C5%9Ft%C4%B1n%C4%B1z:%2A%2A%20%0A%0A%0A%2A%2ANe%20oldu%20%2F%20hata%20mesaj%C4%B1:%2A%2A%20%0A%0A%0A%2A%2AEkran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC:%2A%2A%20" data-i18n="iletisim-buton">🐞 Hata Bildir</a>
+    <div class="qr-kutu animasyon">
+      <img src="qr-site.png" alt="Site QR kodu" width="180" height="180" loading="lazy">
+      <p data-i18n="qr-metin">📱 Bu kodu yazdırıp kooperatif duyuru panosuna asabilirsiniz — üyeler telefonlarıyla okutup siteye saniyeler içinde ulaşır.</p>
+    </div>
   </div>
 </section>
 
@@ -729,6 +770,45 @@
   <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues" data-i18n="footer-issues">Sorunlar</a> &middot; <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases" data-i18n="footer-surumler">Sürümler</a></p>
   <p style="margin-top:8px;font-size:12px;" data-i18n="footer-not">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
 </footer>
+
+<div class="print-yalniz">
+  <h1>🌾 SGK Tarımsal Kesinti Botu — <span data-i18n="print-baslik">Kurulum ve Kullanım Kılavuzu</span></h1>
+  <p style="color:#475569;margin-bottom:16px;">https://ardaekiz0.github.io/e-kesinti-otomasyon/ &middot; github.com/ArdaEkiz0/e-kesinti-otomasyon</p>
+
+  <h2>1. <span data-i18n="print-kurulum">Kurulum</span></h2>
+  <ol>
+    <li data-i18n="print-adim1">Siteye girin ve <strong>KURULUM.exe</strong>'yi indirin.</li>
+    <li data-i18n="print-adim2">Windows "Bilinmeyen yayımcı" derse: <strong>Diğer bilgiler → Yine de çalıştır</strong>.</li>
+    <li data-i18n="print-adim3">Kurulum aracı Python, Chrome, chromedriver ve paketleri otomatik kurar.</li>
+    <li data-i18n="print-adim4">Masaüstünde <strong>şablon Excel dosyası</strong> ve <strong>BOT_BAŞLAT.bat</strong> oluşturulur.</li>
+  </ol>
+
+  <h2>2. <span data-i18n="print-doldur">Excel'i Doldurma</span></h2>
+  <table style="border-collapse:collapse;margin-bottom:16px;">
+    <tr style="background:#f1f5f9;"><th style="border:1px solid #cbd5e1;padding:8px;text-align:left;" data-i18n="tablo-sutun">Sütun</th><th style="border:1px solid #cbd5e1;padding:8px;text-align:left;" data-i18n="tablo-icerik">İçerik</th></tr>
+    <tr><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-unvan">Ünvan</td><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-unvan-aciklama">Üretici adı (zorunlu değil)</td></tr>
+    <tr><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-tc">TC Kimlik No</td><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-tc-aciklama">11 haneli TC kimlik numarası</td></tr>
+    <tr><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-matrah">Matrah</td><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-matrah-aciklama">Alım bedeli</td></tr>
+    <tr><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-bagkur">Bağ-Kur</td><td style="border:1px solid #cbd5e1;padding:8px;" data-i18n="tablo-bagkur-aciklama">Kesinti tutarı (hesaplanır)</td></tr>
+  </table>
+
+  <h2>3. <span data-i18n="print-calistir">Çalıştırma</span></h2>
+  <ol>
+    <li data-i18n="print-calistir1">Excel dosyasını doldurup kaydedin.</li>
+    <li data-i18n="print-calistir2"><strong>BOT_BAŞLAT.bat</strong>'a çift tıklayın ya da Excel'i üzerine sürükleyin.</li>
+    <li data-i18n="print-calistir3">Bot kayıtları işler; bitince <strong>Windows bildirimi</strong> gelir.</li>
+    <li data-i18n="print-calistir4">Hatalı kayıtlar 3 kez otomatik denenir ve özette listelenir.</li>
+  </ol>
+
+  <h2>4. <span data-i18n="print-sorun">Sorun mu Var?</span></h2>
+  <ul>
+    <li data-i18n="print-sorun1">"Sürücü hatası" → KURULUM.exe'yi yeniden çalıştırın.</li>
+    <li data-i18n="print-sorun2">Güncellemeler otomatiktir; sürüm uyarısı çıkarsa yeni KURULUM.exe'yi indirin.</li>
+    <li data-i18n="print-sorun3">Hata bildirimi: github.com/ArdaEkiz0/e-kesinti-otomasyon/issues</li>
+  </ul>
+
+  <p style="margin-top:20px;color:#475569;font-size:12px;" data-i18n="print-not">Verileriniz yalnızca kendi bilgisayarınızda işlenir; hiçbir sunucuya gönderilmez. Araç tamamen ücretsizdir.</p>
+</div>
 
 <script>
 var DILLER = {
@@ -765,6 +845,8 @@ var DILLER = {
     "guven4-baslik": "Tamamen ücretsiz", "guven4-metin": "Sürüm, güncelleme veya özellik için asla ücret istenmez; bot kendini ücretsiz günceller.",
     "bolum-uygulama": "Uygulama Nasıl Görünüyor?",    "terminal-ad": "SGK Bot — Test Modu (gerçek çıktı)",
     "uygulama-metin": "↑ Bu, uygulamanın test modunun gerçek çıktısıdır — renkler, ilerleme çubuğu, hata tekrar deneme ve özet raporu görünüyor.",
+    "galeri-bot": "🤖 Bot ekranı — ilerleme çubuğu, hata tekrar deneme, özet raporu", "galeri-kurulum": "🚀 Kurulum aracı — 5 adım + işlem bitti bildirimi",
+    "yazdir-buton": "🖨️ Kılavuzu Yazdır / PDF Kaydet",
     "bolum-kullanim": "Nasıl Kullanılır?",
     "adim1-baslik": "KURULUM.exe'yi çalıştırın.", "adim1-metin": "Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.",
     "adim2-baslik": "Excel dosyasını doldurun.", "adim2-metin": "Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).",
@@ -791,7 +873,12 @@ var DILLER = {
     "sss8-soru": "TC kimlik numaralarım güvende mi?", "sss8-cevap": "Güvende. Bot verileri yalnızca sizin bilgisayarınızda işler; hiçbir sunucuya göndermez. Kodun tamamı açık kaynaktır ve incelenebilir — detaylar \"Güven ve Gizlilik\" bölümünde.",
     "bolum-iletisim": "Geri Bildirim",
     "iletisim-metin": "Bir sorun mu buldun? Aklına bir öneri mi geldi? GitHub Issues üzerinden bildir — önceden doldurulmuş şablonla saniyeler sürer.",
-    "iletisim-buton": "🐞 Hata Bildir",
+    "iletisim-buton": "🐞 Hata Bildir", "qr-metin": "📱 Bu kodu yazdırıp kooperatif duyuru panosuna asabilirsiniz — üyeler telefonlarıyla okutup siteye saniyeler içinde ulaşır.",
+    "print-baslik": "Kurulum ve Kullanım Kılavuzu", "print-kurulum": "Kurulum", "print-doldur": "Excel'i Doldurma", "print-calistir": "Çalıştırma", "print-sorun": "Sorun mu Var?",
+    "print-adim1": "Siteye girin ve <strong>KURULUM.exe</strong>'yi indirin.", "print-adim2": "Windows \"Bilinmeyen yayımcı\" derse: <strong>Diğer bilgiler → Yine de çalıştır</strong>.", "print-adim3": "Kurulum aracı Python, Chrome, chromedriver ve paketleri otomatik kurar.", "print-adim4": "Masaüstünde <strong>şablon Excel dosyası</strong> ve <strong>BOT_BAŞLAT.bat</strong> oluşturulur.",
+    "print-calistir1": "Excel dosyasını doldurup kaydedin.", "print-calistir2": "<strong>BOT_BAŞLAT.bat</strong>'a çift tıklayın ya da Excel'i üzerine sürükleyin.", "print-calistir3": "Bot kayıtları işler; bitince <strong>Windows bildirimi</strong> gelir.", "print-calistir4": "Hatalı kayıtlar 3 kez otomatik denenir ve özette listelenir.",
+    "print-sorun1": "\"Sürücü hatası\" → KURULUM.exe'yi yeniden çalıştırın.", "print-sorun2": "Güncellemeler otomatiktir; sürüm uyarısı çıkarsa yeni KURULUM.exe'yi indirin.", "print-sorun3": "Hata bildirimi: github.com/ArdaEkiz0/e-kesinti-otomasyon/issues",
+    "print-not": "Verileriniz yalnızca kendi bilgisayarınızda işlenir; hiçbir sunucuya gönderilmez. Araç tamamen ücretsizdir.",
     "footer-gelistirici": "Geliştirici:",
     "footer-kaynak": "Kaynak Kod",
     "footer-issues": "Sorunlar",
@@ -832,6 +919,8 @@ var DILLER = {
     "bolum-uygulama": "What Does the App Look Like?",
     "terminal-ad": "SGK Bot — Test Mode (real output)",
     "uygulama-metin": "↑ This is the real output of the app's test mode — colors, progress bar, auto-retry and the summary report.",
+    "galeri-bot": "🤖 Bot screen — progress bar, auto-retry, summary report", "galeri-kurulum": "🚀 Installer — 5 steps + completion notification",
+    "yazdir-buton": "🖨️ Print Guide / Save as PDF",
     "bolum-kullanim": "How to Use?",
     "adim1-baslik": "Run KURULUM.exe.", "adim1-metin": "Python, Chrome and chromedriver are prepared; a template Excel file is created.",
     "adim2-baslik": "Fill in the Excel file.", "adim2-metin": "Enter Title, TC ID Number, Base Amount and Bağ-Kur columns (template included).",
@@ -858,7 +947,12 @@ var DILLER = {
     "sss8-soru": "Are my TC ID numbers safe?", "sss8-cevap": "Yes. The bot only processes data on your own computer and never sends it to any server. The full code is open source and can be reviewed — see the \"Trust & Privacy\" section for details.",
     "bolum-iletisim": "Feedback",
     "iletisim-metin": "Found a bug? Have a suggestion? Report it via GitHub Issues — the pre-filled template takes seconds.",
-    "iletisim-buton": "🐞 Report a Bug",
+    "iletisim-buton": "🐞 Report a Bug", "qr-metin": "📱 Print this code and pin it on the cooperative's notice board — members scan it with their phones and reach the site in seconds.",
+    "print-baslik": "Installation & Usage Guide", "print-kurulum": "Installation", "print-doldur": "Filling the Excel", "print-calistir": "Running", "print-sorun": "Having Issues?",
+    "print-adim1": "Go to the site and download <strong>KURULUM.exe</strong>.", "print-adim2": "If Windows says \"Unknown publisher\": <strong>More info → Run anyway</strong>.", "print-adim3": "The installer automatically sets up Python, Chrome, chromedriver and packages.", "print-adim4": "A <strong>template Excel file</strong> and <strong>BOT_BAŞLAT.bat</strong> are created on your desktop.",
+    "print-calistir1": "Fill in and save the Excel file.", "print-calistir2": "Double-click <strong>BOT_BAŞLAT.bat</strong>, or drag-and-drop the Excel onto it.", "print-calistir3": "The bot processes the records; a <strong>Windows notification</strong> appears when done.", "print-calistir4": "Failed records are retried 3 times automatically and listed in the summary.",
+    "print-sorun1": "\"Driver error\" → run KURULUM.exe again.", "print-sorun2": "Updates are automatic; if a version warning appears, download the new KURULUM.exe.", "print-sorun3": "Report issues: github.com/ArdaEkiz0/e-kesinti-otomasyon/issues",
+    "print-not": "Your data is processed only on your own computer; it is never sent to any server. The tool is completely free.",
     "footer-gelistirici": "Developer:",
     "footer-kaynak": "Source Code",
     "footer-issues": "Issues",
@@ -1005,17 +1099,30 @@ if ("serviceWorker" in navigator) {
 var ilerlemeCubugu = document.getElementById("ilerleme-cubugu");
 var navCubugu = document.querySelector("nav");
 var yukariButon = document.getElementById("yukari-buton");
+var spyBolumler = ["baslangic", "ozellikler", "uygulama", "kullanim", "surumler", "sss"].map(function (id) { return document.getElementById(id); }).filter(Boolean);
+var navLinkler = document.querySelectorAll(".nav-linkler a");
+function scrollspy() {
+  var y = (window.pageYOffset || document.documentElement.scrollTop) + 90;
+  var aktifId = "baslangic";
+  spyBolumler.forEach(function (b) { if (b.offsetTop <= y) aktifId = b.id; });
+  navLinkler.forEach(function (a) { a.classList.toggle("aktif", a.getAttribute("href") === "#" + aktifId); });
+}
 window.addEventListener("scroll", function () {
   var y = window.pageYOffset || document.documentElement.scrollTop;
   var toplam = document.documentElement.scrollHeight - window.innerHeight;
   if (ilerlemeCubugu) ilerlemeCubugu.style.width = (toplam > 0 ? (y / toplam) * 100 : 0) + "%";
   if (navCubugu) navCubugu.classList.toggle("kaydirildi", y > 10);
   if (yukariButon) yukariButon.classList.toggle("gorunur", y > 500);
+  scrollspy();
 });
 if (yukariButon) {
   yukariButon.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+}
+var yazdirButon = document.getElementById("yazdir-buton");
+if (yazdirButon) {
+  yazdirButon.addEventListener("click", function () { window.print(); });
 }
 
 // ---------- Kaydırma animasyonları ----------

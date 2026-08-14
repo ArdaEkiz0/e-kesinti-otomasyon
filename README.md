@@ -8,9 +8,19 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 ![Otomasyon](https://img.shields.io/badge/Otomasyon-Selenium-orange?logo=selenium)
 ![Lisans](https://img.shields.io/badge/Lisans-MIT-brightgreen)
 [![Sürüm](https://img.shields.io/github/v/release/ArdaEkiz0/e-kesinti-otomasyon?color=purple&label=S%C3%BCr%C3%BCm)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases)
+[![İndirme](https://img.shields.io/github/downloads/ArdaEkiz0/e-kesinti-otomasyon/total?color=orange&label=%C4%B0ndirme)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases)
+[![Yıldız](https://img.shields.io/github/stars/ArdaEkiz0/e-kesinti-otomasyon?color=yellow&label=Y%C4%B1ld%C4%B1z&style=social)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon)
 [![Derleme](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/actions/workflows/release.yml/badge.svg)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/actions)
 [![Tanıtım Sayfası](https://img.shields.io/badge/Tan%C4%B1t%C4%B1m-Site-blueviolet)](https://ardaekiz0.github.io/e-kesinti-otomasyon/)
 [![Son commit](https://img.shields.io/github/last-commit/ArdaEkiz0/e-kesinti-otomasyon?color=darkgreen&label=Son%20g%C3%BCncelleme)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/commits/main)
+
+---
+
+## 🎬 Canlı Demo
+
+![Bot terminali canlı demo](docs/demo.gif)
+
+Terminal akışı: tek tık kurulum → Excel okunur → kayıtlar tek tek işlenir → sonuç raporlanır.
 
 ---
 

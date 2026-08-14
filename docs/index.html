@@ -439,7 +439,9 @@
   @keyframes yukari-gel { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
   .indir { animation: indir-isilti 2.6s ease-in-out infinite; }
-  .indir:hover { animation-play-state: paused; }
+  .indir.giris-anim { animation: yukari-gel 0.7s ease 0.35s forwards, indir-isilti 2.6s ease-in-out 1.2s infinite; }
+  .indir.giris-anim.g4 { animation-delay: 0.35s, 1.2s; }
+  .indir.giris-anim:hover { animation-play-state: running, paused; }
   @keyframes indir-isilti {
     0%, 100% { box-shadow: 0 4px 14px rgba(34,197,94,0.3); }
     50% { box-shadow: 0 4px 28px rgba(34,197,94,0.55); }
@@ -479,6 +481,7 @@
   @media (prefers-reduced-motion: reduce) {
     .animasyon { opacity: 1; transform: none; transition: none; }
     .giris-anim { opacity: 1; animation: none; }
+    .indir.giris-anim { animation: none; }
     .kabarcik { display: none; }
     .indir { animation: none; }
     html { scroll-behavior: auto; }

@@ -12,6 +12,11 @@
 <meta property="og:url" content="https://ardaekiz0.github.io/e-kesinti-otomasyon/">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -165,6 +170,33 @@
   }
   .canli-surum .v { color: var(--yesil); font-weight: 700; }
   .canli-surum .sayac { color: var(--turkuaz); font-weight: 700; }
+  .v-etiketi { font-size: 14px; opacity: 0.85; }
+  .istatistikler { margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .istatistikler img { border-radius: 6px; }
+  .paylas { margin-top: 18px; display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--soluk); }
+  .paylas a {
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    border-radius: 999px;
+    padding: 6px 16px;
+    text-decoration: none;
+    color: var(--metin);
+    font-weight: 600;
+  }
+  .paylas a:hover { border-color: var(--turkuaz); color: var(--turkuaz); }
+  #yukle-buton {
+    display: none;
+    background: var(--mor);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #yukle-buton:hover { filter: brightness(1.1); }
 
   /* ---------- Bölümler ---------- */
   section { padding: 50px 0; border-bottom: 1px solid var(--cizgi); scroll-margin-top: 70px; }
@@ -230,6 +262,27 @@
   .nokta.sari { background: #eab308; }
   .nokta.yesil { background: #22c55e; }
   .terminal-ad { color: #94a3b8; font-size: 12px; margin-left: 8px; font-family: Consolas, monospace; }
+  .terminal-oynat {
+    margin-left: auto;
+    background: #0b1120;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: Consolas, monospace;
+  }
+  .terminal-oynat:hover { color: #e2e8f0; border-color: #06b6d4; }
+  .terminal-imlec {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #22c55e;
+    vertical-align: middle;
+    animation: imlec-yanip 1s step-start infinite;
+  }
+  @keyframes imlec-yanip { 50% { opacity: 0; } }
   .terminal-icerik {
     font-family: Consolas, "Courier New", monospace;
     font-size: 12.5px;
@@ -324,6 +377,7 @@
       <a href="#sss" data-i18n="nav-sss">SSS</a>
     </div>
     <a class="nav-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
+    <button id="yukle-buton" data-i18n="yukle-buton">📲 Uygulamayı Yükle</button>
     <button id="tema-buton" title="Tema">🌙</button>
     <button id="dil-buton" title="English">EN</button>
   </div>
@@ -334,7 +388,7 @@
     <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows &middot; 💰 Ücretsiz</span>
     <h1>SGK Tarımsal Kesinti Botu</h1>
     <p class="alt-baslik" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
-    <a class="indir" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir</a>
+    <a class="indir" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi"></span></a>
     <span class="indir-notu" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
     <div class="canli-surum">
       <span data-i18n="canli-etiket">En son sürüm:</span>
@@ -345,6 +399,17 @@
       <span>·</span>
       <span class="sayac">…</span>
       <span data-i18n="canli-indirme">indirme</span>
+    </div>
+    <div class="istatistikler">
+      <img src="https://img.shields.io/github/stars/ArdaEkiz0/e-kesinti-otomasyon?label=%E2%AD%90%20Y%C4%B1ld%C4%B1z&color=yellow" alt="Yıldız">
+      <img src="https://img.shields.io/github/forks/ArdaEkiz0/e-kesinti-otomasyon?label=Fork&color=blue" alt="Fork">
+      <img src="https://img.shields.io/github/contributors/ArdaEkiz0/e-kesinti-otomasyon?label=Katk%C4%B1c%C4%B1&color=green" alt="Katkıcı">
+    </div>
+    <div class="paylas">
+      <span data-i18n="paylas-etiket">Paylaş:</span>
+      <a href="https://wa.me/?text=SGK%20Tar%C4%B1msal%20Kesinti%20Botu%20%E2%80%94%20tek%20t%C4%B1kla%20kurulum%2C%20%C3%BCcretsiz!%20https%3A%2F%2Fardaekiz0.github.io%2Fe-kesinti-otomasyon%2F" target="_blank" rel="noopener" title="WhatsApp">💬 WhatsApp</a>
+      <a href="https://t.me/share/url?url=https%3A%2F%2Fardaekiz0.github.io%2Fe-kesinti-otomasyon%2F&text=SGK%20Tar%C4%B1msal%20Kesinti%20Botu%20%E2%80%94%20tek%20t%C4%B1kla%20kurulum%2C%20%C3%BCcretsiz!" target="_blank" rel="noopener" title="Telegram">✈️ Telegram</a>
+      <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fardaekiz0.github.io%2Fe-kesinti-otomasyon%2F&text=SGK%20Tar%C4%B1msal%20Kesinti%20Botu" target="_blank" rel="noopener" title="X">🐦 X</a>
     </div>
   </div>
 </header>
@@ -370,6 +435,7 @@
       <div class="terminal-baslik">
         <span class="nokta kirmizi"></span><span class="nokta sari"></span><span class="nokta yesil"></span>
         <span class="terminal-ad" data-i18n="terminal-ad">SGK Bot — Test Modu (gerçek çıktı)</span>
+        <button class="terminal-oynat" data-i18n="terminal-oynat">▶ Tekrar Oynat</button>
       </div>
       <pre class="terminal-icerik">============================================================
 <span class="t-bold">🤖 SGK TARIMSAL KESİNTİ OTOMASYONU BOT</span>
@@ -498,6 +564,9 @@ var DILLER = {
     "canli-etiket": "En son sürüm:",
     "canli-tarih": "yayın:",
     "canli-indirme": "indirme",
+    "paylas-etiket": "Paylaş:",
+    "terminal-oynat": "▶ Tekrar Oynat",
+    "yukle-buton": "📲 Uygulamayı Yükle",
     "bolum-ozellikler": "Özellikler",
     "oz1-baslik": "Tek Tık Kurulum", "oz1-metin": "KURULUM.exe eksik her şeyi kendisi kurar; kurulum sonrası bot hazırdır.",
     "oz2-baslik": "Otomatik Güncelleme", "oz2-metin": "Yeni sürüm çıkınca bot uyarır, kurulum aracı kendini günceller.",
@@ -552,6 +621,9 @@ var DILLER = {
     "canli-etiket": "Latest version:",
     "canli-tarih": "released:",
     "canli-indirme": "downloads",
+    "paylas-etiket": "Share:",
+    "terminal-oynat": "▶ Replay",
+    "yukle-buton": "📲 Install App",
     "bolum-ozellikler": "Features",
     "oz1-baslik": "One-Click Setup", "oz1-metin": "KURULUM.exe installs everything missing; the bot is ready right after.",
     "oz2-baslik": "Auto Updates", "oz2-metin": "The bot warns when a new version is out, and the installer updates itself.",
@@ -628,7 +700,11 @@ function surumBilgisi() {
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (v) {
       if (!v) return;
-      if (v.tag_name) document.querySelector(".canli-surum .v").textContent = v.tag_name;
+      if (v.tag_name) {
+        document.querySelector(".canli-surum .v").textContent = v.tag_name;
+        var etiket = document.querySelector(".v-etiketi");
+        if (etiket) etiket.textContent = " (v" + v.tag_name + ")";
+      }
       if (v.published_at) {
         document.querySelector(".canli-surum .tarih").textContent =
           new Date(v.published_at).toLocaleDateString(document.documentElement.lang === "en" ? "en-GB" : "tr-TR");
@@ -668,6 +744,61 @@ function surumGecmisi() {
     .catch(function () {
       liste.textContent = DILLER[document.documentElement.lang].surumler_hata;
     });
+}
+
+// ---------- Terminal animasyonu ----------
+var terminalKapsayici = document.querySelector(".terminal-icerik");
+var terminalSatirlar = terminalKapsayici.innerHTML.split("\n");
+while (terminalSatirlar.length && terminalSatirlar[0].trim() === "") terminalSatirlar.shift();
+while (terminalSatirlar.length && terminalSatirlar[terminalSatirlar.length - 1].trim() === "") terminalSatirlar.pop();
+var terminalTimer = null;
+function terminalOynat(hiz) {
+  if (terminalTimer) clearTimeout(terminalTimer);
+  terminalKapsayici.innerHTML = "";
+  var i = 0;
+  function adim() {
+    if (i < terminalSatirlar.length) {
+      var satir = document.createElement("div");
+      satir.className = "terminal-satir";
+      satir.innerHTML = terminalSatirlar[i];
+      terminalKapsayici.appendChild(satir);
+      i++;
+      terminalTimer = setTimeout(adim, hiz);
+    } else {
+      var imlec = document.createElement("span");
+      imlec.className = "terminal-imlec";
+      terminalKapsayici.appendChild(imlec);
+    }
+  }
+  adim();
+}
+var hareketAzaltma = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.querySelector(".terminal-oynat").addEventListener("click", function () {
+  terminalOynat(hareketAzaltma ? 1 : 200);
+});
+var terminalGozlemci = new IntersectionObserver(function (girisler) {
+  girisler.forEach(function (g) {
+    if (g.isIntersecting) {
+      terminalOynat(hareketAzaltma ? 1 : 150);
+      terminalGozlemci.unobserve(g.target);
+    }
+  });
+}, { threshold: 0.1 });
+terminalGozlemci.observe(document.getElementById("uygulama"));
+
+// ---------- PWA kurulum butonu ----------
+var yukleButon = document.getElementById("yukle-buton");
+var yukleOlayi = null;
+window.addEventListener("beforeinstallprompt", function (e) {
+  e.preventDefault();
+  yukleOlayi = e;
+  yukleButon.style.display = "inline-block";
+});
+yukleButon.addEventListener("click", function () {
+  if (yukleOlayi) yukleOlayi.prompt();
+});
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(function () {});
 }
 
 // ---------- Kaydırma animasyonları ----------

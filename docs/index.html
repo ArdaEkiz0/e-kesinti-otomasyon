@@ -25,6 +25,7 @@
     --soluk: #94a3b8;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     font-family: "Segoe UI", Arial, sans-serif;
     background: var(--arka);
@@ -32,10 +33,63 @@
     line-height: 1.6;
   }
   .kapsayici { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Gezinme menüsü ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #334155;
+  }
+  .nav-ic {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 60px;
+  }
+  .nav-logo { font-weight: 800; font-size: 17px; text-decoration: none; color: var(--metin); white-space: nowrap; }
+  .nav-linkler { display: flex; gap: 18px; flex: 1; }
+  .nav-linkler a { color: var(--soluk); text-decoration: none; font-size: 14px; }
+  .nav-linkler a:hover { color: var(--turkuaz); }
+  .nav-buton {
+    background: var(--yesil);
+    color: #052e16;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-buton:hover { filter: brightness(1.1); }
+  #dil-buton {
+    background: var(--kart);
+    color: var(--metin);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #dil-buton:hover { border-color: var(--turkuaz); }
+  @media (max-width: 600px) {
+    .nav-linkler { display: none; }
+    .nav-ic { justify-content: space-between; }
+  }
+
+  /* ---------- Giriş (hero) ---------- */
   header {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
     border-bottom: 1px solid #334155;
-    padding: 60px 0 40px;
+    padding: 70px 0 50px;
     text-align: center;
   }
   .rozet {
@@ -55,7 +109,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .alt-baslik { color: var(--soluk); font-size: 18px; margin: 14px 0 28px; }
+  .alt-baslik { color: var(--soluk); font-size: 18px; margin: 14px auto 28px; max-width: 640px; }
   .indir {
     display: inline-block;
     background: var(--yesil);
@@ -69,12 +123,27 @@
   }
   .indir:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
   .indir-notu { display: block; color: var(--soluk); font-size: 13px; margin-top: 12px; }
-  section { padding: 40px 0; border-bottom: 1px solid #1e293b; }
+  .canli-surum {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    background: var(--kart);
+    border: 1px solid #334155;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    color: var(--soluk);
+  }
+  .canli-surum .v { color: var(--yesil); font-weight: 700; }
+  .canli-surum .sayac { color: var(--turkuaz); font-weight: 700; }
+
+  /* ---------- Bölümler ---------- */
+  section { padding: 50px 0; border-bottom: 1px solid #1e293b; scroll-margin-top: 70px; }
   h2 {
     font-size: 26px;
     font-weight: 700;
-    margin-bottom: 24px;
-    color: var(--metin);
+    margin-bottom: 26px;
   }
   h2::before { content: "🌾 "; }
   .ozellikler {
@@ -91,6 +160,7 @@
   .kart .sembol { font-size: 26px; }
   .kart h3 { font-size: 17px; margin: 10px 0 6px; }
   .kart p { color: var(--soluk); font-size: 14px; }
+
   .adimlar { counter-reset: adim; }
   .adim {
     display: flex;
@@ -115,13 +185,38 @@
   }
   .adim p { color: var(--soluk); font-size: 15px; }
   .adim strong { color: var(--metin); }
+
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 10px 14px; font-size: 14px; }
   th { background: var(--kart); color: var(--turkuaz); }
   tr:nth-child(even) td { background: #172033; }
   td { border-bottom: 1px solid #1e293b; }
-  .sorun { background: var(--kart); border-left: 4px solid var(--sari); padding: 14px 18px; border-radius: 8px; margin-bottom: 12px; }
-  .sorun strong { color: var(--sari); }
+
+  /* ---------- Açılır SSS ---------- */
+  .sss {
+    background: var(--kart);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .sss summary {
+    cursor: pointer;
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 15px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .sss summary::-webkit-details-marker { display: none; }
+  .sss summary::after { content: "▾"; color: var(--turkuaz); transition: transform 0.2s; }
+  .sss[open] summary::after { transform: rotate(180deg); }
+  .sss p { padding: 0 20px 16px; color: var(--soluk); font-size: 14px; }
+
+  /* ---------- Alt bilgi ---------- */
   footer {
     text-align: center;
     padding: 30px 20px;
@@ -129,6 +224,14 @@
     font-size: 14px;
   }
   footer a { color: var(--turkuaz); text-decoration: none; }
+
+  /* ---------- Animasyonlar ---------- */
+  .animasyon { opacity: 0; transform: translateY(26px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .animasyon.gorunur { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .animasyon { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
   @media (max-width: 600px) {
     h1 { font-size: 32px; }
     .ozellikler { grid-template-columns: 1fr; }
@@ -137,68 +240,233 @@
 </head>
 <body>
 
-<header>
+<nav>
+  <div class="nav-ic">
+    <a class="nav-logo" href="#baslangic">🌾 SGK Bot</a>
+    <div class="nav-linkler">
+      <a href="#ozellikler" data-i18n="nav-ozellikler">Özellikler</a>
+      <a href="#kullanim" data-i18n="nav-kullanim">Kullanım</a>
+      <a href="#sss" data-i18n="nav-sss">SSS</a>
+      <a href="https://github.com/ArdaEkiz0/sgk-bot/releases" data-i18n="nav-surumler">Sürümler</a>
+    </div>
+    <a class="nav-buton" href="https://github.com/ArdaEkiz0/sgk-bot/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
+    <button id="dil-buton" title="English">EN</button>
+  </div>
+</nav>
+
+<header id="baslangic">
   <div class="kapsayici">
     <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows</span>
     <h1>SGK Tarımsal Kesinti Botu</h1>
-    <p class="alt-baslik">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
-    <a class="indir" href="https://github.com/ArdaEkiz0/sgk-bot/releases/latest/download/KURULUM.exe">⬇️ KURULUM.exe'yi İndir</a>
-    <span class="indir-notu">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
+    <p class="alt-baslik" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
+    <a class="indir" href="https://github.com/ArdaEkiz0/sgk-bot/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir</a>
+    <span class="indir-notu" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
+    <div class="canli-surum">
+      <span data-i18n="canli-etiket">En son sürüm:</span>
+      <span class="v">…</span>
+      <span>·</span>
+      <span data-i18n="canli-tarih">yayın:</span>
+      <span class="tarih">…</span>
+      <span>·</span>
+      <span class="sayac">…</span>
+      <span data-i18n="canli-indirme">indirme</span>
+    </div>
   </div>
 </header>
 
-<section>
+<section id="ozellikler">
   <div class="kapsayici">
-    <h2>Özellikler</h2>
+    <h2 data-i18n="bolum-ozellikler">Özellikler</h2>
     <div class="ozellikler">
-      <div class="kart"><div class="sembol">⚡</div><h3>Tek Tık Kurulum</h3><p>KURULUM.exe eksik her şeyi kendisi kurar; kurulum sonrası bot hazırdır.</p></div>
-      <div class="kart"><div class="sembol">🔄</div><h3>Otomatik Güncelleme</h3><p>Yeni sürüm çıkınca bot uyarır, kurulum aracı kendini günceller.</p></div>
-      <div class="kart"><div class="sembol">📊</div><h3>Renkli Arayüz</h3><p>Her kayıt için ilerleme çubuğu, yeşil/kırmızı durum mesajları ve işlem özeti.</p></div>
-      <div class="kart"><div class="sembol">🔁</div><h3>Hata Tekrar Deneme</h3><p>Hatalı kayıtlar 3 kez denenir — site yavaş olduğunda başarı oranı artar.</p></div>
-      <div class="kart"><div class="sembol">🔔</div><h3>Windows Bildirimi</h3><p>İşlem bitince ekrana bakmadan bildirimle sonucu öğrenirsiniz.</p></div>
-      <div class="kart"><div class="sembol">📁</div><h3>Her Excel'i Kullan</h3><p>Dosya adı ne olursa olsun seçin ya da başlatıcının üzerine sürükleyin.</p></div>
+      <div class="kart animasyon"><div class="sembol">⚡</div><h3 data-i18n="oz1-baslik">Tek Tık Kurulum</h3><p data-i18n="oz1-metin">KURULUM.exe eksik her şeyi kendisi kurar; kurulum sonrası bot hazırdır.</p></div>
+      <div class="kart animasyon"><div class="sembol">🔄</div><h3 data-i18n="oz2-baslik">Otomatik Güncelleme</h3><p data-i18n="oz2-metin">Yeni sürüm çıkınca bot uyarır, kurulum aracı kendini günceller.</p></div>
+      <div class="kart animasyon"><div class="sembol">📊</div><h3 data-i18n="oz3-baslik">Renkli Arayüz</h3><p data-i18n="oz3-metin">Her kayıt için ilerleme çubuğu, yeşil/kırmızı durum mesajları ve işlem özeti.</p></div>
+      <div class="kart animasyon"><div class="sembol">🔁</div><h3 data-i18n="oz4-baslik">Hata Tekrar Deneme</h3><p data-i18n="oz4-metin">Hatalı kayıtlar 3 kez denenir — site yavaş olduğunda başarı oranı artar.</p></div>
+      <div class="kart animasyon"><div class="sembol">🔔</div><h3 data-i18n="oz5-baslik">Windows Bildirimi</h3><p data-i18n="oz5-metin">İşlem bitince ekrana bakmadan bildirimle sonucu öğrenirsiniz.</p></div>
+      <div class="kart animasyon"><div class="sembol">📁</div><h3 data-i18n="oz6-baslik">Her Excel'i Kullan</h3><p data-i18n="oz6-metin">Dosya adı ne olursa olsun seçin ya da başlatıcının üzerine sürükleyin.</p></div>
     </div>
   </div>
 </section>
 
-<section>
+<section id="kullanim">
   <div class="kapsayici">
-    <h2>Nasıl Kullanılır?</h2>
+    <h2 data-i18n="bolum-kullanim">Nasıl Kullanılır?</h2>
     <div class="adimlar">
-      <div class="adim"><div class="numara">1</div><div><strong>KURULUM.exe'yi çalıştırın.</strong><p>Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.</p></div></div>
-      <div class="adim"><div class="numara">2</div><div><strong>Excel dosyasını doldurun.</strong><p>Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).</p></div></div>
-      <div class="adim"><div class="numara">3</div><div><strong>BOT_BAŞLAT.bat'a çift tıklayın</strong><p>Ya da Excel dosyanızı doğrudan BOT_BAŞLAT.bat üzerine sürükleyip bırakın.</p></div></div>
-      <div class="adim"><div class="numara">4</div><div><strong>Bot işlesin, siz bekleyin.</strong><p>Kayıtlar tek tek işlenir; bitince Windows bildirimi gelir.</p></div></div>
+      <div class="adim animasyon"><div class="numara">1</div><div><strong data-i18n="adim1-baslik">KURULUM.exe'yi çalıştırın.</strong><p data-i18n="adim1-metin">Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.</p></div></div>
+      <div class="adim animasyon"><div class="numara">2</div><div><strong data-i18n="adim2-baslik">Excel dosyasını doldurun.</strong><p data-i18n="adim2-metin">Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).</p></div></div>
+      <div class="adim animasyon"><div class="numara">3</div><div><strong data-i18n="adim3-baslik">BOT_BAŞLAT.bat'a çift tıklayın</strong><p data-i18n="adim3-metin">Ya da Excel dosyanızı doğrudan BOT_BAŞLAT.bat üzerine sürükleyip bırakın.</p></div></div>
+      <div class="adim animasyon"><div class="numara">4</div><div><strong data-i18n="adim4-baslik">Bot işlesin, siz bekleyin.</strong><p data-i18n="adim4-metin">Kayıtlar tek tek işlenir; bitince Windows bildirimi gelir.</p></div></div>
     </div>
-  </div>
-</section>
 
-<section>
-  <div class="kapsayici">
-    <h2>Excel Formatı</h2>
-    <table>
-      <tr><th>Sütun</th><th>İçerik</th></tr>
-      <tr><td><strong>Ünvan</strong></td><td>Üretici adı (zorunlu değil)</td></tr>
-      <tr><td><strong>TC Kimlik No</strong></td><td>11 haneli TC kimlik numarası</td></tr>
-      <tr><td><strong>Matrah</strong></td><td>Alım bedeli (örn: <code>13014,09</code>)</td></tr>
-      <tr><td><strong>Bağ-Kur</strong></td><td>Kesinti tutarı (hesaplanır)</td></tr>
+    <h2 style="margin-top:40px" data-i18n="bolum-format">Excel Formatı</h2>
+    <table class="animasyon">
+      <tr><th data-i18n="tablo-sutun">Sütun</th><th data-i18n="tablo-icerik">İçerik</th></tr>
+      <tr><td><strong data-i18n="tablo-unvan">Ünvan</strong></td><td data-i18n="tablo-unvan-aciklama">Üretici adı (zorunlu değil)</td></tr>
+      <tr><td><strong data-i18n="tablo-tc">TC Kimlik No</strong></td><td data-i18n="tablo-tc-aciklama">11 haneli TC kimlik numarası</td></tr>
+      <tr><td><strong data-i18n="tablo-matrah">Matrah</strong></td><td><span data-i18n="tablo-matrah-aciklama">Alım bedeli</span> (örn: <code>13014,09</code>)</td></tr>
+      <tr><td><strong data-i18n="tablo-bagkur">Bağ-Kur</strong></td><td data-i18n="tablo-bagkur-aciklama">Kesinti tutarı (hesaplanır)</td></tr>
     </table>
   </div>
 </section>
 
-<section>
+<section id="sss">
   <div class="kapsayici">
-    <h2>Sık Karşılaşılan Sorunlar</h2>
-    <div class="sorun"><strong>Bot açılmıyor / sürücü hatası</strong><p>Chrome güncellenmiş olabilir — KURULUM.exe'yi yeniden çalıştırın.</p></div>
-    <div class="sorun"><strong>Kuruş yanlış yazılıyor (13014,90)</strong><p>Eski sürüm sorunudur; güncel sürümde kuruş her zaman 2 haneli yazılır.</p></div>
-    <div class="sorun"><strong>Sayfa elemanı bulunamadı</strong><p>SGK sitesi değişmiş olabilir — yeni sürümü kontrol edin.</p></div>
+    <h2 data-i18n="bolum-sss">Sık Sorulan Sorular</h2>
+    <details class="sss animasyon"><summary><span data-i18n="sss1-soru">Bot açılmıyor / sürücü hatası veriyor</span></summary><p data-i18n="sss1-cevap">Chrome güncellenmiş olabilir — KURULUM.exe'yi yeniden çalıştırın, uyumlu sürücüyü otomatik kurar.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss2-soru">Kuruşlar yanlış yazılıyor (ör: 13014,90)</span></summary><p data-i18n="sss2-cevap">Bu, eski sürümlerde görülen bir sorundu. Güncel sürümde kuruş her zaman 2 haneli (09) yazılır ve doğrulama yapılır.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss3-soru">"Sayfa elemanı bulunamadı" hatası alıyorum</span></summary><p data-i18n="sss3-cevap">SGK sitesi değişmiş olabilir. En son sürümü kullandığınızdan emin olun; sorun sürerse geliştiriciye ulaşın.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss4-soru">Güncellemeler ücretsiz mi?</span></summary><p data-i18n="sss4-cevap">Evet. Uygulama tamamen ücretsizdir; tüm sürümler ve güncellemeler GitHub'dan otomatik indirilir.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss5-soru">İnternet bağlantım zayıf, bot yine de çalışır mı?</span></summary><p data-i18n="sss5-cevap">Çalışır. Hata olan kayıtlar 3 kez otomatik denenir; internet kesilirse hatalı kayıtlar ekranda ve özette listelenir.</p></details>
+    <details class="sss animasyon"><summary><span data-i18n="sss6-soru">Kaç kaydı aynı anda işleyebilirim?</span></summary><p data-i18n="sss6-cevap">Sınır yoktur. Excel'deki tüm satırlar sırayla işlenir; ilerleme çubuğundan durumu takip edebilirsiniz.</p></details>
   </div>
 </section>
 
 <footer>
-  <p>👨‍💻 Geliştirici: <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot/releases">Sürümler</a></p>
-  <p style="margin-top:8px;font-size:12px;">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
+  <p>👨‍💻 <span data-i18n="footer-gelistirici">Geliştirici:</span> <a href="https://github.com/ArdaEkiz0">Arda M. Ekiz</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot" data-i18n="footer-kaynak">Kaynak Kod</a> &middot; <a href="https://github.com/ArdaEkiz0/sgk-bot/releases" data-i18n="footer-surumler">Sürümler</a></p>
+  <p style="margin-top:8px;font-size:12px;" data-i18n="footer-not">⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir.</p>
 </footer>
+
+<script>
+// ---------- Türkçe / İngilizce ----------
+var DILLER = {
+  tr: {
+    "nav-ozellikler": "Özellikler",
+    "nav-kullanim": "Kullanım",
+    "nav-sss": "SSS",
+    "nav-surumler": "Sürümler",
+    "nav-indir": "⬇️ İndir",
+    "hero-alt": "Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.",
+    "hero-indir": "⬇️ KURULUM.exe'yi İndir",
+    "hero-not": "Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar",
+    "canli-etiket": "En son sürüm:",
+    "canli-tarih": "yayın:",
+    "canli-indirme": "indirme",
+    "bolum-ozellikler": "Özellikler",
+    "oz1-baslik": "Tek Tık Kurulum", "oz1-metin": "KURULUM.exe eksik her şeyi kendisi kurar; kurulum sonrası bot hazırdır.",
+    "oz2-baslik": "Otomatik Güncelleme", "oz2-metin": "Yeni sürüm çıkınca bot uyarır, kurulum aracı kendini günceller.",
+    "oz3-baslik": "Renkli Arayüz", "oz3-metin": "Her kayıt için ilerleme çubuğu, yeşil/kırmızı durum mesajları ve işlem özeti.",
+    "oz4-baslik": "Hata Tekrar Deneme", "oz4-metin": "Hatalı kayıtlar 3 kez denenir — site yavaş olduğunda başarı oranı artar.",
+    "oz5-baslik": "Windows Bildirimi", "oz5-metin": "İşlem bitince ekrana bakmadan bildirimle sonucu öğrenirsiniz.",
+    "oz6-baslik": "Her Excel'i Kullan", "oz6-metin": "Dosya adı ne olursa olsun seçin ya da başlatıcının üzerine sürükleyin.",
+    "bolum-kullanim": "Nasıl Kullanılır?",
+    "adim1-baslik": "KURULUM.exe'yi çalıştırın.", "adim1-metin": "Python, Chrome ve chromedriver hazırlanır, şablon Excel dosyası oluşturulur.",
+    "adim2-baslik": "Excel dosyasını doldurun.", "adim2-metin": "Ünvan, TC Kimlik No, Matrah ve Bağ-Kur sütunlarını girin (şablon hazır).",
+    "adim3-baslik": "BOT_BAŞLAT.bat'a çift tıklayın", "adim3-metin": "Ya da Excel dosyanızı doğrudan BOT_BAŞLAT.bat üzerine sürükleyip bırakın.",
+    "adim4-baslik": "Bot işlesin, siz bekleyin.", "adim4-metin": "Kayıtlar tek tek işlenir; bitince Windows bildirimi gelir.",
+    "bolum-format": "Excel Formatı",
+    "tablo-sutun": "Sütun", "tablo-icerik": "İçerik",
+    "tablo-unvan": "Ünvan", "tablo-unvan-aciklama": "Üretici adı (zorunlu değil)",
+    "tablo-tc": "TC Kimlik No", "tablo-tc-aciklama": "11 haneli TC kimlik numarası",
+    "tablo-matrah": "Matrah", "tablo-matrah-aciklama": "Alım bedeli",
+    "tablo-bagkur": "Bağ-Kur", "tablo-bagkur-aciklama": "Kesinti tutarı (hesaplanır)",
+    "bolum-sss": "Sık Sorulan Sorular",
+    "sss1-soru": "Bot açılmıyor / sürücü hatası veriyor", "sss1-cevap": "Chrome güncellenmiş olabilir — KURULUM.exe'yi yeniden çalıştırın, uyumlu sürücüyü otomatik kurar.",
+    "sss2-soru": "Kuruşlar yanlış yazılıyor (ör: 13014,90)", "sss2-cevap": "Bu, eski sürümlerde görülen bir sorundu. Güncel sürümde kuruş her zaman 2 haneli (09) yazılır ve doğrulama yapılır.",
+    "sss3-soru": "\"Sayfa elemanı bulunamadı\" hatası alıyorum", "sss3-cevap": "SGK sitesi değişmiş olabilir. En son sürümü kullandığınızdan emin olun; sorun sürerse geliştiriciye ulaşın.",
+    "sss4-soru": "Güncellemeler ücretsiz mi?", "sss4-cevap": "Evet. Uygulama tamamen ücretsizdir; tüm sürümler ve güncellemeler GitHub'dan otomatik indirilir.",
+    "sss5-soru": "İnternet bağlantım zayıf, bot yine de çalışır mı?", "sss5-cevap": "Çalışır. Hata olan kayıtlar 3 kez otomatik denenir; internet kesilirse hatalı kayıtlar ekranda ve özette listelenir.",
+    "sss6-soru": "Kaç kaydı aynı anda işleyebilirim?", "sss6-cevap": "Sınır yoktur. Excel'deki tüm satırlar sırayla işlenir; ilerleme çubuğundan durumu takip edebilirsiniz.",
+    "footer-gelistirici": "Geliştirici:",
+    "footer-kaynak": "Kaynak Kod",
+    "footer-surumler": "Sürümler",
+    "footer-not": "⚠️ Excel dosyaları gerçek TC kimlik numaraları içerdiğinden depoya yüklenmemelidir."
+  },
+  en: {
+    "nav-ozellikler": "Features",
+    "nav-kullanim": "Usage",
+    "nav-sss": "FAQ",
+    "nav-surumler": "Releases",
+    "nav-indir": "⬇️ Download",
+    "hero-alt": "Automate your Bağ-Kur agricultural activity notifications — no more manual data entry.",
+    "hero-indir": "⬇️ Download KURULUM.exe",
+    "hero-not": "One-click setup: installs Python, Chrome, chromedriver and packages automatically",
+    "canli-etiket": "Latest version:",
+    "canli-tarih": "released:",
+    "canli-indirme": "downloads",
+    "bolum-ozellikler": "Features",
+    "oz1-baslik": "One-Click Setup", "oz1-metin": "KURULUM.exe installs everything missing; the bot is ready right after.",
+    "oz2-baslik": "Auto Updates", "oz2-metin": "The bot warns when a new version is out, and the installer updates itself.",
+    "oz3-baslik": "Colorful Interface", "oz3-metin": "Progress bar for every record, green/red status messages and a summary report.",
+    "oz4-baslik": "Auto Retry", "oz4-metin": "Failed records are retried 3 times — success rate increases when the site is slow.",
+    "oz5-baslik": "Windows Notification", "oz5-metin": "Get notified when the job finishes — no need to watch the screen.",
+    "oz6-baslik": "Use Any Excel File", "oz6-metin": "Pick any Excel file, whatever its name, or drag-and-drop it onto the launcher.",
+    "bolum-kullanim": "How to Use?",
+    "adim1-baslik": "Run KURULUM.exe.", "adim1-metin": "Python, Chrome and chromedriver are prepared; a template Excel file is created.",
+    "adim2-baslik": "Fill in the Excel file.", "adim2-metin": "Enter Title, TC ID Number, Base Amount and Bağ-Kur columns (template included).",
+    "adim3-baslik": "Double-click BOT_BAŞLAT.bat", "adim3-metin": "Or simply drag-and-drop your Excel file onto BOT_BAŞLAT.bat.",
+    "adim4-baslik": "Let the bot work, you relax.", "adim4-metin": "Records are processed one by one; a Windows notification appears when done.",
+    "bolum-format": "Excel Format",
+    "tablo-sutun": "Column", "tablo-icerik": "Content",
+    "tablo-unvan": "Title", "tablo-unvan-aciklama": "Producer name (optional)",
+    "tablo-tc": "TC ID Number", "tablo-tc-aciklama": "11-digit Turkish ID number",
+    "tablo-matrah": "Base Amount", "tablo-matrah-aciklama": "Purchase amount",
+    "tablo-bagkur": "Bağ-Kur", "tablo-bagkur-aciklama": "Deduction amount (calculated)",
+    "bolum-sss": "Frequently Asked Questions",
+    "sss1-soru": "Bot won't start / driver error", "sss1-cevap": "Chrome may have been updated — run KURULUM.exe again, it installs the matching driver automatically.",
+    "sss2-soru": "Cents are written wrong (e.g. 13014,90)", "sss2-cevap": "This was an issue in old versions. Current versions always write cents with 2 digits (09) and verify the value.",
+    "sss3-soru": "Getting \"page element not found\" error", "sss3-cevap": "The SGK site may have changed. Make sure you use the latest version; contact the developer if it persists.",
+    "sss4-soru": "Are updates free?", "sss4-cevap": "Yes. The app is completely free; all versions and updates are downloaded automatically from GitHub.",
+    "sss5-soru": "My internet is weak, will the bot still work?", "sss5-cevap": "Yes. Failed records are retried 3 times automatically; if the connection drops, failures are listed on screen and in the summary.",
+    "sss6-soru": "How many records can I process at once?", "sss6-cevap": "No limit. All rows in the Excel file are processed in order; track progress with the progress bar.",
+    "footer-gelistirici": "Developer:",
+    "footer-kaynak": "Source Code",
+    "footer-surumler": "Releases",
+    "footer-not": "⚠️ Excel files contain real Turkish ID numbers, so they must never be uploaded to the repository."
+  }
+};
+
+function dilUygula(dil) {
+  var sozluk = DILLER[dil] || DILLER.tr;
+  document.documentElement.lang = dil;
+  document.querySelectorAll("[data-i18n]").forEach(function (el) {
+    var anahtar = el.getAttribute("data-i18n");
+    if (sozluk[anahtar]) el.textContent = sozluk[anahtar];
+  });
+  document.getElementById("dil-buton").textContent = dil === "tr" ? "EN" : "TR";
+  try { localStorage.setItem("sgk-dil", dil); } catch (e) {}
+}
+
+document.getElementById("dil-buton").addEventListener("click", function () {
+  var suanki = document.documentElement.lang === "en" ? "en" : "tr";
+  dilUygula(suanki === "tr" ? "en" : "tr");
+});
+
+// ---------- Canlı sürüm + indirme sayacı ----------
+function surumBilgisi() {
+  fetch("https://api.github.com/repos/ArdaEkiz0/sgk-bot/releases/latest")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (v) {
+      if (!v) return;
+      if (v.tag_name) document.querySelector(".canli-surum .v").textContent = v.tag_name;
+      if (v.published_at) {
+        document.querySelector(".canli-surum .tarih").textContent =
+          new Date(v.published_at).toLocaleDateString(document.documentElement.lang === "en" ? "en-GB" : "tr-TR");
+      }
+      var indirme = (v.assets || []).reduce(function (toplam, a) { return toplam + (a.download_count || 0); }, 0);
+      if (indirme > 0) document.querySelector(".canli-surum .sayac").textContent = indirme;
+    })
+    .catch(function () {});
+}
+
+// ---------- Kaydırma animasyonları ----------
+var gozlemci = new IntersectionObserver(function (girisler) {
+  girisler.forEach(function (g) {
+    if (g.isIntersecting) {
+      g.target.classList.add("gorunur");
+      gozlemci.unobserve(g.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll(".animasyon").forEach(function (el) { gozlemci.observe(el); });
+
+// ---------- Başlangıç ----------
+(function baslat() {
+  var kayitli = null;
+  try { kayitli = localStorage.getItem("sgk-dil"); } catch (e) {}
+  dilUygula(kayitli === "en" ? "en" : "tr");
+  surumBilgisi();
+})();
+</script>
 
 </body>
 </html>

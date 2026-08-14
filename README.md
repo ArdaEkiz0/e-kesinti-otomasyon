@@ -13,6 +13,7 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 ## ✨ Özellikler
 
 - ⚡ **Tek Tık Kurulum** — `KURULUM.exe` Python, Chrome, chromedriver ve paketleri kendisi kurar
+- 🔄 **Otomatik Güncelleme** — kurulum aracı açılışta GitHub'dan yeni sürüm olup olmadığını kontrol eder, varsa kendini günceller
 - 📊 **Renkli ve İlerlemeli Arayüz** — her kayıt için ilerleme çubuğu, yeşil/kırmızı durum mesajları
 - 🔄 **Otomatik Tekrar Deneme** — hata olan kayıt 3 kez denenir (site yavaşsa başarı oranı artar)
 - 🔔 **Windows Bitiş Bildirimi** — işlem bitince ekrana bakmadan bildirimle öğrenirsin

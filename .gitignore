@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+
+# Bot dosyaları (KURULUM.exe otomatik indirir/oluşturur)
+chromedriver.exe
+chromedriver.zip
+python-kurucu.exe
+chrome-kurucu.exe
+
+# ÖNEMLİ: Kişisel veri içerir (gerçek TC kimlik numaraları) - ASLA yüklenmemeli!
+çalışmaaaa.xlsx
+*.xlsx

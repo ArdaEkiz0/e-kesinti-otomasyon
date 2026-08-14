@@ -1,0 +1,121 @@
+═══════════════════════════════════════════════════════════════════
+    SGK TARIMSAL KESİNTİ OTOMASYONU BOT
+    Kurulum Paketi v2.0
+═══════════════════════════════════════════════════════════════════
+
+📋 İÇERİK:
+────────────────────────────────────────────────────────────────
+✅ sgk_bot.py          → Ana bot dosyası
+✅ KURULUM.exe         → OTOMATİK KURULUM (çift tıkla, hepsi kendiliğinden)
+✅ BOT_BAŞLAT.bat      → Bot başlatma (kurulumdan sonra)
+✅ çalışmaaaa.xlsx     → Excel veri dosyası (yoksa otomatik oluşturulur)
+✅ BENI_OKU.txt        → Bu dosya (talimatlar)
+
+🚀 KURULUM (YENİ BİLGİSAYARDA 1 KEZ):
+────────────────────────────────────────────────────────────────
+
+1. KURULUM.exe dosyasına ÇİFT TIKLA
+2. Program otomatik olarak şunları yapar:
+   ✅ Python kontrol → yoksa İNDİRİP KURAR
+   ✅ Python sürümü kontrol → eskiyse yenisi kurulur
+   ✅ Gerekli paketler (selenium, pandas, openpyxl, webdriver-manager)
+   ✅ Google Chrome kontrol → yoksa İNDİRİP KURAR
+   ✅ Chrome'a uygun chromedriver → yoksa İNDİRİR
+   ✅ Excel şablonu (çalışmaaaa.xlsx) → yoksa OLUŞTURUR
+3. "KURULUM TAMAMLANDI" yazısını görünce ENTER'a bas
+
+⚠️  Python ilk kez kurulduysa bilgisayarı YENİDEN BAŞLAT.
+
+📊 EXCEL ŞABLONU:
+────────────────────────────────────────────────────────────────
+
+çalışmaaaa.xlsx dosyası yoksa bot onu otomatik oluşturur.
+Şablon yapısı hep aynıdır:
+
+    Ünvan       | TC Kimlik No  | Matrah    | Bağ-Kur
+    (İsim soyisim)| 11 haneli    | TL tutarı | Kesinti
+
+Excel'e üretici bilgilerini doldur ve BOT_BAŞLAT.bat ile botu çalıştır.
+(Matrah ve Bağ-Kur sütunlarındaki değerler sayı olmalıdır)
+
+🚀 BOT BAŞLATMA (HER KULLANIMDA):
+────────────────────────────────────────────────────────────────
+
+   BOT_BAŞLAT.bat dosyasına çift tıkla
+
+   1. Chrome tarayıcı açılır, SGK sitesine gider
+   2. SİZ login yaparsınız (bot login yapmaz!)
+   3. CMD'de ENTER'a basarsınız
+   4. Bot tüm TC'leri otomatik işler ☕
+
+📂 İSTEDİĞİN EXCEL DOSYASINI KULLANMA:
+────────────────────────────────────────────────────────────────
+
+   Bot artık klasördeki Excel dosyasını KENDİLİĞİNDEN bulur:
+
+   1. Klasörde TEK Excel dosyası varsa → adı ne olursa olsun onu kullanır
+      (çalışmaaaa.xlsx şart değil!)
+   2. Birden fazla Excel dosyası varsa → sana seçtirir
+      (örn. mayis.xlsx, haziran.xlsx arasından)
+   3. Hiç Excel yoksa → şablon oluşturur
+
+   İstersen dosyayı BOT_BAŞLAT.bat üzerine sürükleyerek de seçebilirsin.
+   Not: Dosya içindeki sütun düzeni şablonla aynı olmalı
+   (Ünvan, TC Kimlik No, Matrah, Bağ-Kur).
+
+📊 ÇIKTI ÖRNEĞİ:
+────────────────────────────────────────────────────────────────
+
+✅ Excel'den 14 kayıt okundu
+🌐 SGK sitesine gidiliyor...
+⏳ Lütfen siteye login yapınız...  → [SİZ LOGIN YAPIN, ENTER]
+📍 Kayıt 3/14
+   [████░░░░░░░░░░░░░░░░]  21% (3/14)  TC=12345678901
+    ✅ TC yazıldı: 12345678901
+   💰 Matrah yazıldı: 54216.00
+   ➕ EKLE tıklanıyor...
+   ✅ TC başarıyla işlendi!
+...
+✅ İŞLEM TAMAMLANDI!
+   Başarılı: 13/14   Süre: 1 dk 40 sn
+   ❌ HATA ALAN KAYITLAR:
+     • TC=12345678901: Sayfa elemanı bulunamadı (SGK sayfası değişmiş olabilir)
+
+🔍 TEST MODU (tarayıcı açmadan):
+────────────────────────────────────────────────────────────────
+
+   cmd'de şunu yaz:  python sgk_bot.py --test
+   → Excel okuma, ilerleme çubuğu, hata mesajları ve özet simüle edilir.
+
+⚠️  ÖNEMLİ NOTLAR:
+────────────────────────────────────────────────────────────────
+
+1. Bot siteye login YAPMAZ - SİZ yaparsınız
+2. Tarayıcıyı kapatmayın!
+3. Excel'de TC numarası 11 haneli olmalı
+4. KURULUM.exe her çalıştırıldığında gereksinimleri kontrol eder
+
+🐛 SORUN GİDERME:
+────────────────────────────────────────────────────────────────
+
+"Bot sayfaları görmüyor veya hata veriyor"
+→ KURULUM.exe'yi tekrar çalıştır (chromedriver'ı düzeltir)
+
+"Chrome açılmıyor / tarayıcı başlatılamadı"
+→ KURULUM.exe'yi tekrar çalıştır
+→ İnternet bağlantını kontrol et
+
+Excel şablonu hatalı görünüyorsa
+→ çalışmaaaa.xlsx'i sil, KURULUM.exe veya bot yeniden oluşturur
+
+📞 YARDIM:
+────────────────────────────────────────────────────────────────
+
+1. Komut satırının çıktısını oku (hata mesajı ne diyor?)
+2. KURULUM.exe'yi tekrar çalıştır
+3. İnternet bağlantısını kontrol et
+
+═══════════════════════════════════════════════════════════════════
+Hazırlandı: 2026
+Versiyon: 2.0
+═══════════════════════════════════════════════════════════════════

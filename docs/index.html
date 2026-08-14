@@ -19,6 +19,32 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="canonical" href="https://ardaekiz0.github.io/e-kesinti-otomasyon/">
+<script>
+(function () {
+  try {
+    var tema = localStorage.getItem("sgk-tema");
+    if (tema !== "acik" && tema !== "koyu") {
+      tema = window.matchMedia("(prefers-color-scheme: light)").matches ? "acik" : "koyu";
+    }
+    document.documentElement.setAttribute("data-tema", tema);
+  } catch (e) {}
+})();
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Bot açılmıyor / sürücü hatası veriyor", "acceptedAnswer": {"@type": "Answer", "text": "Chrome güncellenmiş olabilir — KURULUM.exe'yi yeniden çalıştırın, uyumlu sürücüyü otomatik kurar."}},
+    {"@type": "Question", "name": "Windows 'Bilinmeyen yayımcı' uyarısı veriyor, sorun mu var?", "acceptedAnswer": {"@type": "Answer", "text": "Sorun yok — bu, her imzasız programda görünen normal bir Windows korumasıdır. KURULUM.exe yalnızca resmi indirme butonundan veya GitHub Releases'ten iner. Uyarıda 'Diğer bilgiler → Yine de çalıştır' deyip devam edebilirsiniz."}},
+    {"@type": "Question", "name": "TC kimlik numaralarım güvende mi?", "acceptedAnswer": {"@type": "Answer", "text": "Güvende. Bot verileri yalnızca sizin bilgisayarınızda işler; hiçbir sunucuya göndermez. Kodun tamamı açık kaynaktır ve incelenebilir."}},
+    {"@type": "Question", "name": "Güncellemeler ücretsiz mi?", "acceptedAnswer": {"@type": "Answer", "text": "Evet. Uygulama tamamen ücretsizdir; tüm sürümler ve güncellemeler GitHub'dan otomatik indirilir."}},
+    {"@type": "Question", "name": "İnternet bağlantım zayıf, bot yine de çalışır mı?", "acceptedAnswer": {"@type": "Answer", "text": "Çalışır. Hata olan kayıtlar 3 kez otomatik denenir; internet kesilirse hatalı kayıtlar ekranda ve özette listelenir."}},
+    {"@type": "Question", "name": "Kaç kaydı aynı anda işleyebilirim?", "acceptedAnswer": {"@type": "Answer", "text": "Sınır yoktur. Excel'deki tüm satırlar sırayla işlenir; ilerleme çubuğundan durumu takip edebilirsiniz."}}
+  ]
+}
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -477,6 +503,36 @@
   #yukari-buton.gorunur { opacity: 1; visibility: visible; transform: none; }
   #yukari-buton:hover { border-color: var(--turkuaz); }
 
+  /* ---------- İndirme kutlama toast'ı ---------- */
+  #kutlama {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    z-index: 70;
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    border-left: 4px solid var(--yesil);
+    border-radius: 14px;
+    padding: 16px 22px;
+    max-width: 420px;
+    width: calc(100% - 40px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s, transform 0.35s, visibility 0.35s;
+  }
+  #kutlama.gorunur { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+  #kutlama .k-baslik { font-weight: 700; font-size: 15px; color: var(--yesil); margin-bottom: 6px; }
+  #kutlama .k-adim { color: var(--soluk); font-size: 13.5px; padding: 2px 0; }
+  #kutlama .k-kapat { position: absolute; top: 8px; right: 12px; background: none; border: none; color: var(--soluk); font-size: 18px; cursor: pointer; }
+  #kutlama .k-kapat:hover { color: var(--metin); }
+  #kutlama .k-cubuk { height: 3px; background: linear-gradient(90deg, var(--yesil), var(--turkuaz)); border-radius: 3px; margin-top: 10px; width: 100%; animation: k-kucul 8s linear forwards; transform-origin: left; }
+  @keyframes k-kucul { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+  /* ---------- Kopyala butonu ---------- */
+  .paylas a.kopyala-aktif { border-color: var(--yesil); color: var(--yesil); }
+
   /* ---------- Ekran görüntüleri galerisi ---------- */
   .galeri { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 24px; }
   .galeri figure { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 14px; padding: 10px; transition: border-color 0.25s, transform 0.25s; }
@@ -535,7 +591,7 @@
       <a href="#surumler" data-i18n="nav-surumgecmisi">Sürümler</a>
       <a href="#sss" data-i18n="nav-sss">SSS</a>
     </div>
-    <a class="nav-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
+    <a class="nav-buton" id="nav-indir" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="nav-indir">⬇️ İndir</a>
     <button id="yukle-buton" data-i18n="yukle-buton">📲 Uygulamayı Yükle</button>
     <button id="tema-buton" title="Tema">🌙</button>
     <button id="dil-buton" title="English">EN</button>
@@ -550,7 +606,7 @@
     <span class="rozet giris-anim g1">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows &middot; 💰 Ücretsiz</span>
     <h1 class="giris-anim g2">SGK Tarımsal Kesinti Botu</h1>
     <p class="alt-baslik giris-anim g3" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
-    <a class="indir giris-anim g4" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi"></span></a>
+    <a class="indir giris-anim g4" id="indir-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi"></span></a>
     <span class="indir-notu giris-anim g5" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
     <div class="canli-surum">
       <span data-i18n="canli-etiket">En son sürüm:</span>
@@ -572,6 +628,7 @@
       <a href="https://wa.me/?text=SGK%20Tar%C4%B1msal%20Kesinti%20Botu%20%E2%80%94%20tek%20t%C4%B1kla%20kurulum%2C%20%C3%BCcretsiz!%20https%3A%2F%2Fardaekiz0.github.io%2Fe-kesinti-otomasyon%2F" target="_blank" rel="noopener" title="WhatsApp">💬 WhatsApp</a>
       <a href="https://t.me/share/url?url=https%3A%2F%2Fardaekiz0.github.io%2Fe-kesinti-otomasyon%2F&text=SGK%20Tar%C4%B1msal%20Kesinti%20Botu%20%E2%80%94%20tek%20t%C4%B1kla%20kurulum%2C%20%C3%BCcretsiz!" target="_blank" rel="noopener" title="Telegram">✈️ Telegram</a>
       <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fardaekiz0.github.io%2Fe-kesinti-otomasyon%2F&text=SGK%20Tar%C4%B1msal%20Kesinti%20Botu" target="_blank" rel="noopener" title="X">🐦 X</a>
+      <a href="#" id="kopyala-buton" title="Kopyala" data-i18n="kopyala">🔗 Kopyala</a>
     </div>
   </div>
 </header>
@@ -687,8 +744,8 @@
     </div>
     <p class="terminal-alt" data-i18n="uygulama-metin">↑ Bu, uygulamanın test modunun gerçek çıktısıdır — renkler, ilerleme çubuğu, hata tekrar deneme ve özet raporu görünüyor.</p>
     <div class="galeri">
-      <figure class="animasyon"><a href="ekran-bot.png" target="_blank" rel="noopener"><img src="ekran-bot.png" alt="SGK Bot arayüzü" loading="lazy"></a><figcaption data-i18n="galeri-bot">🤖 Bot ekranı — ilerleme çubuğu, hata tekrar deneme, özet raporu</figcaption></figure>
-      <figure class="animasyon"><a href="ekran-kurulum.png" target="_blank" rel="noopener"><img src="ekran-kurulum.png" alt="Kurulum aracı" loading="lazy"></a><figcaption data-i18n="galeri-kurulum">🚀 Kurulum aracı — 5 adım + işlem bitti bildirimi</figcaption></figure>
+      <figure class="animasyon"><a href="ekran-bot.png" target="_blank" rel="noopener"><picture><source srcset="ekran-bot.webp" type="image/webp"><img src="ekran-bot.png" alt="SGK Bot arayüzü" loading="lazy" width="700" height="418"></picture></a><figcaption data-i18n="galeri-bot">🤖 Bot ekranı — ilerleme çubuğu, hata tekrar deneme, özet raporu</figcaption></figure>
+      <figure class="animasyon"><a href="ekran-kurulum.png" target="_blank" rel="noopener"><picture><source srcset="ekran-kurulum.webp" type="image/webp"><img src="ekran-kurulum.png" alt="Kurulum aracı" loading="lazy" width="600" height="455"></picture></a><figcaption data-i18n="galeri-kurulum">🚀 Kurulum aracı — 5 adım + işlem bitti bildirimi</figcaption></figure>
     </div>
   </div>
 </section>
@@ -760,7 +817,7 @@
     <p data-i18n="iletisim-metin">Bir sorun mu buldun? Aklına bir öneri mi geldi? GitHub Issues üzerinden bildir — önceden doldurulmuş şablonla saniyeler sürer.</p>
     <a class="hata-buton" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues/new?title=%F0%9F%90%9E%20Hata%20Bildirimi&body=%2A%2AUygulama%20s%C3%BCr%C3%BCm%C3%BC:%2A%2A%20%0A%0A%0A%2A%2AWindows%20s%C3%BCr%C3%BCm%C3%BC:%2A%2A%20%0A%0A%0A%2A%2ANe%20yapmaya%20%C3%A7al%C4%B1%C5%9Ft%C4%B1n%C4%B1z:%2A%2A%20%0A%0A%0A%2A%2ANe%20oldu%20%2F%20hata%20mesaj%C4%B1:%2A%2A%20%0A%0A%0A%2A%2AEkran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC:%2A%2A%20" data-i18n="iletisim-buton">🐞 Hata Bildir</a>
     <div class="qr-kutu animasyon">
-      <img src="qr-site.png" alt="Site QR kodu" width="180" height="180" loading="lazy">
+      <picture><source srcset="qr-site.webp" type="image/webp"><img src="qr-site.png" alt="Site QR kodu" width="180" height="180" loading="lazy"></picture>
       <p data-i18n="qr-metin">📱 Bu kodu yazdırıp kooperatif duyuru panosuna asabilirsiniz — üyeler telefonlarıyla okutup siteye saniyeler içinde ulaşır.</p>
     </div>
   </div>
@@ -826,6 +883,8 @@ var DILLER = {
     "canli-tarih": "yayın:",
     "canli-indirme": "indirme",
     "paylas-etiket": "Paylaş:",
+    "kopyala": "🔗 Kopyala",
+    "kutlama-baslik": "✅ İndirme başladı!", "kutlama-adim1": "1) KURULUM.exe'yi çalıştırın", "kutlama-adim2": "2) Kurulum bittiğinde Excel'i doldurun", "kutlama-adim3": "3) BOT_BAŞLAT.bat'a çift tıklayın",
     "terminal-oynat": "▶ Tekrar Oynat",
     "yukle-buton": "📲 Uygulamayı Yükle",
     "bolum-ozellikler": "Özellikler",
@@ -899,6 +958,8 @@ var DILLER = {
     "canli-tarih": "released:",
     "canli-indirme": "downloads",
     "paylas-etiket": "Share:",
+    "kopyala": "🔗 Copy",
+    "kutlama-baslik": "✅ Download started!", "kutlama-adim1": "1) Run KURULUM.exe", "kutlama-adim2": "2) Fill in the Excel after setup", "kutlama-adim3": "3) Double-click BOT_BAŞLAT.bat",
     "terminal-oynat": "▶ Replay",
     "yukle-buton": "📲 Install App",
     "bolum-ozellikler": "Features",
@@ -1125,6 +1186,60 @@ if (yazdirButon) {
   yazdirButon.addEventListener("click", function () { window.print(); });
 }
 
+// ---------- İndirme kutlama toast'ı ----------
+var kutlama = document.getElementById("kutlama");
+var kutlamaZamanlayici = null;
+function kutlamaGoster() {
+  if (!kutlama) return;
+  if (kutlamaZamanlayici) clearTimeout(kutlamaZamanlayici);
+  var cubuk = kutlama.querySelector(".k-cubuk");
+  if (cubuk) {
+    cubuk.style.animation = "none";
+    void cubuk.offsetWidth;
+    cubuk.style.animation = "";
+  }
+  kutlama.classList.add("gorunur");
+  kutlamaZamanlayici = setTimeout(function () { kutlama.classList.remove("gorunur"); }, 8000);
+}
+document.querySelectorAll("#indir-buton, #nav-indir").forEach(function (el) {
+  el.addEventListener("click", kutlamaGoster);
+});
+var kutlamaKapat = document.getElementById("kutlama-kapat");
+if (kutlamaKapat) {
+  kutlamaKapat.addEventListener("click", function () {
+    kutlama.classList.remove("gorunur");
+    if (kutlamaZamanlayici) clearTimeout(kutlamaZamanlayici);
+  });
+}
+
+// ---------- Bağlantıyı kopyala ----------
+var kopyalaButon = document.getElementById("kopyala-buton");
+if (kopyalaButon) {
+  kopyalaButon.addEventListener("click", function (e) {
+    e.preventDefault();
+    function basarili() {
+      kopyalaButon.classList.add("kopyala-aktif");
+      kopyalaButon.textContent = document.documentElement.lang === "en" ? "✓ Copied!" : "✓ Kopyalandı!";
+      setTimeout(function () {
+        kopyalaButon.classList.remove("kopyala-aktif");
+        dilUygula(document.documentElement.lang === "en" ? "en" : "tr");
+      }, 2500);
+    }
+    var metin = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(metin).then(basarili, function () { basarili(); });
+    } else {
+      var gecici = document.createElement("textarea");
+      gecici.value = metin;
+      document.body.appendChild(gecici);
+      gecici.select();
+      try { document.execCommand("copy"); } catch (err) {}
+      document.body.removeChild(gecici);
+      basarili();
+    }
+  });
+}
+
 // ---------- Kaydırma animasyonları ----------
 var gozlemci = new IntersectionObserver(function (girisler) {
   girisler.forEach(function (g) {
@@ -1195,5 +1310,14 @@ karsilastirmalar.forEach(function (k) { barGozlemci.observe(k); });
 </script>
 
 <button id="yukari-buton" title="↑">↑</button>
+
+<div id="kutlama" role="status" aria-live="polite">
+  <button class="k-kapat" id="kutlama-kapat" aria-label="Kapat">✕</button>
+  <div class="k-baslik" data-i18n="kutlama-baslik">✅ İndirme başladı!</div>
+  <div class="k-adim" data-i18n="kutlama-adim1">1) KURULUM.exe'yi çalıştırın</div>
+  <div class="k-adim" data-i18n="kutlama-adim2">2) Kurulum bittiğinde Excel'i doldurun</div>
+  <div class="k-adim" data-i18n="kutlama-adim3">3) BOT_BAŞLAT.bat'a çift tıklayın</div>
+  <div class="k-cubuk"></div>
+</div>
 </body>
 </html>

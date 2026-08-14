@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Sayfa Bulunamadı | SGK Bot</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+    color: #e2e8f0;
+    overflow: hidden;
+    position: relative;
+  }
+  .kabarcik { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.4; pointer-events: none; }
+  .b1 { width: 300px; height: 300px; background: rgba(34,197,94,0.4); top: -100px; left: -80px; animation: yuz 16s ease-in-out infinite alternate; }
+  .b2 { width: 260px; height: 260px; background: rgba(6,182,212,0.4); bottom: -90px; right: -60px; animation: yuz 20s ease-in-out infinite alternate-reverse; }
+  .b3 { width: 180px; height: 180px; background: rgba(168,85,247,0.35); top: 20%; left: 55%; animation: yuz 14s ease-in-out infinite alternate; }
+  @keyframes yuz { to { transform: translate(50px, 40px) scale(1.15); } }
+  .kutu { position: relative; z-index: 1; padding: 40px 24px; max-width: 560px; }
+  .emoji { font-size: 90px; display: inline-block; animation: zipla 2s ease-in-out infinite; }
+  @keyframes zipla { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  h1 { font-size: 96px; font-weight: 800; margin: 10px 0 6px; background: linear-gradient(90deg, #22c55e, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  p { color: #94a3b8; font-size: 17px; margin-bottom: 26px; }
+  .butonlar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  a {
+    display: inline-block;
+    background: #22c55e;
+    color: #052e16;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 12px 26px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  a:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
+  a.gri { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+  a.gri:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  #dil {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 2;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .emoji, .kabarcik { animation: none; }
+  }
+</style>
+</head>
+<body>
+<span class="kabarcik b1"></span>
+<span class="kabarcik b2"></span>
+<span class="kabarcik b3"></span>
+<button id="dil" title="English">EN</button>
+<div class="kutu">
+  <span class="emoji">🌾</span>
+  <h1>404</h1>
+  <p data-i18n="404-metin">Bu sayfada buğday mı yetişiyordu? Bir şeyler kayboldu — ama merak etmeyin, bot sizi eve götürür.</p>
+  <div class="butonlar">
+    <a href="./" data-i18n="404-anasayfa">🏠 Ana Sayfa</a>
+    <a href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="404-indir">⬇️ İndir</a>
+    <a class="gri" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon" data-i18n="404-github">🐙 GitHub</a>
+  </div>
+</div>
+<script>
+var DILLER = {
+  tr: {
+    "404-metin": "Bu sayfada buğday mı yetişiyordu? Bir şeyler kayboldu — ama merak etmeyin, bot sizi eve götürür.",
+    "404-anasayfa": "🏠 Ana Sayfa",
+    "404-indir": "⬇️ İndir",
+    "404-github": "🐙 GitHub"
+  },
+  en: {
+    "404-metin": "Was wheat growing on this page? Something got lost — but don't worry, the bot will take you home.",
+    "404-anasayfa": "🏠 Home",
+    "404-indir": "⬇️ Download",
+    "404-github": "🐙 GitHub"
+  }
+};
+var dil = "tr";
+try { if (localStorage.getItem("sgk-dil") === "en") dil = "en"; } catch (e) {}
+function uygula() {
+  var i18nOge = document.querySelectorAll("[data-i18n]");
+  i18nOge.forEach(function (el) { el.textContent = DILLER[dil][el.getAttribute("data-i18n")] || el.textContent; });
+  document.getElementById("dil").textContent = dil === "tr" ? "EN" : "TR";
+}
+document.getElementById("dil").addEventListener("click", function () {
+  dil = dil === "tr" ? "en" : "tr";
+  try { localStorage.setItem("sgk-dil", dil); } catch (e) {}
+  uygula();
+});
+uygula();
+</script>
+</body>
+</html>

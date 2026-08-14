@@ -385,11 +385,102 @@
   footer { text-align: center; padding: 30px 20px; color: var(--soluk); font-size: 14px; }
   footer a { color: var(--turkuaz); text-decoration: none; }
 
+  /* ---------- Gelişmiş animasyonlar ---------- */
+  header { position: relative; overflow: hidden; }
+  header > .kapsayici { position: relative; z-index: 1; }
+  .kabarcik {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .kabarcik.b1 { width: 320px; height: 320px; background: rgba(34,197,94,0.4); top: -120px; left: -80px; animation: yuz-b1 16s ease-in-out infinite alternate; }
+  .kabarcik.b2 { width: 260px; height: 260px; background: rgba(6,182,212,0.4); bottom: -100px; right: -60px; animation: yuz-b2 20s ease-in-out infinite alternate; }
+  .kabarcik.b3 { width: 180px; height: 180px; background: rgba(168,85,247,0.35); top: 25%; left: 60%; animation: yuz-b3 14s ease-in-out infinite alternate; }
+  @keyframes yuz-b1 { to { transform: translate(70px, 45px) scale(1.15); } }
+  @keyframes yuz-b2 { to { transform: translate(-70px, -55px) scale(1.1); } }
+  @keyframes yuz-b3 { to { transform: translate(-45px, 35px) scale(1.2); } }
+
+  #ilerleme-cubugu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, var(--yesil), var(--turkuaz));
+    z-index: 60;
+  }
+  nav.kaydirildi { box-shadow: 0 6px 24px rgba(0,0,0,0.18); }
+  .nav-linkler a { position: relative; padding-bottom: 2px; }
+  .nav-linkler a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background: var(--turkuaz);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s;
+  }
+  .nav-linkler a:hover::after { transform: scaleX(1); }
+
+  .giris-anim { opacity: 0; animation: yukari-gel 0.7s ease forwards; }
+  .giris-anim.g1 { animation-delay: 0.05s; }
+  .giris-anim.g2 { animation-delay: 0.15s; }
+  .giris-anim.g3 { animation-delay: 0.25s; }
+  .giris-anim.g4 { animation-delay: 0.35s; }
+  .giris-anim.g5 { animation-delay: 0.5s; }
+  .giris-anim.g6 { animation-delay: 0.65s; }
+  .giris-anim.g7 { animation-delay: 0.8s; }
+  @keyframes yukari-gel { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+  .indir { animation: indir-isilti 2.6s ease-in-out infinite; }
+  .indir:hover { animation-play-state: paused; }
+  @keyframes indir-isilti {
+    0%, 100% { box-shadow: 0 4px 14px rgba(34,197,94,0.3); }
+    50% { box-shadow: 0 4px 28px rgba(34,197,94,0.55); }
+  }
+
+  .kart, .guven-kutu, .adim, .surum-kayit, .sss { transition: background 0.3s, transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s; }
+  .kart:hover, .guven-kutu:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.25); border-color: var(--turkuaz); }
+  .adim:hover, .surum-kayit:hover, .sss:hover { border-color: var(--turkuaz); }
+  .kart .sembol, .guven-kutu .sembol { display: inline-block; }
+  .kart:hover .sembol, .guven-kutu:hover .sembol { animation: sembol-zipla 0.5s ease; }
+  @keyframes sembol-zipla { 0%, 100% { transform: none; } 40% { transform: translateY(-6px) scale(1.2); } }
+
+  #yukari-buton {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 55;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--kart);
+    border: 1px solid var(--cizgi);
+    color: var(--turkuaz);
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+  }
+  #yukari-buton.gorunur { opacity: 1; visibility: visible; transform: none; }
+  #yukari-buton:hover { border-color: var(--turkuaz); }
+
   /* ---------- Animasyonlar ---------- */
   .animasyon { opacity: 0; transform: translateY(26px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .animasyon.gorunur { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) {
     .animasyon { opacity: 1; transform: none; transition: none; }
+    .giris-anim { opacity: 1; animation: none; }
+    .kabarcik { display: none; }
+    .indir { animation: none; }
     html { scroll-behavior: auto; }
   }
   @media (max-width: 600px) {
@@ -399,6 +490,8 @@
 </style>
 </head>
 <body>
+
+<div id="ilerleme-cubugu"></div>
 
 <nav>
   <div class="nav-ic">
@@ -418,12 +511,15 @@
 </nav>
 
 <header id="baslangic">
+  <span class="kabarcik b1"></span>
+  <span class="kabarcik b2"></span>
+  <span class="kabarcik b3"></span>
   <div class="kapsayici">
-    <span class="rozet">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows &middot; 💰 Ücretsiz</span>
-    <h1>SGK Tarımsal Kesinti Botu</h1>
-    <p class="alt-baslik" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
-    <a class="indir" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi"></span></a>
-    <span class="indir-notu" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
+    <span class="rozet giris-anim g1">🐍 Python &middot; ⚙️ Selenium &middot; 🪟 Windows &middot; 💰 Ücretsiz</span>
+    <h1 class="giris-anim g2">SGK Tarımsal Kesinti Botu</h1>
+    <p class="alt-baslik giris-anim g3" data-i18n="hero-alt">Bağ-Kur tarımsal faaliyet bildirimlerini otomatikleştirin — kayıtları tek tek elle girmek tarihe karışsın.</p>
+    <a class="indir giris-anim g4" href="https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases/latest/download/KURULUM.exe" data-i18n="hero-indir">⬇️ KURULUM.exe'yi İndir<span class="v-etiketi"></span></a>
+    <span class="indir-notu giris-anim g5" data-i18n="hero-not">Tek tıkla kurulum: Python, Chrome, chromedriver ve paketleri kendisi kurar</span>
     <div class="canli-surum">
       <span data-i18n="canli-etiket">En son sürüm:</span>
       <span class="v">…</span>
@@ -902,16 +998,41 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(function () {});
 }
 
+// ---------- Kaydırma ilerlemesi, nav gölgesi, yukarı çık ----------
+var ilerlemeCubugu = document.getElementById("ilerleme-cubugu");
+var navCubugu = document.querySelector("nav");
+var yukariButon = document.getElementById("yukari-buton");
+window.addEventListener("scroll", function () {
+  var y = window.pageYOffset || document.documentElement.scrollTop;
+  var toplam = document.documentElement.scrollHeight - window.innerHeight;
+  if (ilerlemeCubugu) ilerlemeCubugu.style.width = (toplam > 0 ? (y / toplam) * 100 : 0) + "%";
+  if (navCubugu) navCubugu.classList.toggle("kaydirildi", y > 10);
+  if (yukariButon) yukariButon.classList.toggle("gorunur", y > 500);
+});
+if (yukariButon) {
+  yukariButon.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 // ---------- Kaydırma animasyonları ----------
 var gozlemci = new IntersectionObserver(function (girisler) {
   girisler.forEach(function (g) {
     if (g.isIntersecting) {
+      var sira = parseInt(g.target.dataset.sira || "0", 10);
+      g.target.style.transitionDelay = Math.min(sira, 7) * 0.08 + "s";
       g.target.classList.add("gorunur");
       gozlemci.unobserve(g.target);
     }
   });
 }, { threshold: 0.15 });
-document.querySelectorAll(".animasyon").forEach(function (el) { gozlemci.observe(el); });
+document.querySelectorAll(".animasyon").forEach(function (el) {
+  var esler = Array.prototype.filter.call(el.parentNode.children, function (k) {
+    return k.classList && k.classList.contains("animasyon");
+  });
+  el.dataset.sira = esler.indexOf(el);
+  gozlemci.observe(el);
+});
 
 // ---------- Zaman hesaplayıcı ----------
 function sureBiçimle(saniye) {
@@ -963,5 +1084,6 @@ karsilastirmalar.forEach(function (k) { barGozlemci.observe(k); });
 })();
 </script>
 
+<button id="yukari-buton" title="↑">↑</button>
 </body>
 </html>

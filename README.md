@@ -13,6 +13,14 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 
 ---
 
+## 🌐 Tanıtım Sayfası
+
+👉 **https://ardaekiz0.github.io/e-kesinti-otomasyon/**
+
+İndirme, özellikler, kullanım kılavuzu ve SSS'nin tamamı tek sayfada — siteyi arkadaşlarınla paylaş!
+
+---
+
 ## ✨ Özellikler
 
 - ⚡ **Tek Tık Kurulum** — `KURULUM.exe` Python, Chrome, chromedriver ve paketleri kendisi kurar

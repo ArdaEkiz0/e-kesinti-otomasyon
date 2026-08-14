@@ -10,6 +10,15 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 [![Sürüm](https://img.shields.io/github/v/release/ArdaEkiz0/e-kesinti-otomasyon?color=purple&label=S%C3%BCr%C3%BCm)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/releases)
 [![Derleme](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/actions/workflows/release.yml/badge.svg)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/actions)
 [![Tanıtım Sayfası](https://img.shields.io/badge/Tan%C4%B1t%C4%B1m-Site-blueviolet)](https://ardaekiz0.github.io/e-kesinti-otomasyon/)
+[![Son commit](https://img.shields.io/github/last-commit/ArdaEkiz0/e-kesinti-otomasyon?color=darkgreen&label=Son%20g%C3%BCncelleme)](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/commits/main)
+
+---
+
+## 📸 Ekran Görüntüleri
+
+| Bot çalışırken | Kurulum aracı |
+| :---: | :---: |
+| ![Bot ekran görüntüsü](docs/ekran-bot.png) | ![Kurulum aracı ekran görüntüsü](docs/ekran-kurulum.png) |
 
 ---
 
@@ -51,10 +60,11 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 ```bat
 git clone https://github.com/ArdaEkiz0/e-kesinti-otomasyon.git
 cd e-kesinti-otomasyon
-python KURULUM.py
+python -m pip install -r requirements.txt
+python sgk_bot.py
 ```
 
-> 📌 Kurulumu `KURULUM.py` üzerinden de çalıştırabilirsin: `python KURULUM.py`
+> 📌 Bağımlılıkları tek tek kurmak yerine `requirements.txt` kullanılır; kurulum aracı (`KURULUM.py`) zaten bu paketleri otomatik kurar.
 
 ---
 
@@ -95,6 +105,16 @@ Sayfa açmadan, sahte sürücü ile tüm akışın çalıştığını doğrular.
 | Bot açılmıyor / sürücü hatası | `KURULUM.exe` yeniden çalıştır (Chrome güncellenmiş olabilir) |
 | Kuruş yanlış yazılıyor (ör: `13014,90`) | Bu botun eski sürüm sorunudur; güncel sürümde kuruş her zaman 2 haneli (`09`) yazılır |
 | Sayfa elemanı bulunamadı | SGK sitesi değişmiş olabilir — sürümü kontrol et |
+
+---
+
+## 🤝 Katkı
+
+Geliştirmeler, hata bildirimleri ve öneriler her zaman açıktır. Nasıl katkı sağlayacağını gör:
+
+- 👉 [CONTRIBUTING.md](CONTRIBUTING.md) — katkı rehberi ve hata bildirimi şablonu
+- 💬 [Discussions](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/discussions) — soru, öneri ve geri bildirim
+- 🐛 [Issues](https://github.com/ArdaEkiz0/e-kesinti-otomasyon/issues) — hata bildirimi ve geliştirme talebi
 
 ---
 

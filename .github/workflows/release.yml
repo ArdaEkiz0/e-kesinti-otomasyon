@@ -1,0 +1,33 @@
+name: Exe Derle ve Release Olustur
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  derle:
+    runs-on: windows-latest
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: PyInstaller kur
+        run: pip install pyinstaller
+
+      - name: KURULUM.exe derle
+        run: pyinstaller --onefile --console --clean --name KURULUM KURULUM.py
+
+      - name: Release olustur ve exe'yi yukle
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/KURULUM.exe
+          generate_release_notes: true

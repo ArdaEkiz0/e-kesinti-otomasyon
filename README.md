@@ -8,6 +8,7 @@ Excel'deki üretici listesini okur, SGK sayfasında tek tek işler ve işlem son
 ![Otomasyon](https://img.shields.io/badge/Otomasyon-Selenium-orange?logo=selenium)
 ![Lisans](https://img.shields.io/badge/Lisans-MIT-brightgreen)
 [![Sürüm](https://img.shields.io/github/v/release/ArdaEkiz0/sgk-bot?color=purple&label=S%C3%BCr%C3%BCm)](https://github.com/ArdaEkiz0/sgk-bot/releases)
+[![Derleme](https://github.com/ArdaEkiz0/sgk-bot/actions/workflows/release.yml/badge.svg)](https://github.com/ArdaEkiz0/sgk-bot/actions)
 
 ---
 

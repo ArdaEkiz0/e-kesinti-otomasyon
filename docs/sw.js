@@ -1,4 +1,4 @@
-var KAS_ISMI = "sgk-bot-site-v1";
+var KAS_ISMI = "sgk-bot-site-v2";
 var VARLIKLAR = ["/e-kesinti-otomasyon/"];
 
 self.addEventListener("install", function (e) {
@@ -14,15 +14,34 @@ self.addEventListener("activate", function (e) {
 });
 
 self.addEventListener("fetch", function (e) {
+  var istek = e.request;
+  var apiMi = istek.url.indexOf("api.github.com") !== -1;
+
+  if (istek.method !== "GET" || apiMi) {
+    return;
+  }
+
+  if (istek.mode === "navigate") {
+    e.respondWith(
+      fetch(istek).then(function (yanit) {
+        var kopya = yanit.clone();
+        caches.open(KAS_ISMI).then(function (k) { k.put(istek, kopya); });
+        return yanit;
+      }).catch(function () {
+        return caches.match(istek);
+      })
+    );
+    return;
+  }
+
   e.respondWith(
-    caches.match(e.request).then(function (yanit) {
-      return yanit || fetch(e.request).then(function (agYaniti) {
-        if (e.request.method === "GET" && e.request.url.indexOf("api.github.com") === -1) {
-          var kopya = agYaniti.clone();
-          caches.open(KAS_ISMI).then(function (k) { k.put(e.request, kopya); });
-        }
+    caches.match(istek).then(function (yanit) {
+      var agIstek = fetch(istek).then(function (agYaniti) {
+        var kopya = agYaniti.clone();
+        caches.open(KAS_ISMI).then(function (k) { k.put(istek, kopya); });
         return agYaniti;
-      });
+      }).catch(function () { return yanit; });
+      return yanit || agIstek;
     })
   );
 });

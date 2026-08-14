@@ -14,7 +14,12 @@ from selenium.common.exceptions import (
 )
 import pandas as pd
 from datetime import datetime, timedelta
-import time, os, sys
+import time, os, sys, re, json, urllib.request, urllib.error
+
+# Uygulama sürümü ve güncelleme kontrolü
+BOT_SURUM = "1.0.1"  # GitHub release etiketiyle karşılaştırılır
+GITHUB_REPO = "ArdaEkiz0/sgk-bot"
+GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # Türkçe karakterler ve emojiler hangi konsolda olursa olsun yazılabilsin
 if hasattr(sys.stdout, "reconfigure"):
@@ -102,6 +107,28 @@ def hata_aciklamasi(e):
     if "alert" in metin:
         return "Sayfada açılır pencere (alert) bekleniyor, elle kapatın"
     return (metin[:200] if metin else f"Bilinmeyen hata ({sinif})")
+
+
+def guncelleme_kontrol_goster():
+    """GitHub'da daha yeni bir sürüm varsa kullanıcıyı uyarır (hata olursa sessizce geçer)."""
+    try:
+        istek = urllib.request.Request(
+            GITHUB_API, headers={"User-Agent": "SGK-BOT", "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(istek, timeout=8) as r:
+            veri = json.loads(r.read().decode("utf-8"))
+        uzak_surum = str(veri.get("tag_name", "")).lstrip("v")
+        if not uzak_surum:
+            return
+        yerel = [int(x) for x in re.findall(r"\d+", BOT_SURUM)]
+        uzak = [int(x) for x in re.findall(r"\d+", uzak_surum)]
+        uzunluk = max(len(yerel), len(uzak))
+        yerel += [0] * (uzunluk - len(yerel))
+        uzak += [0] * (uzunluk - len(uzak))
+        if uzak > yerel:
+            print(renkli(f"\n🔄 YENİ SÜRÜM VAR: v{uzak_surum} (senin sürüm: v{BOT_SURUM})", Renk.SARI, kalin=True))
+            print(renkli("   Güncellemek için 'KURULUM.exe'yi çalıştırın — kendini otomatik günceller.", Renk.SARI))
+    except Exception:
+        pass  # internet yoksa veya hata olursa sessizce geç
 
 
 def windows_bildirim(baslik, metin):
@@ -518,6 +545,7 @@ def excel_dosyasi_sec():
 
 
 if __name__ == "__main__":
+    guncelleme_kontrol_goster()
     test_modu = "--test" in sys.argv
     # Kullanıcı Excel dosyası verirse onu kullan, vermezse klasördeki Excel'i otomatik bul
     # Kullanım:  python sgk_bot.py [excel_dosya.xlsx]  veya  dosyayı BOT_BAŞLAT.bat üzerine sürükle

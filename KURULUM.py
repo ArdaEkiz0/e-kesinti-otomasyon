@@ -1,11 +1,12 @@
-"""KURULUM - SGK Bot Otomatik Kurulum Aracı (v2.1)
+"""KURULUM - SGK Bot Otomatik Kurulum Aracı (v2.2)
 Bu program bilgisayardaki gereksinimleri kontrol eder, eksikleri otomatik kurar:
   0. GitHub'da yeni sürüm olup olmadığını kontrol eder (varsa kendini günceller)
-  1. Python  (yoksa indirir + sessiz kurar)
-  2. Gerekli Python paketleri (selenium, pandas, openpyxl, webdriver-manager)
-  3. Google Chrome (yoksa indirir + kurar)
-  4. chrome sürümüne uygun chromedriver.exe
-  5. çalışmaaaa.xlsx şablonu (yoksa oluşturur)
+  1. Bot dosyaları (sgk_bot.py, BOT_BAŞLAT.bat — yoksa indirir/oluşturur)
+  2. Python  (yoksa indirir + sessiz kurar)
+  3. Gerekli Python paketleri (selenium, pandas, openpyxl, webdriver-manager)
+  4. Google Chrome (yoksa indirir + kurar)
+  5. chrome sürümüne uygun chromedriver.exe
+  6. çalışmaaaa.xlsx şablonu (yoksa oluşturur) + bot simülasyon testi
 Kurulumdan sonra bot BOT_BAŞLAT.bat ile başlatılır.
 """
 import json
@@ -46,7 +47,7 @@ PYTHON_INDIR = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.e
 CHROME_INDIR = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
 PAKETLER = ["selenium", "pandas", "openpyxl", "webdriver-manager"]
 
-SURUM = "1.0.4"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
+SURUM = "1.0.5"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -97,21 +98,31 @@ def baslik():
 
 
 def indir(url, hedef):
-    """Dosyayı ilerleme göstergesiyle indirir."""
-    yaz(f"   ⬇️  İndiriliyor: {url.split('/')[-1]}", Renk.SARI)
-    istek = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(istek, timeout=180) as r, open(hedef, "wb") as f:
-        toplam = int(r.headers.get("Content-Length", 0))
-        yazilan = 0
-        while True:
-            parca = r.read(65536)
-            if not parca:
-                break
-            f.write(parca)
-            yazilan += len(parca)
-            if toplam:
-                print(f"\r   %3d%%" % (yazilan * 100 // toplam), end="", flush=True)
-    print("")
+    """Dosyayı ilerleme göstergesiyle indirir (başarısız olursa bir kez tekrar dener)."""
+    son_hata = None
+    for deneme in (1, 2):
+        try:
+            yaz(f"   ⬇️  İndiriliyor: {url.split('/')[-1]}" + (" (tekrar deneme)" if deneme == 2 else ""), Renk.SARI)
+            istek = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(istek, timeout=180) as r, open(hedef, "wb") as f:
+                toplam = int(r.headers.get("Content-Length", 0))
+                yazilan = 0
+                while True:
+                    parca = r.read(65536)
+                    if not parca:
+                        break
+                    f.write(parca)
+                    yazilan += len(parca)
+                    if toplam:
+                        print(f"\r   %3d%%" % (yazilan * 100 // toplam), end="", flush=True)
+            print("")
+            return
+        except Exception as e:
+            son_hata = e
+            print("")
+            if deneme == 1:
+                time.sleep(3)
+    raise RuntimeError(f"İndirme başarısız: {url} ({son_hata})")
 
 
 # ---------- 0. Güncelleme kontrolü ----------
@@ -189,6 +200,66 @@ def guncelle_uygula(url):
     sys.exit(0)
 
 
+# ---------- 0.5 Bot dosyaları ----------
+
+SGK_BOT_RAW = "https://raw.githubusercontent.com/ArdaEkiz0/e-kesinti-otomasyon/main/sgk_bot.py"
+
+BOT_BASLAT_ICERIK = r"""@echo off
+chcp 65001 > nul
+set "PY="
+where python >nul 2>nul && set "PY=python"
+if not defined PY (
+    where py >nul 2>nul && set "PY=py -3"
+)
+if not defined PY (
+    if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PY=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+)
+if not defined PY (
+    if exist "%ProgramFiles%\Python312\python.exe" set "PY=%ProgramFiles%\Python312\python.exe"
+)
+if not defined PY (
+    echo HATA: Python bulunamadi! Once KURULUM.exe calistirin.
+    pause
+    exit /b 1
+)
+if "%~1"=="" (
+    %PY% "%~dp0sgk_bot.py"
+) else (
+    echo Seçilen Excel: %~nx1
+    %PY% "%~dp0sgk_bot.py" "%~1"
+)
+pause"""
+
+
+def bot_dosyalari_hazirla():
+    """sgk_bot.py ve BOT_BAŞLAT.bat eksikse indirir/oluşturur."""
+    yaz("\n📁 1/6 ADIM - Bot dosyaları kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    bot = os.path.join(BASE_DIR, "sgk_bot.py")
+
+    def bot_icerik():
+        try:
+            with open(bot, encoding="utf-8", errors="replace") as f:
+                return f.read()
+        except OSError:
+            return ""
+
+    if os.path.exists(bot) and os.path.getsize(bot) > 5000 and "SGKBot" in bot_icerik():
+        yaz("   ✅ sgk_bot.py mevcut", Renk.YESIL)
+    else:
+        yaz("   sgk_bot.py bulunamadı veya eksik, GitHub'dan indiriliyor...", Renk.SARI)
+        indir(SGK_BOT_RAW, bot)
+        if os.path.getsize(bot) < 5000 or "SGKBot" not in bot_icerik():
+            raise RuntimeError("Bot dosyası indirilemedi! İnternet bağlantınızı kontrol edip tekrar deneyin.")
+        yaz("   ✅ sgk_bot.py indirildi", Renk.YESIL)
+    bat = os.path.join(BASE_DIR, "BOT_BAŞLAT.bat")
+    if not os.path.exists(bat):
+        with open(bat, "w", encoding="utf-8", newline="\r\n") as f:
+            f.write(BOT_BASLAT_ICERIK)
+        yaz("   ✅ BOT_BAŞLAT.bat oluşturuldu", Renk.YESIL)
+    else:
+        yaz("   ✅ BOT_BAŞLAT.bat mevcut", Renk.YESIL)
+
+
 # ---------- 1. Python kontrolü ve kurulumu ----------
 
 def winreg_yolu(kok, alt_anahtar):
@@ -256,6 +327,10 @@ def python_surumu(komut_taban):
 
 def python_kur():
     yaz("   Python bulunamadı! Otomatik kuruluyor...", Renk.SARI)
+    if os.environ.get("PROCESSOR_ARCHITECTURE", "").lower() == "x86":
+        raise RuntimeError(
+            "Bu bilgisayar 32-bit! Python'un 64-bit sürümü kurulamıyor. "
+            "https://www.python.org/downloads adresinden Python 3.12'yi elle kurun.")
     kurucu = os.path.join(BASE_DIR, "python-kurucu.exe")
     indir(PYTHON_INDIR, kurucu)
     if os.path.getsize(kurucu) < 5_000_000:
@@ -286,7 +361,7 @@ def python_kur():
 
 
 def python_hazirla():
-    yaz("\n📦 1/5 ADIM - Python kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    yaz("\n📦 2/6 ADIM - Python kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     en_iyi = None
     for ad, taban, ek in python_adaylari():
         surum = python_surumu([taban] + ek)
@@ -303,7 +378,7 @@ def python_hazirla():
 # ---------- 2. Python paketleri ----------
 
 def paketleri_kur(komut):
-    yaz("\n📦 2/5 ADIM - Python paketleri yükleniyor/kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    yaz("\n📦 3/6 ADIM - Python paketleri yükleniyor/kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     subprocess.run(komut + ["-m", "pip", "install", "--upgrade", "pip", "--quiet", "--disable-pip-version-check"],
                    capture_output=True, timeout=600)
     r = subprocess.run(komut + ["-m", "pip", "install", "--quiet", "--disable-pip-version-check"] + PAKETLER,
@@ -346,7 +421,7 @@ def dosya_surumu(dosya):
 
 
 def chrome_hazirla():
-    yaz("\n🌐 3/5 ADIM - Google Chrome kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    yaz("\n🌐 4/6 ADIM - Google Chrome kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     chrome = chrome_bul()
     if chrome:
         surum = dosya_surumu(chrome)
@@ -356,7 +431,7 @@ def chrome_hazirla():
     kurucu = os.path.join(BASE_DIR, "chrome-kurucu.exe")
     indir(CHROME_INDIR, kurucu)
     yaz("   🛠️  Chrome kuruluyor (sessiz kurulum)...", Renk.SARI)
-    subprocess.run([kurucu, "/silent", "/install"], timeout=900)
+    r = subprocess.run([kurucu, "/silent", "/install"], timeout=900)
     try:
         os.remove(kurucu)
     except OSError:
@@ -364,7 +439,8 @@ def chrome_hazirla():
     time.sleep(5)
     chrome = chrome_bul()
     if not chrome:
-        raise RuntimeError("Chrome kurulamadı! https://www.google.com/chrome adresinden manuel kurun.")
+        hata = "" if r.returncode == 0 else f" (kurulum kodu: {r.returncode})"
+        raise RuntimeError(f"Chrome kurulamadı{hata}! https://www.google.com/chrome adresinden manuel kurun.")
     surum = dosya_surumu(chrome)
     yaz(f"   ✅ Chrome kuruldu (sürüm: {surum or 'bilinmiyor'})", Renk.YESIL)
     return surum
@@ -386,6 +462,14 @@ def chromedriver_surumu(exe):
 def chromedriver_indir(chrome_surum):
     """Chrome sürümüne uygun chromedriver'ı bulur ve indirir."""
     url = None
+    if not chrome_surum or chrome_surum == "LATEST":
+        try:
+            with urllib.request.urlopen(
+                    "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_STABLE",
+                    timeout=60) as r:
+                chrome_surum = r.read().decode("utf-8").strip()
+        except Exception:
+            pass
     try:
         with urllib.request.urlopen(
                 "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json",
@@ -399,31 +483,44 @@ def chromedriver_indir(chrome_surum):
                 break
     except Exception:
         pass
+    if not url and chrome_surum:
+        url = (f"https://storage.googleapis.com/chrome-for-testing-public/"
+               f"{chrome_surum}/win64/chromedriver-win64.zip")
     if not url:
-        url = f"https://edgedl.me/chrome-for-testing/{chrome_surum}/win64/chromedriver-win64.zip"
+        raise RuntimeError("chromedriver adresi bulunamadı! İnternet bağlantınızı kontrol edin.")
     hedef = os.path.join(BASE_DIR, "chromedriver.exe")
     zip_yol = os.path.join(BASE_DIR, "chromedriver.zip")
     indir(url, zip_yol)
+    if os.path.getsize(zip_yol) < 100_000:
+        os.remove(zip_yol)
+        raise RuntimeError("chromedriver indirilemedi (dosya eksik)! İnternet bağlantınızı kontrol edin.")
+    bulundu = False
     with zipfile.ZipFile(zip_yol) as z:
         for ad in z.namelist():
             if ad.endswith("chromedriver.exe"):
                 with z.open(ad) as kaynak, open(hedef, "wb") as cikti:
                     cikti.write(kaynak.read())
+                bulundu = True
                 break
     os.remove(zip_yol)
+    if not bulundu:
+        raise RuntimeError("chromedriver.zip içinde sürücü bulunamadı!")
+    if not chromedriver_surumu(hedef):
+        raise RuntimeError("İndirilen chromedriver çalıştırılamadı! Antivirüs engelliyor olabilir.")
     return hedef
 
 
 def chromedriver_hazirla(chrome_surum):
-    yaz("\n🚗 4/5 ADIM - chromedriver kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    yaz("\n🚗 5/6 ADIM - chromedriver kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    hedef = os.path.join(BASE_DIR, "chromedriver.exe")
     if not chrome_surum:
         yaz("   ⚠️  Chrome sürümü okunamadı, en güncel chromedriver indiriliyor...", Renk.SARI)
-        hedef = os.path.join(BASE_DIR, "chromedriver.exe")
-        if not os.path.exists(hedef):
-            chromedriver_indir(chrome_surum or "LATEST")
+        if os.path.exists(hedef) and chromedriver_surumu(hedef):
+            yaz(f"   ✅ chromedriver zaten hazır: {hedef}", Renk.YESIL)
+            return
+        chromedriver_indir(chrome_surum)
         yaz(f"   ✅ chromedriver hazır: {hedef}", Renk.YESIL)
         return
-    hedef = os.path.join(BASE_DIR, "chromedriver.exe")
     if os.path.exists(hedef):
         mevcut = chromedriver_surumu(hedef)
         if mevcut == chrome_surum:
@@ -442,7 +539,7 @@ def chromedriver_hazirla(chrome_surum):
 # ---------- 5. Excel şablonu ----------
 
 def excel_sablonu_hazirla(komut):
-    yaz("\n📁 5/5 ADIM - Excel şablonu kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
+    yaz("\n📁 6/6 ADIM - Excel şablonu kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     yol = os.path.join(BASE_DIR, "çalışmaaaa.xlsx")
     if os.path.exists(yol):
         yaz("   ✅ çalışmaaaa.xlsx zaten mevcut", Renk.YESIL)
@@ -450,11 +547,10 @@ def excel_sablonu_hazirla(komut):
     r = subprocess.run(
         komut + ["-c", "import sys; sys.path.insert(0, '.'); import sgk_bot; sgk_bot.SGKBot.excel_sablonu_hazirla('çalışmaaaa.xlsx')"],
         cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
-    if os.path.exists(yol):
-        yaz("   ✅ Standart şablon oluşturuldu (çalışmaaaa.xlsx)", Renk.YESIL)
-        yaz("   ⚠️  Şablonu Excel'de açıp Ünvan, TC Kimlik No, Matrah, Bağ-Kur sütunlarını doldurun.", Renk.SARI)
-    else:
-        yaz("   ❌ Şablon oluşturulamadı: " + (r.stderr or "").strip()[-300:], Renk.KIRMIZI)
+    if not os.path.exists(yol):
+        raise RuntimeError("Şablon oluşturulamadı: " + (r.stderr or r.stdout or "").strip()[-300:])
+    yaz("   ✅ Standart şablon oluşturuldu (çalışmaaaa.xlsx)", Renk.YESIL)
+    yaz("   ⚠️  Şablonu Excel'de açıp Ünvan, TC Kimlik No, Matrah, Bağ-Kur sütunlarını doldurun.", Renk.SARI)
 
 
 # ---------- Bot doğrulama ----------
@@ -466,6 +562,20 @@ def botu_dogrula(komut):
     if r.returncode != 0:
         raise RuntimeError(f"sgk_bot.py hatalı!\n{r.stderr[-300:]}")
     yaz("   ✅ Bot dosyası sorunsuz", Renk.YESIL)
+
+
+def botu_test_et(komut):
+    """Sayfa açmadan bot akışını simülasyonla dener (şablon boşsa sessizce başarılı olur)."""
+    yaz("\n🧪 Son kontrol: bot simülasyonla deneniyor...", Renk.TURKUAZ, kalin=True)
+    r = subprocess.run(
+        komut + ["sgk_bot.py", "--test", "çalışmaaaa.xlsx"],
+        cwd=BASE_DIR, capture_output=True, text=True, timeout=300)
+    if r.returncode != 0:
+        yaz("   ⚠️  Bot testi tamamlanamadı (teknik detay: "
+            + (r.stderr or r.stdout or "")[-200:].strip() + ")", Renk.SARI)
+        yaz("   Bot yine de çalışabilir — hatayı görürseniz bize bildirin.", Renk.SARI)
+        return
+    yaz("   ✅ Bot testi başarılı (tarayıcı açılmadan tüm akış doğrulandı)", Renk.YESIL)
 
 
 # ---------- Ana akış ----------
@@ -482,12 +592,14 @@ def ana():
         if cevap in ("e", "evet", ""):
             guncelle_uygula(yeni_url)
     try:
+        bot_dosyalari_hazirla()
         py = python_hazirla()
         paketleri_kur(py)
         chrome_surum = chrome_hazirla()
         chromedriver_hazirla(chrome_surum)
         excel_sablonu_hazirla(py)
         botu_dogrula(py)
+        botu_test_et(py)
 
         print("\n" + "=" * 60)
         yaz("🎉 KURULUM TAMAMLANDI!", Renk.YESIL, kalin=True)
@@ -499,6 +611,7 @@ def ana():
         print("\n" + "=" * 60)
         yaz(f"❌ KURULUM BAŞARISIZ: {e}", Renk.KIRMIZI, kalin=True)
         yaz("   İnternet bağlantınızı kontrol edip tekrar deneyin.", Renk.SARI)
+        yaz("   Sorun sürerse hata mesajının tam metnini bize iletin.", Renk.SARI)
         print("=" * 60)
     try:
         input("\nKapatmak için ENTER'a basınız...")

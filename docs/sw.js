@@ -1,4 +1,4 @@
-var KAS_ISMI = "sgk-bot-site-v2";
+var KAS_ISMI = "sgk-bot-site-v3";
 var VARLIKLAR = ["/e-kesinti-otomasyon/"];
 
 self.addEventListener("install", function (e) {
@@ -28,7 +28,7 @@ self.addEventListener("fetch", function (e) {
 
   if (istek.mode === "navigate") {
     e.respondWith(
-      fetch(istek).then(function (yanit) {
+      fetch(istek, { cache: "no-store" }).then(function (yanit) {
         var kopya = yanit.clone();
         caches.open(KAS_ISMI).then(function (k) { k.put(istek, kopya); });
         return yanit;

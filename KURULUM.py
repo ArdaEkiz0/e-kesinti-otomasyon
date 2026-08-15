@@ -46,7 +46,7 @@ PYTHON_INDIR = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.e
 CHROME_INDIR = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
 PAKETLER = ["selenium", "pandas", "openpyxl", "webdriver-manager"]
 
-SURUM = "1.0.3"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
+SURUM = "1.0.4"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -191,24 +191,56 @@ def guncelle_uygula(url):
 
 # ---------- 1. Python kontrolü ve kurulumu ----------
 
+def winreg_yolu(kok, alt_anahtar):
+    """Registry'den Python kurulum yolunu okur (ör. PythonCore\\3.12\\InstallPath)."""
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE if kok == "HKLM" else winreg.HKEY_CURRENT_USER,
+                            alt_anahtar) as k:
+            yol, _ = winreg.QueryValueEx(k, "")
+            return yol
+    except Exception:
+        return None
+
+
 def python_adaylari():
-    """Sistemdeki Python adaylarını bulur: py launcher, PATH, ortak kurulum yolları."""
+    """Sistemdeki Python adaylarını bulur: py launcher, PATH, registry, ortak kurulum yolları."""
     adaylar = []
-    for ad, komut in (("py launcher", ["py", "-3"]), ("PATH'teki python", ["python"])):
+    for ad, komut in (("py launcher", ["py", "-3"]),
+                      ("PATH'teki python", ["python"]),
+                      ("PATH'teki python3", ["python3"])):
         try:
             cikti = subprocess.run(komut + ["--version"], capture_output=True, text=True, timeout=30)
             if cikti.returncode == 0:
                 adaylar.append((ad, komut[0], komut[1:]))
         except Exception:
             pass
+    # Registry: HKCU + HKLM, tüm PythonCore sürümleri
+    for kok in ("HKCU", "HKLM"):
+        for surum in ("3.14", "3.13", "3.12", "3.11", "3.10"):
+            yol = winreg_yolu(kok, rf"SOFTWARE\Python\PythonCore\{surum}\InstallPath")
+            if yol and os.path.exists(os.path.join(yol, "python.exe")):
+                py = os.path.join(yol, "python.exe")
+                adaylar.append((f"registry {kok} {surum}", py, []))
+    # Ortak kurulum dizinleri
     for kok in (os.path.expandvars(r"%LOCALAPPDATA%\Programs\Python"),
+                "C:\\Program Files\\Python",
+                "C:\\Program Files (x86)\\Python",
                 "C:\\Python313", "C:\\Python312", "C:\\Python311", "C:\\Python310"):
         if os.path.isdir(kok):
-            for alt in os.listdir(kok):
+            for alt in sorted(os.listdir(kok), reverse=True):
                 py = os.path.join(kok, alt, "python.exe")
                 if os.path.exists(py):
                     adaylar.append((py, py, []))
-    return adaylar
+    # Tekilleştir (aynı exe birden fazla kez bulunabilir)
+    gorulen = set()
+    sonuc = []
+    for ad, taban, ek in adaylar:
+        anahtar = (taban, tuple(ek))
+        if anahtar not in gorulen:
+            gorulen.add(anahtar)
+            sonuc.append((ad, taban, ek))
+    return sonuc
 
 
 def python_surumu(komut_taban):
@@ -226,20 +258,31 @@ def python_kur():
     yaz("   Python bulunamadı! Otomatik kuruluyor...", Renk.SARI)
     kurucu = os.path.join(BASE_DIR, "python-kurucu.exe")
     indir(PYTHON_INDIR, kurucu)
+    if os.path.getsize(kurucu) < 5_000_000:
+        raise RuntimeError("Python indirilemedi (dosya eksik)! İnternet bağlantınızı kontrol edip tekrar deneyin.")
     yaz("   🛠️  Python kuruluyor (sessiz kurulum, biraz sürebilir)...", Renk.SARI)
     r = subprocess.run([kurucu, "/quiet", "InstallAllUsers=0", "PrependPath=1",
                         "Include_launcher=1", "Include_test=0", "Include_doc=0",
                         "Include_pip=1", "Shortcuts=0"], timeout=900)
-    if r.returncode != 0:
-        raise RuntimeError("Python kurulumu başarısız oldu!")
+    # 3010 = "başarılı ama yeniden başlatma gerekebilir" (Windows Installer kodu)
+    if r.returncode not in (0, 3010):
+        raise RuntimeError(f"Python kurulumu başarısız oldu (kod: {r.returncode})!")
     try:
         os.remove(kurucu)
     except OSError:
         pass
-    yeni = os.path.expandvars(r"%LOCALAPPDATA%\Programs\Python\Python312\python.exe")
-    if os.path.exists(yeni):
-        return yeni
-    raise RuntimeError("Python kuruldu ama bulunamadı! Bilgisayarı yeniden başlatıp tekrar deneyin.")
+    # Kurulumdan sonra geniş arama: py launcher (registry'ye yazar, hemen çalışır),
+    # registry yolları ve %LOCALAPPDATA% taraması
+    yaz("   🔍 Kurulan Python aranıyor...", Renk.SARI)
+    for ad, taban, ek in python_adaylari():
+        surum = python_surumu([taban] + ek)
+        if surum and surum >= (3, 9):
+            yaz(f"   ✅ Python {'.'.join(map(str, surum))} kuruldu ve bulundu ({ad})", Renk.YESIL)
+            return [taban] + ek
+    raise RuntimeError(
+        "Python kuruldu ama bulunamadı! Bilgisayarı yeniden başlatıp tekrar deneyin. "
+        "Olmazsa https://www.python.org/downloads adresinden Python 3.12'yi elle kurun "
+        "ve 'Add python.exe to PATH' kutusunu işaretleyin.")
 
 
 def python_hazirla():
@@ -254,16 +297,16 @@ def python_hazirla():
             en_iyi = (ad, surum)
     if en_iyi:
         yaz(f"   ⚠️  Python {'.'.join(map(str, en_iyi[1]))} çok eski ({en_iyi[0]})", Renk.SARI)
-    return [python_kur()]
+    return python_kur()
 
 
 # ---------- 2. Python paketleri ----------
 
-def paketleri_kur(py):
+def paketleri_kur(komut):
     yaz("\n📦 2/5 ADIM - Python paketleri yükleniyor/kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
-    subprocess.run([py, "-m", "pip", "install", "--upgrade", "pip", "--quiet", "--disable-pip-version-check"],
+    subprocess.run(komut + ["-m", "pip", "install", "--upgrade", "pip", "--quiet", "--disable-pip-version-check"],
                    capture_output=True, timeout=600)
-    r = subprocess.run([py, "-m", "pip", "install", "--quiet", "--disable-pip-version-check"] + PAKETLER,
+    r = subprocess.run(komut + ["-m", "pip", "install", "--quiet", "--disable-pip-version-check"] + PAKETLER,
                        capture_output=True, timeout=900)
     if r.returncode != 0:
         raise RuntimeError(f"Paket kurulumu başarısız oldu!\n{r.stderr.decode('utf-8', 'replace')[-500:]}")
@@ -398,14 +441,14 @@ def chromedriver_hazirla(chrome_surum):
 
 # ---------- 5. Excel şablonu ----------
 
-def excel_sablonu_hazirla(py):
+def excel_sablonu_hazirla(komut):
     yaz("\n📁 5/5 ADIM - Excel şablonu kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     yol = os.path.join(BASE_DIR, "çalışmaaaa.xlsx")
     if os.path.exists(yol):
         yaz("   ✅ çalışmaaaa.xlsx zaten mevcut", Renk.YESIL)
         return
     r = subprocess.run(
-        [py, "-c", "import sys; sys.path.insert(0, '.'); import sgk_bot; sgk_bot.SGKBot.excel_sablonu_hazirla('çalışmaaaa.xlsx')"],
+        komut + ["-c", "import sys; sys.path.insert(0, '.'); import sgk_bot; sgk_bot.SGKBot.excel_sablonu_hazirla('çalışmaaaa.xlsx')"],
         cwd=BASE_DIR, capture_output=True, text=True, timeout=120)
     if os.path.exists(yol):
         yaz("   ✅ Standart şablon oluşturuldu (çalışmaaaa.xlsx)", Renk.YESIL)
@@ -416,9 +459,9 @@ def excel_sablonu_hazirla(py):
 
 # ---------- Bot doğrulama ----------
 
-def botu_dogrula(py):
+def botu_dogrula(komut):
     yaz("\n🔍 Bot dosyası doğrulanıyor...", Renk.TURKUAZ, kalin=True)
-    r = subprocess.run([py, "-m", "py_compile", os.path.join(BASE_DIR, "sgk_bot.py")],
+    r = subprocess.run(komut + ["-m", "py_compile", os.path.join(BASE_DIR, "sgk_bot.py")],
                        capture_output=True, text=True, timeout=120)
     if r.returncode != 0:
         raise RuntimeError(f"sgk_bot.py hatalı!\n{r.stderr[-300:]}")
@@ -440,11 +483,11 @@ def ana():
             guncelle_uygula(yeni_url)
     try:
         py = python_hazirla()
-        paketleri_kur(py[0])
+        paketleri_kur(py)
         chrome_surum = chrome_hazirla()
         chromedriver_hazirla(chrome_surum)
-        excel_sablonu_hazirla(py[0])
-        botu_dogrula(py[0])
+        excel_sablonu_hazirla(py)
+        botu_dogrula(py)
 
         print("\n" + "=" * 60)
         yaz("🎉 KURULUM TAMAMLANDI!", Renk.YESIL, kalin=True)

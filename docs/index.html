@@ -276,37 +276,84 @@
   .guven-kutu h3 { font-size: 17px; margin: 10px 0 6px; }
   .guven-kutu p { color: var(--soluk); font-size: 14px; }
 
-  .adimlar { counter-reset: adim; }
+  .adimlar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
   .adim {
     display: flex;
-    gap: 16px;
+    align-items: flex-start;
+    gap: 14px;
     background: var(--kart);
     border: 1px solid var(--cizgi);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 12px;
-    counter-increment: adim;
-    transition: background 0.3s;
+    border-radius: 14px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
   }
+  .adim::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--turkuaz), var(--mor));
+    opacity: 0.8;
+  }
+  .adim > div:last-child { flex: 1; }
   .adim .numara {
-    flex: 0 0 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--mavi), var(--mor));
+    flex: 0 0 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--mavi), var(--turkuaz));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 18px;
+    font-weight: 800;
+    font-size: 16px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
   }
-  .adim p { color: var(--soluk); font-size: 15px; }
-  .adim strong { color: var(--metin); }
+  .adim:nth-child(2) .numara { background: linear-gradient(135deg, var(--yesil), var(--turkuaz)); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35); }
+  .adim:nth-child(3) .numara { background: linear-gradient(135deg, var(--mor), var(--mavi)); box-shadow: 0 4px 12px rgba(168, 85, 247, 0.35); }
+  .adim:nth-child(4) .numara { background: linear-gradient(135deg, var(--sari), var(--yesil)); box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35); }
+  .adim p { color: var(--soluk); font-size: 15px; margin-top: 3px; }
+  .adim strong { color: var(--metin); display: block; }
+  @media (max-width: 720px) {
+    .adimlar { grid-template-columns: 1fr; }
+  }
 
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 10px 14px; font-size: 14px; }
   th { background: var(--kart); color: var(--turkuaz); }
   tr:nth-child(even) td { background: var(--arka); }
   td { border-bottom: 1px solid var(--cizgi); }
+
+  .format-tablosu {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--cizgi);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+  .format-tablosu th, .format-tablosu td { padding: 13px 16px; }
+  .format-tablosu th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--cizgi);
+  }
+  .format-tablosu tr:last-child td { border-bottom: none; }
+  .format-tablosu code {
+    background: var(--arka);
+    border: 1px solid var(--cizgi);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    color: var(--turkuaz);
+  }
 
   /* ---------- Terminal (uygulama görüntüsü) ---------- */
   .terminal {
@@ -406,6 +453,23 @@
     text-decoration: none;
   }
   .hata-buton:hover { border-color: var(--turkuaz); color: var(--turkuaz); }
+
+  .yazdir-buton {
+    display: inline-block;
+    background: var(--kart);
+    color: var(--metin);
+    border: 1px solid var(--cizgi);
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .yazdir-buton:hover { border-color: var(--turkuaz); color: var(--turkuaz); background: var(--arka); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6, 182, 212, 0.15); }
+  .kullanim-aksiyon { text-align: center; margin-top: 26px; }
+  .format-baslik { margin-top: 44px; }
 
   /* ---------- Açılır SSS ---------- */
   .sss { background: var(--kart); border: 1px solid var(--cizgi); border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: background 0.3s; }
@@ -826,12 +890,12 @@
       <div class="adim animasyon"><div class="numara">4</div><div><strong data-i18n="adim4-baslik">Bot işlesin, siz bekleyin.</strong><p data-i18n="adim4-metin">Kayıtlar tek tek işlenir; bitince Windows bildirimi gelir.</p></div></div>
     </div>
 
-    <div style="text-align:center; margin-top:22px;">
-      <button id="yazdir-buton" class="hata-buton" data-i18n="yazdir-buton">🖨️ Kılavuzu Yazdır / PDF Kaydet</button>
+    <div class="kullanim-aksiyon">
+      <button id="yazdir-buton" class="yazdir-buton" data-i18n="yazdir-buton">🖨️ Kılavuzu Yazdır / PDF Kaydet</button>
     </div>
 
-    <h2 style="margin-top:40px" data-i18n="bolum-format">Excel Formatı</h2>
-    <table class="animasyon">
+    <h2 class="format-baslik" data-i18n="bolum-format">Excel Formatı</h2>
+    <table class="format-tablosu animasyon">
       <tr><th data-i18n="tablo-sutun">Sütun</th><th data-i18n="tablo-icerik">İçerik</th></tr>
       <tr><td><strong data-i18n="tablo-unvan">Ünvan</strong></td><td data-i18n="tablo-unvan-aciklama">Üretici adı (zorunlu değil)</td></tr>
       <tr><td><strong data-i18n="tablo-tc">TC Kimlik No</strong></td><td data-i18n="tablo-tc-aciklama">11 haneli TC kimlik numarası</td></tr>

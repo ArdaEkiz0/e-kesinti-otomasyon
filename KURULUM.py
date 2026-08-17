@@ -1,13 +1,13 @@
 """KURULUM - SGK Bot Otomatik Kurulum Aracı (v2.2)
 Bu program bilgisayardaki gereksinimleri kontrol eder, eksikleri otomatik kurar:
   0. GitHub'da yeni sürüm olup olmadığını kontrol eder (varsa kendini günceller)
-  1. Bot dosyaları (sgk_bot.py, BOT_BAŞLAT.bat — yoksa indirir/oluşturur)
+  1. Bot dosyaları (sgk_bot.py, BAT_BASLAT.bat — yoksa indirir/oluşturur)
   2. Python  (yoksa indirir + sessiz kurar)
   3. Gerekli Python paketleri (selenium, pandas, openpyxl, webdriver-manager)
   4. Google Chrome (yoksa indirir + kurar)
   5. chrome sürümüne uygun chromedriver.exe
   6. çalışmaaaa.xlsx şablonu (yoksa oluşturur) + bot simülasyon testi
-Kurulumdan sonra bot BOT_BAŞLAT.bat ile başlatılır.
+Kurulumdan sonra bot BAT_BASLAT.bat ile başlatılır.
 """
 import json
 import os
@@ -232,7 +232,7 @@ pause"""
 
 
 def bot_dosyalari_hazirla():
-    """sgk_bot.py ve BOT_BAŞLAT.bat eksikse indirir/oluşturur."""
+    """sgk_bot.py ve BAT_BASLAT.bat eksikse indirir/oluşturur."""
     yaz("\n📁 1/6 ADIM - Bot dosyaları kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     bot = os.path.join(BASE_DIR, "sgk_bot.py")
 
@@ -251,13 +251,13 @@ def bot_dosyalari_hazirla():
         if os.path.getsize(bot) < 5000 or "SGKBot" not in bot_icerik():
             raise RuntimeError("Bot dosyası indirilemedi! İnternet bağlantınızı kontrol edip tekrar deneyin.")
         yaz("   ✅ sgk_bot.py indirildi", Renk.YESIL)
-    bat = os.path.join(BASE_DIR, "BOT_BAŞLAT.bat")
+    bat = os.path.join(BASE_DIR, "BAT_BASLAT.bat")
     if not os.path.exists(bat):
         with open(bat, "w", encoding="utf-8", newline="\r\n") as f:
             f.write(BOT_BASLAT_ICERIK)
-        yaz("   ✅ BOT_BAŞLAT.bat oluşturuldu", Renk.YESIL)
+        yaz("   ✅ BAT_BASLAT.bat oluşturuldu", Renk.YESIL)
     else:
-        yaz("   ✅ BOT_BAŞLAT.bat mevcut", Renk.YESIL)
+        yaz("   ✅ BAT_BASLAT.bat mevcut", Renk.YESIL)
 
 
 # ---------- 1. Python kontrolü ve kurulumu ----------
@@ -603,7 +603,7 @@ def ana():
 
         print("\n" + "=" * 60)
         yaz("🎉 KURULUM TAMAMLANDI!", Renk.YESIL, kalin=True)
-        yaz("   Şimdi 'BOT_BAŞLAT.bat' dosyasına çift tıklayarak botu başlatabilirsiniz.", Renk.TURKUAZ)
+        yaz("   Şimdi 'BAT_BASLAT.bat' dosyasına çift tıklayarak botu başlatabilirsiniz.", Renk.TURKUAZ)
         yaz("   (İlk kurulumda Python yeni kurulduysa önce bilgisayarı yeniden başlatın)", Renk.SARI)
         print("=" * 60)
         print(renkli("Developer: Arda M. Ekiz", Renk.MOR, kalin=True))

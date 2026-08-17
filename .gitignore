@@ -14,3 +14,4 @@ chrome-kurucu.exe
 # ÖNEMLİ: Kişisel veri içerir (gerçek TC kimlik numaraları) - ASLA yüklenmemeli!
 çalışmaaaa.xlsx
 *.xlsx
+.wrangler/

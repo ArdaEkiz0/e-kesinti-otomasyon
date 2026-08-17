@@ -94,8 +94,8 @@ Uygulama şu sütunlara sahip bir Excel dosyası bekler (şablonu kurulum otomat
 ## 🖥️ Kullanım
 
 1. Excel dosyanı hazırla (veya şablonu kullan)
-2. `BOT_BAŞLAT.bat` dosyasına **çift tıkla** — dosyayı sorar
-3. **Daha kolay:** Excel dosyanı `BOT_BAŞLAT.bat` üzerine **sürükle-bırak**
+2. `BAT_BASLAT.bat` dosyasına **çift tıkla** — dosyayı sorar
+3. **Daha kolay:** Excel dosyanı `BAT_BASLAT.bat` üzerine **sürükle-bırak**
 4. Bot SGK sayfasını açar, kayıtları tek tek işler ve raporu ekranda gösterir
 
 ### Test Modu

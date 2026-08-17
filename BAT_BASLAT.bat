@@ -16,7 +16,7 @@ if not defined PY (
 if "%~1"=="" (
     %PY% "%~dp0sgk_bot.py"
 ) else (
-    echo Seçilen Excel: %~nx1
+    echo Secilen Excel: %~nx1
     %PY% "%~dp0sgk_bot.py" "%~1"
 )
 pause

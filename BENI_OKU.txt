@@ -7,7 +7,7 @@
 ────────────────────────────────────────────────────────────────
 ✅ sgk_bot.py          → Ana bot dosyası
 ✅ KURULUM.exe         → OTOMATİK KURULUM (çift tıkla, hepsi kendiliğinden)
-✅ BOT_BAŞLAT.bat      → Bot başlatma (kurulumdan sonra)
+✅ BAT_BASLAT.bat      → Bot başlatma (kurulumdan sonra)
 ✅ çalışmaaaa.xlsx     → Excel veri dosyası (yoksa otomatik oluşturulur)
 ✅ BENI_OKU.txt        → Bu dosya (talimatlar)
 
@@ -35,13 +35,13 @@
     Ünvan       | TC Kimlik No  | Matrah    | Bağ-Kur
     (İsim soyisim)| 11 haneli    | TL tutarı | Kesinti
 
-Excel'e üretici bilgilerini doldur ve BOT_BAŞLAT.bat ile botu çalıştır.
+Excel'e üretici bilgilerini doldur ve BAT_BASLAT.bat ile botu çalıştır.
 (Matrah ve Bağ-Kur sütunlarındaki değerler sayı olmalıdır)
 
 🚀 BOT BAŞLATMA (HER KULLANIMDA):
 ────────────────────────────────────────────────────────────────
 
-   BOT_BAŞLAT.bat dosyasına çift tıkla
+   BAT_BASLAT.bat dosyasına çift tıkla
 
    1. Chrome tarayıcı açılır, SGK sitesine gider
    2. SİZ login yaparsınız (bot login yapmaz!)
@@ -59,7 +59,7 @@ Excel'e üretici bilgilerini doldur ve BOT_BAŞLAT.bat ile botu çalıştır.
       (örn. mayis.xlsx, haziran.xlsx arasından)
    3. Hiç Excel yoksa → şablon oluşturur
 
-   İstersen dosyayı BOT_BAŞLAT.bat üzerine sürükleyerek de seçebilirsin.
+   İstersen dosyayı BAT_BASLAT.bat üzerine sürükleyerek de seçebilirsin.
    Not: Dosya içindeki sütun düzeni şablonla aynı olmalı
    (Ünvan, TC Kimlik No, Matrah, Bağ-Kur).
 

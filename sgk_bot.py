@@ -570,7 +570,7 @@ if __name__ == "__main__":
     guncelleme_kontrol_goster()
     test_modu = "--test" in sys.argv
     # Kullanıcı Excel dosyası verirse onu kullan, vermezse klasördeki Excel'i otomatik bul
-    # Kullanım:  python sgk_bot.py [excel_dosya.xlsx]  veya  dosyayı BOT_BAŞLAT.bat üzerine sürükle
+    # Kullanım:  python sgk_bot.py [excel_dosya.xlsx]  veya  dosyayı BAT_BASLAT.bat üzerine sürükle
     verilen_dosyalar = [a for a in sys.argv[1:] if not a.startswith("--")]
     if verilen_dosyalar:
         excel_file = verilen_dosyalar[0]

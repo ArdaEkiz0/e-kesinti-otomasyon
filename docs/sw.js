@@ -1,8 +1,17 @@
-var KAS_ISMI = "sgk-bot-site-v3";
-var VARLIKLAR = ["/e-kesinti-otomasyon/"];
+var KAS_ISMI = "sgk-bot-site-v4";
+var VARLIKLAR = [
+  "/e-kesinti-otomasyon/",
+  "/e-kesinti-otomasyon/index.html"
+];
 
 self.addEventListener("install", function (e) {
-  e.waitUntil(caches.open(KAS_ISMI).then(function (k) { return k.addAll(VARLIKLAR); }));
+  e.waitUntil(
+    caches.open(KAS_ISMI).then(function (k) {
+      return k.addAll(VARLIKLAR).catch(function (err) {
+        console.warn("SW: Precache başarısız:", err);
+      });
+    })
+  );
 });
 
 self.addEventListener("message", function (e) {
@@ -12,10 +21,15 @@ self.addEventListener("message", function (e) {
 });
 
 self.addEventListener("activate", function (e) {
-  e.waitUntil(caches.keys().then(function (anahtarlar) {
-    return Promise.all(anahtarlar.filter(function (k) { return k !== KAS_ISMI; }).map(function (k) { return caches.delete(k); }));
-  }));
-  self.clients.claim();
+  e.waitUntil(
+    caches.keys().then(function (anahtarlar) {
+      return Promise.all(
+        anahtarlar.filter(function (k) { return k !== KAS_ISMI; }).map(function (k) { return caches.delete(k); })
+      );
+    }).then(function () {
+      return self.clients.claim();
+    })
+  );
 });
 
 self.addEventListener("fetch", function (e) {

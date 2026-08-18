@@ -1,17 +1,39 @@
 # Python
 __pycache__/
 *.pyc
+*.pyo
 build/
 dist/
 *.spec
+__pypackages__/
+*.egg-info/
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Environment & secrets
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
 # Bot dosyaları (KURULUM.exe otomatik indirir/oluşturur)
 chromedriver.exe
 chromedriver.zip
 python-kurucu.exe
 chrome-kurucu.exe
+KURULUM_yeni.exe
+_guncelle.bat
 
 # ÖNEMLİ: Kişisel veri içerir (gerçek TC kimlik numaraları) - ASLA yüklenmemeli!
 çalışmaaaa.xlsx
 *.xlsx
+
+# Cloudflare
 .wrangler/

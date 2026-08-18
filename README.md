@@ -58,7 +58,8 @@ Terminal akışı: tek tık kurulum → Excel okunur → kayıtlar tek tek işle
 ### Seçenek 1: KURULUM.exe ile (Önerilen)
 
 1. `KURULUM.exe` dosyasını indir
-2. Çift tıkla, **5 adımı otomatik yapar**:
+2. Çift tıkla, **6 adımı otomatik yapar**:
+   - Bot dosyalarını kontrol eder (sgk_bot.py, BAT_BASLAT.bat)
    - Python 3.9+ kontrolü (yoksa kurar)
    - Gerekli paketler: `selenium`, `pandas`, `openpyxl`, `webdriver-manager`
    - Google Chrome kontrolü (yoksa kurar)

@@ -137,13 +137,16 @@ def windows_bildirim(baslik, metin):
         return
     try:
         import subprocess
+        def _ps_escape(s):
+            """PowerShell string kaçış: tek tırnak ve özel karakterleri temizler."""
+            return str(s).replace("'", "''").replace("`", "").replace("$", "").replace(";", "")
         ps = (
             "Add-Type -AssemblyName System.Windows.Forms;"
             "Add-Type -AssemblyName System.Drawing;"
             "$n = New-Object System.Windows.Forms.NotifyIcon;"
             "$n.Icon = [System.Drawing.SystemIcons]::Information;"
-            f"$n.BalloonTipTitle = '{baslik}';"
-            f"$n.BalloonTipText = '{metin}';"
+            f"$n.BalloonTipTitle = '{_ps_escape(baslik)}';"
+            f"$n.BalloonTipText = '{_ps_escape(metin)}';"
             "$n.Visible = $true;"
             "$n.ShowBalloonTip(8000)"
         )
@@ -203,7 +206,6 @@ class SGKBot:
             self.driver = surucu
         else:
             self.driver = self._start_driver()
-            self.wait = WebDriverWait(self.driver, 10)
 
     def _temizle_eski_kilitler(self, en_fazla_dk=5):
         """webdriver-manager'ın yarıda kalan indirmelerden bıraktığı eski kilit dosyalarını siler."""
@@ -294,7 +296,7 @@ class SGKBot:
                         matrah = self._sayiya_cevir(row.iloc[2])
                         kesinti = self._sayiya_cevir(row.iloc[3])
                         data.append({'tc': tc_no, 'matrah': matrah, 'kesinti': kesinti})
-                    except:
+                    except Exception:
                         continue
             if self.kooperatif_adi:
                 print(f"   🏢 Kooperatif: {renkli(self.kooperatif_adi, Renk.SARI, kalin=True)}")
@@ -367,14 +369,14 @@ class SGKBot:
             try:
                 self.driver.execute_script("goToPage('/GooKesintiIcinUreticiSorgulaAction.do')")
                 time.sleep(3)
-            except:
+            except Exception:
                 print(renkli("⚠️  Navigasyon hatası", Renk.SARI))
 
             print(renkli("\n📂 'Dosya Aç / Çağır' dialog açılıyor...", Renk.TURKUAZ))
             try:
                 self.driver.execute_script("acikDosyaSayisiniKontrolEt()")
                 time.sleep(3)
-            except:
+            except Exception:
                 print(renkli("⚠️  Dialog açılmadı", Renk.SARI))
 
             print(renkli("\n📅 Ay ve Yıl seçiliyor...", Renk.TURKUAZ))

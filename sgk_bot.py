@@ -289,18 +289,31 @@ class SGKBot:
             self.kooperatif_adi = self._kooperatif_adi_oku(file_path)
             df = pd.read_excel(file_path)
             data = []
+            bolunen_sayisi = 0
             for idx, row in df.iterrows():
                 if pd.notna(row.iloc[1]) and len(str(row.iloc[1])) == 11:
                     try:
                         tc_no = str(int(row.iloc[1]))
                         matrah = self._sayiya_cevir(row.iloc[2])
                         kesinti = self._sayiya_cevir(row.iloc[3])
-                        data.append({'tc': tc_no, 'matrah': matrah, 'kesinti': kesinti})
+                        # Matrah 1 milyon ve üzeriyse ikiye böl
+                        if matrah >= 1_000_000:
+                            yari_matrah = round(matrah / 2, 2)
+                            yari_kesinti = round(kesinti / 2, 2)
+                            data.append({'tc': tc_no, 'matrah': yari_matrah, 'kesinti': yari_kesinti})
+                            data.append({'tc': tc_no, 'matrah': yari_matrah, 'kesinti': yari_kesinti})
+                            bolunen_sayisi += 1
+                        else:
+                            data.append({'tc': tc_no, 'matrah': matrah, 'kesinti': kesinti})
                     except Exception:
                         continue
             if self.kooperatif_adi:
                 print(f"   🏢 Kooperatif: {renkli(self.kooperatif_adi, Renk.SARI, kalin=True)}")
-            print(f"✅ Excel'den {len(data)} kayıt okundu")
+            print(f"✅ Excel'den {len(data)} kayıt okundu", end="")
+            if bolunen_sayisi > 0:
+                print(f" ({renkli(str(bolunen_sayisi) + ' kayıt bölündü', Renk.SARI)})")
+            else:
+                print()
             return data
         except Exception as e:
             print(f"❌ Excel okunamadı: {e}")

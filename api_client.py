@@ -16,7 +16,7 @@ from typing import Optional, Dict, Any
 
 
 # Worker URL - deploy edildikten sonra guncellenmeli
-WORKER_URL = "https://sgk-license-api.ardaekiz72.workers.dev"
+WORKER_URL = "https://sgk-api-v2.ardaekiz72.workers.dev"
 ADMIN_PASSWORD = "***KALDIRILDI***"  # Admin paneli icin (sadece admin tarafindan kullanilir)
 
 # Timeout

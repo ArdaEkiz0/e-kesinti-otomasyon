@@ -41,7 +41,33 @@ if os.name == "nt":
     except Exception:
         pass
 
-BASE_DIR = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.abspath(__file__))
+def _masaustu_yolu():
+    """Windows masaüstü yolunu registry'den/varsayılanından bulur."""
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                            r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders") as k:
+            yol, _ = winreg.QueryValueEx(k, "Desktop")
+            yol = os.path.expandvars(yol)
+            if os.path.isdir(yol):
+                return yol
+    except Exception:
+        pass
+    aday = os.path.join(os.environ.get("USERPROFILE", os.path.expanduser("~")), "Desktop")
+    return aday if os.path.isdir(aday) else os.path.expanduser("~")
+
+
+def _kurulum_klasoru():
+    """Masaüstünde SGK_E_Kesinti_Otomasyon klasörü oluşturur (yazılamazsa EXE yanını döner)."""
+    hedef = os.path.join(_masaustu_yolu(), "SGK_E_Kesinti_Otomasyon")
+    try:
+        os.makedirs(hedef, exist_ok=True)
+        return hedef
+    except OSError:
+        return os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.abspath(__file__))
+
+
+BASE_DIR = _kurulum_klasoru()
 
 PYTHON_INDIR = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe"
 CHROME_INDIR = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
@@ -615,10 +641,15 @@ def ana():
 
         print("\n" + "=" * 60)
         yaz("🎉 KURULUM TAMAMLANDI!", Renk.YESIL, kalin=True)
-        yaz("   Şimdi 'BAT_BASLAT.bat' dosyasına çift tıklayarak botu başlatabilirsiniz.", Renk.TURKUAZ)
+        yaz(f"   Tüm dosyalar şu klasörde: {BASE_DIR}", Renk.TURKUAZ)
+        yaz("   'BAT_BASLAT.bat' dosyasına çift tıklayarak botu başlatabilirsiniz.", Renk.TURKUAZ)
         yaz("   (İlk kurulumda Python yeni kurulduysa önce bilgisayarı yeniden başlatın)", Renk.SARI)
         print("=" * 60)
         print(renkli("Developer: Arda M. Ekiz", Renk.MOR, kalin=True))
+        try:
+            os.startfile(BASE_DIR)
+        except Exception:
+            pass
     except Exception as e:
         print("\n" + "=" * 60)
         yaz(f"❌ KURULUM BAŞARISIZ: {e}", Renk.KIRMIZI, kalin=True)

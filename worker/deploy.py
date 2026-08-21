@@ -1,12 +1,18 @@
 import json
+import os
+import sys
 import urllib.request
 import urllib.error
-import sys
 
-API_TOKEN = "***KALDIRILDI***"
+# Token koda yazilmaz; CLOUDFLARE_API_TOKEN env degiskeninden okunur.
+API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+if not API_TOKEN:
+    print("ERROR: CLOUDFLARE_API_TOKEN ortam degiskeni ayarlanmadi.")
+    sys.exit(1)
+
 ACCOUNT_ID = "375e7ccb3889662f86cb4bc4097cf67f"
 DATABASE_ID = "37f99095-2543-489f-b1a1-62f6bf7514af"
-SCRIPT_NAME = "sgk-license-api"
+SCRIPT_NAME = "sgk-api-v2"
 
 with open("worker.mjs", "r", encoding="utf-8") as f:
     worker_code = f.read()

@@ -37,7 +37,7 @@ jobs:
       - name: Derlen EXE'i gömülü klasordda bul
         run: |
           dir "dist"
-          if not exist "dist\SGK_E_Kesinti_Otomasyon.exe" (echo "HATA: EXE bulunamadi" & exit /b 1)
+          if (-not (Test-Path "dist\SGK_E_Kesinti_Otomasyon.exe")) { echo "HATA: EXE bulunamadi"; exit 1 }
 
       - name: Release olustur ve EXE'yi yukle
         uses: softprops/action-gh-release@v2

@@ -77,6 +77,25 @@ python sgk_bot.py
 
 > 📌 Bağımlılıkları tek tek kurmak yerine `requirements.txt` kullanılır; kurulum aracı (`KURULUM.py`) zaten bu paketleri otomatik kurar.
 
+### Seçenek 3: Profesyonel GUI EXE (Önerilen)
+
+Profesyonel arayüz (`sgk_app.py`) tek EXE haline derlenir — PyQt5 GUI, lisans kontrol,
+işlem logu, durum izleme ve ayni SGK bot entegrasyonda. GitHub Actions'a her `v*` tag
+için otomatik derlir ve release'ye yuklir:
+
+1. **Derlen EXE**: `SGK_E_Kesinti_Otomasyon.exe` (Release sayfasıda)
+2. Çift tıkla açılır — lisans (HWID + IP) sunucu tarafindan dogrulır
+3. Excel dosyasına seç ve **Baslat** butonuna basin
+
+**Yerelde derlemek için:**
+```bat
+pip install pyinstaller pyqt5 -r requirements.txt
+pyinstaller --noconfirm --clean sgk_app.spec
+```
+
+> 📌 Lisans sunucu (`api_client.py`'de `WORKER_URL`) exe'de doğrulma
+> açılma açılma HWID ve IP'i kaydet — bu profesyonel lisans modeludur.
+
 ---
 
 ## 📄 Excel Formatı

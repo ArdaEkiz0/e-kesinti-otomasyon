@@ -11,11 +11,7 @@ import platform
 import subprocess
 import time
 import json
-import re
-import threading
 from datetime import datetime
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -57,16 +53,6 @@ INPUT_BG = "#0d1117"
 INPUT_BORDER = "#30363d"
 HOVER_BG = "#1c2333"
 INFO_COLOR = "#58a6ff"
-
-# --- OpenRouter ---
-OPENROUTER_API_KEY = "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"
-OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "google/gemini-2.0-flash-001"
-OPENROUTER_SYSTEM_PROMPT = (
-    "Sen SGK E-Kesinti Otomasyonu asistanisin. Kullanicilara SGK tarimsal kesinti "
-    "islemleri, Excel formati, hata cozumu ve bot kullanimi konularinda yardim ediyorsun. "
-    "Turkce yanit ver."
-)
 
 # --- Demo Lisans ---
 DEMO_LISANS = "SGK-DEMO0001-2025-ARDA-2026"
@@ -266,60 +252,6 @@ class GlowLogo(QLabel):
         super().paintEvent(event)
 
 
-# --- AI Thread ---
-class AIThread(QThread):
-    response_signal = pyqtSignal(str)
-    error_signal = pyqtSignal(str)
-    finished_signal = pyqtSignal()
-
-    def __init__(self, messages, parent=None):
-        super().__init__(parent)
-        self.messages = messages
-
-    def run(self):
-        try:
-            payload = json.dumps({
-                "model": OPENROUTER_MODEL,
-                "messages": self.messages,
-                "max_tokens": 1024,
-                "temperature": 0.7,
-            }).encode("utf-8")
-
-            req = Request(
-                OPENROUTER_API_URL,
-                data=payload,
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                    "HTTP-Referer": "https://sgk-bot.local",
-                    "X-Title": "SGK E-Kesinti Otomasyon",
-                },
-                method="POST",
-            )
-
-            with urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-
-            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if content:
-                self.response_signal.emit(content)
-            else:
-                self.error_signal.emit("Bos yanit alindi.")
-        except HTTPError as e:
-            body = ""
-            try:
-                body = e.read().decode("utf-8", errors="replace")
-            except Exception:
-                pass
-            self.error_signal.emit(f"HTTP {e.code}: {e.reason}\n{body[:500]}")
-        except URLError as e:
-            self.error_signal.emit(f"Ag hatasi: {str(e)}")
-        except Exception as e:
-            self.error_signal.emit(f"Beklenmeyen hata: {str(e)}")
-        finally:
-            self.finished_signal.emit()
-
-
 # --- Bot Thread ---
 class BotThread(QThread):
     log_signal = pyqtSignal(str)
@@ -483,8 +415,6 @@ class SGKApp(QMainWindow):
         self.resize(1000, 700)
         self.hardware_id = get_hardware_id()
         self.bot_thread = None
-        self.ai_thread = None
-        self.chat_history = []
         self.dark_palette()
 
         central = QWidget()
@@ -504,7 +434,6 @@ class SGKApp(QMainWindow):
         self.pages.addWidget(self._create_settings_page())
         self.pages.addWidget(self._create_license_page())
         self.pages.addWidget(self._create_about_page())
-        self.pages.addWidget(self._create_ai_page())
         content_area.addWidget(self.pages, 1)
 
         main_layout.addLayout(content_area, 1)
@@ -737,7 +666,6 @@ class SGKApp(QMainWindow):
             ("⚙️  Ayarlar", 1),
             ("🔑  Lisans", 2),
             ("ℹ️  Hakkında", 3),
-            ("✨  Yardimci AI", 4),
         ]
         self.nav_buttons = []
         for text, idx in nav_data:
@@ -1152,166 +1080,6 @@ class SGKApp(QMainWindow):
         layout.addWidget(footer)
 
         return page
-
-    # --- AI Page ---
-    def _create_ai_page(self):
-        page = QWidget()
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(30, 24, 30, 20)
-        layout.setSpacing(12)
-
-        header_row = QHBoxLayout()
-        header = QLabel("✨  Yardimci AI")
-        header.setStyleSheet(f"font-size: 22px; font-weight: bold; color: {CYAN};")
-        header_row.addWidget(header)
-
-        header_row.addStretch()
-
-        model_label = QLabel(f"Model: {OPENROUTER_MODEL}")
-        model_label.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: 11px; background: transparent;")
-        header_row.addWidget(model_label)
-
-        layout.addLayout(header_row)
-
-        card = CardFrame()
-        c_layout = QVBoxLayout(card)
-        c_layout.setSpacing(10)
-
-        self.ai_chat_display = QTextEdit()
-        self.ai_chat_display.setReadOnly(True)
-        self.ai_chat_display.setMinimumHeight(300)
-        self.ai_chat_display.setStyleSheet(f"""
-            QTextEdit {{
-                background-color: {INPUT_BG};
-                color: {TEXT_PRIMARY};
-                border: 1px solid {INPUT_BORDER};
-                border-radius: 8px;
-                padding: 12px;
-                font-size: 14px;
-                line-height: 1.5;
-            }}
-        """)
-        self.ai_chat_display.setHtml(self._ai_welcome_html())
-        c_layout.addWidget(self.ai_chat_display)
-
-        layout.addWidget(card, 1)
-
-        input_row = QHBoxLayout()
-        input_row.setSpacing(10)
-
-        self.ai_input = QLineEdit()
-        self.ai_input.setPlaceholderText("Mesajinizi yazin...")
-        self.ai_input.returnPressed.connect(self._send_ai_message)
-        input_row.addWidget(self.ai_input, 1)
-
-        self.ai_send_btn = StyledButton("Gonder", CYAN)
-        self.ai_send_btn.setFixedWidth(100)
-        self.ai_send_btn.clicked.connect(self._send_ai_message)
-        input_row.addWidget(self.ai_send_btn)
-
-        self.ai_clear_btn = StyledButton("Temizle", TEXT_SECONDARY)
-        self.ai_clear_btn.setFixedWidth(100)
-        self.ai_clear_btn.clicked.connect(self._clear_ai_chat)
-        input_row.addWidget(self.ai_clear_btn)
-
-        layout.addLayout(input_row)
-
-        return page
-
-    def _ai_welcome_html(self):
-        return f"""
-        <div style="padding: 10px;">
-            <p style="color: {CYAN}; font-size: 15px; font-weight: bold;">Merhaba! Ben SGK E-Kesinti Asistani ✨</p>
-            <p style="color: {TEXT_SECONDARY}; font-size: 13px;">SGK tarimsal kesinti islemleri, Excel formati, hata cozumu ve bot kullanimi konularinda size yardimci olabilirim.</p>
-            <hr style="border-color: {INPUT_BORDER}; margin: 10px 0;">
-            <p style="color: {TEXT_SECONDARY}; font-size: 12px;">Ornek sorular:</p>
-            <ul style="color: {TEXT_SECONDARY}; font-size: 12px;">
-                <li>Excel dosyasi nasil hazirlanir?</li>
-                <li>E-Kesinti hatasi aliyorum, ne yapmaliyim?</li>
-                <li>Bot nasil calistirilir?</li>
-            </ul>
-        </div>
-        """
-
-    def _send_ai_message(self):
-        text = self.ai_input.text().strip()
-        if not text:
-            return
-
-        self.chat_history.append({"role": "user", "content": text})
-        self._append_ai_message("Siz", text, CYAN)
-
-        self.ai_input.clear()
-        self.ai_send_btn.setEnabled(False)
-        self.ai_input.setEnabled(False)
-
-        typing_html = f"""
-        <div style="padding: 4px 0;">
-            <span style="color: {INFO_COLOR}; font-size: 13px; font-style: italic;">
-                ⏳ Asistani yaziyor...
-            </span>
-        </div>
-        """
-        self.ai_chat_display.append(typing_html)
-
-        messages_for_api = [
-            {"role": "system", "content": OPENROUTER_SYSTEM_PROMPT}
-        ] + self.chat_history
-
-        self.ai_thread = AIThread(messages_for_api)
-        self.ai_thread.response_signal.connect(self._on_ai_response)
-        self.ai_thread.error_signal.connect(self._on_ai_error)
-        self.ai_thread.finished_signal.connect(self._on_ai_finished)
-        self.ai_thread.start()
-
-    def _on_ai_response(self, content):
-        self.chat_history.append({"role": "assistant", "content": content})
-
-        cursor = self.ai_chat_display.textCursor()
-        cursor.movePosition(cursor.End)
-        cursor.select(cursor.BlockUnderCursor)
-        cursor.removeSelectedText()
-        cursor.movePosition(cursor.End)
-        self.ai_chat_display.setTextCursor(cursor)
-        self.ai_chat_display.append("")
-
-        self._append_ai_message("AI Asistan", content, SUCCESS)
-
-    def _on_ai_error(self, error_msg):
-        cursor = self.ai_chat_display.textCursor()
-        cursor.movePosition(cursor.End)
-        cursor.select(cursor.BlockUnderCursor)
-        cursor.removeSelectedText()
-        cursor.movePosition(cursor.End)
-        self.ai_chat_display.setTextCursor(cursor)
-        self.ai_chat_display.append("")
-
-        self._append_ai_message("Hata", f"API hatasi: {error_msg}", ERROR)
-
-    def _on_ai_finished(self):
-        self.ai_send_btn.setEnabled(True)
-        self.ai_input.setEnabled(True)
-        self.ai_input.setFocus()
-
-    def _append_ai_message(self, sender, text, color):
-        escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        escaped = escaped.replace("\n", "<br>")
-        timestamp = datetime.now().strftime("%H:%M")
-
-        html = f"""
-        <div style="padding: 6px 0; border-bottom: 1px solid {INPUT_BORDER};">
-            <span style="color: {color}; font-weight: bold; font-size: 13px;">{sender}</span>
-            <span style="color: {TEXT_SECONDARY}; font-size: 11px; margin-left: 8px;">{timestamp}</span>
-            <p style="color: {TEXT_PRIMARY}; font-size: 14px; margin: 4px 0 0 0;">{escaped}</p>
-        </div>
-        """
-        self.ai_chat_display.append(html)
-        sb = self.ai_chat_display.verticalScrollBar()
-        sb.setValue(sb.maximum())
-
-    def _clear_ai_chat(self):
-        self.chat_history.clear()
-        self.ai_chat_display.setHtml(self._ai_welcome_html())
 
     # --- Core Methods ---
     def _browse_file(self):

@@ -2,25 +2,18 @@
 # SGK E-Kesinti Otomasyon - Profesyonel GUI EXE (PyInstaller spec)
 # Arda Yazılım
 
-from PyInstaller.utils.hooks import collect_submodules, collect_data_files
-
 a = Analysis(
     ['sgk_app.py'],
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=['sgk_bot', 'api_client'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     optimize=0,
 )
-
-# sgk_bot ve api_client dinamik import edilir (BotThread insil/run içinde)
-a.datas += collect_data_files('selenium')
-a.hiddenimports += collect_submodules('webdriver_manager')
-a.hiddenimports += ['sgk_bot', 'api_client']
 
 pyz = PYZ(a.pure)
 

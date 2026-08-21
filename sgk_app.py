@@ -300,8 +300,6 @@ class SGKApp(QMainWindow):
             QWidget {{
                 background-color: transparent;
                 color: {TEXT_PRIMARY};
-                font-family: 'Segoe UI';
-                font-size: 14px;
             }}
             QScrollBar:vertical {{
                 background: {NAV_BG};
@@ -1225,10 +1223,14 @@ class SGKApp(QMainWindow):
 
 
 def main():
+    # Yüksek DPI ekranlarda (laptop/4K) metinlerin üst üste binmemesi icin gerekli
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 
     font = QFont("Segoe UI", 11)
+    font.setHintingPreference(QFont.PreferFullHinting)
     app.setFont(font)
 
     window = SGKApp()

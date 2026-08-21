@@ -950,6 +950,10 @@ class SGKApp(QMainWindow):
             self.excel_path_input.setText(path)
 
     def _start_bot(self):
+        if not self.is_authorized:
+            QMessageBox.warning(self, "Yetkisiz", "Lisans dogrulamasi yapilmadi. Once lisansinizi dogrulayin.")
+            return
+
         path = self.excel_path_input.text().strip()
         if not path:
             QMessageBox.warning(self, "Uyari", "Lutfen bir Excel dosyasi secin.")
@@ -1035,18 +1039,37 @@ class SGKApp(QMainWindow):
         try:
             result = register_and_check(self.hardware_id)
             self.is_authorized = result.get("authorized", False)
+            is_demo = result.get("demo", False)
+            admin_ok = result.get("admin_authorized", False)
+            days_left = result.get("demo_days_left", 0)
 
             if self.is_authorized:
-                self.license_status.setText("Lisans: Aktif (Sunucu)")
-                self.license_status.setStyleSheet(f"""
-                    color: {SUCCESS};
-                    background-color: rgba(16, 185, 129, 0.15);
-                    border: 2px solid {SUCCESS};
-                    border-radius: 8px;
-                    padding: 6px 16px;
-                    font-size: 14px;
-                    font-weight: bold;
-                """)
+                if admin_ok:
+                    self.license_status.setText("Lisans: Aktif (Sunucu)")
+                    self.license_status.setStyleSheet(f"""
+                        color: {SUCCESS};
+                        background-color: rgba(16, 185, 129, 0.15);
+                        border: 2px solid {SUCCESS};
+                        border-radius: 8px;
+                        padding: 6px 16px;
+                        font-size: 14px;
+                        font-weight: bold;
+                    """)
+                    self.license_info.setText("Lisans durumu: Aktif - Sunucu tarafindan dogrulandi")
+                    self.license_info.setStyleSheet(f"color: {SUCCESS}; font-size: 16px; font-weight: bold;")
+                else:
+                    self.license_status.setText(f"Lisans: Demo ({days_left} gun)")
+                    self.license_status.setStyleSheet(f"""
+                        color: {WARNING};
+                        background-color: rgba(245, 158, 11, 0.15);
+                        border: 2px solid {WARNING};
+                        border-radius: 8px;
+                        padding: 6px 16px;
+                        font-size: 14px;
+                        font-weight: bold;
+                    """)
+                    self.license_info.setText(f"Lisans durumu: Demo aktif ({days_left} gun kaldi)")
+                    self.license_info.setStyleSheet(f"color: {WARNING}; font-size: 16px; font-weight: bold;")
                 self.start_btn.setEnabled(True)
                 self.start_btn.setText("Botu Baslat")
             else:
@@ -1084,63 +1107,21 @@ class SGKApp(QMainWindow):
             QMessageBox.warning(self, "Uyari", "Lisans anahtari bos olamaz.")
             return
 
-        if key == DEMO_LISANS:
-            self.license_status.setText("Lisans: Demo")
-            self.license_status.setStyleSheet(f"""
-                color: {WARNING};
-                background-color: rgba(245, 158, 11, 0.15);
-                border: 2px solid {WARNING};
-                border-radius: 8px;
-                padding: 6px 16px;
-                font-size: 14px;
-                font-weight: bold;
-            """)
-            self.license_info.setText("Lisans durumu: Demo lisans aktif (30 gun sinirli)")
-            self.license_info.setStyleSheet(f"color: {WARNING}; font-size: 16px; font-weight: bold;")
-            QMessageBox.information(self, "Demo Lisans", "Demo lisans basariyla aktif edildi!\n\nBu lisans 30 gun gecerlidir.")
-        else:
-            simple_check = (key.startswith("SGK-") and len(key) == 24 and key.count("-") == 4)
-            if simple_check:
-                # API ile sunucu tarafindan dogrula
-                if API_AVAILABLE:
-                    try:
-                        result = register_and_check(self.hardware_id)
-                        self.is_authorized = result.get("authorized", False)
-                        if self.is_authorized:
-                            self.license_status.setText("Lisans: Aktif (Sunucu)")
-                            self.license_status.setStyleSheet(f"""
-                                color: {SUCCESS};
-                                background-color: rgba(16, 185, 129, 0.15);
-                                border: 2px solid {SUCCESS};
-                                border-radius: 8px;
-                                padding: 6px 16px;
-                                font-size: 14px;
-                                font-weight: bold;
-                            """)
-                            self.license_info.setText("Lisans durumu: Aktif - Sunucu tarafindan dogrulandi")
-                            self.license_info.setStyleSheet(f"color: {SUCCESS}; font-size: 16px; font-weight: bold;")
-                            QMessageBox.information(self, "Basarili", "Lisans dogrulandi!\nTum ozellikler aktif.")
-                        else:
-                            self.license_status.setText("Lisans: Yetkisiz")
-                            self.license_status.setStyleSheet(f"""
-                                color: {ERROR};
-                                background-color: rgba(244, 67, 54, 0.15);
-                                border: 2px solid {ERROR};
-                                border-radius: 8px;
-                                padding: 6px 16px;
-                                font-size: 14px;
-                                font-weight: bold;
-                            """)
-                            msg = result.get("message", "HWID yetkisiz")
-                            self.license_info.setText(f"Lisans durumu: {msg}")
-                            self.license_info.setStyleSheet(f"color: {ERROR}; font-size: 16px; font-weight: bold;")
-                            QMessageBox.warning(self, "Yetkisiz", f"{msg}\n\nAdmin panelinden yetkilendirme gerektirir.")
-                    except Exception as e:
-                        QMessageBox.warning(self, "Hata", f"Sunucu baglantisi hatasi:\n{str(e)}")
-                else:
-                    # Offline mod - sadece format kontrolu
-                    self.is_authorized = True
-                    self.license_status.setText("Lisans: Aktif (Offline)")
+        if not API_AVAILABLE:
+            QMessageBox.warning(self, "Baglanti Hatasi",
+                                "Sunucuya ulasilamiyor. Lisans dogrulamasi icin internet baglantisi gerekli.")
+            return
+
+        try:
+            result = register_and_check(self.hardware_id)
+            self.is_authorized = result.get("authorized", False)
+            is_demo = result.get("demo", False)
+            admin_ok = result.get("admin_authorized", False)
+            days_left = result.get("demo_days_left", 0)
+
+            if self.is_authorized:
+                if admin_ok:
+                    self.license_status.setText("Lisans: Aktif (Sunucu)")
                     self.license_status.setStyleSheet(f"""
                         color: {SUCCESS};
                         background-color: rgba(16, 185, 129, 0.15);
@@ -1150,11 +1131,43 @@ class SGKApp(QMainWindow):
                         font-size: 14px;
                         font-weight: bold;
                     """)
-                    self.license_info.setText("Lisans durumu: Offline mod - sunucu baglantisi yok")
+                    self.license_info.setText("Lisans durumu: Aktif - Sunucu tarafindan dogrulandi")
                     self.license_info.setStyleSheet(f"color: {SUCCESS}; font-size: 16px; font-weight: bold;")
-                    QMessageBox.information(self, "Basarili", "Lisans formati dogru.\nOffline modda calisiyor.")
+                    QMessageBox.information(self, "Basarili", "Lisans dogrulandi!\nTum ozellikler aktif.")
+                else:
+                    self.license_status.setText("Lisans: Demo")
+                    self.license_status.setStyleSheet(f"""
+                        color: {WARNING};
+                        background-color: rgba(245, 158, 11, 0.15);
+                        border: 2px solid {WARNING};
+                        border-radius: 8px;
+                        padding: 6px 16px;
+                        font-size: 14px;
+                        font-weight: bold;
+                    """)
+                    self.license_info.setText(f"Lisans durumu: Demo aktif ({days_left} gun kaldi)")
+                    self.license_info.setStyleSheet(f"color: {WARNING}; font-size: 16px; font-weight: bold;")
+                    QMessageBox.information(self, "Demo Lisans",
+                                            f"Demo lisans aktif!\n\n{days_left} gun kaldi. Sure bitince admin onayi gerekir.")
             else:
-                QMessageBox.warning(self, "Hata", "Gecersiz lisans formati!\nBeklenen: SGK-XXXX-XXXX-XXXX-XXXX")
+                self.license_status.setText("Lisans: Yetkisiz")
+                self.license_status.setStyleSheet(f"""
+                    color: {ERROR};
+                    background-color: rgba(244, 67, 54, 0.15);
+                    border: 2px solid {ERROR};
+                    border-radius: 8px;
+                    padding: 6px 16px;
+                    font-size: 14px;
+                    font-weight: bold;
+                """)
+                msg = result.get("message", "HWID yetkisiz")
+                self.license_info.setText(f"Lisans durumu: {msg}")
+                self.license_info.setStyleSheet(f"color: {ERROR}; font-size: 16px; font-weight: bold;")
+                QMessageBox.warning(self, "Yetkisiz",
+                                    f"{msg}\n\nDemo suresi doldu veya yetki verilmedi.\nAdmin panelinden yetkilendirme gerektirir.")
+        except Exception as e:
+            self.is_authorized = False
+            QMessageBox.warning(self, "Hata", f"Sunucu baglantisi hatasi:\n{str(e)}")
 
     def _get_demo_license(self):
         self.license_input.setText(DEMO_LISANS)

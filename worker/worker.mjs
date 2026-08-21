@@ -22,16 +22,19 @@ function sha(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s
 function adm(pw){return sha(pw).then(function(h){return h===H;});}
 
 async function reg(r,e){
+  var D=30,MS=D*24*3600*1000;
   var b=await r.json();
   if(!b.hwid||!b.ip)return j({error:'hwid and ip required',authorized:false},400);
   var n=new Date().toISOString();
   var x=await e.DB.prepare('SELECT * FROM users WHERE hwid=?').bind(b.hwid).first();
   if(x){
     await e.DB.prepare('UPDATE users SET ip=?,last_seen=? WHERE hwid=?').bind(b.ip,n,b.hwid).run();
-    return j({authorized:!!x.authorized,msg:x.authorized?'Access granted':'Not authorized',hwid:x.hwid,first:x.first_seen,last:n});
+    var demo=Date.now()-new Date(x.first_seen).getTime()<MS;
+    var ok=!!x.authorized||demo;
+    return j({authorized:ok,demo:demo&&!x.authorized,admin_authorized:!!x.authorized,demo_days_left:demo?Math.max(0,Math.ceil((MS-(Date.now()-new Date(x.first_seen).getTime()))/86400000)):0,msg:!!x.authorized?'Access granted':(demo?'Demo access (30 gun)':'Not authorized'),hwid:x.hwid,first:x.first_seen,last:n});
   }
   await e.DB.prepare('INSERT INTO users(hwid,ip,first_seen,last_seen,authorized)VALUES(?,?,?,?,0)').bind(b.hwid,b.ip,n,n).run();
-  return j({authorized:false,msg:'Pending authorization',hwid:b.hwid},201);
+  return j({authorized:true,demo:true,admin_authorized:false,demo_days_left:D,msg:'Demo access (30 gun)',hwid:b.hwid},201);
 }
 
 async function users(url,e){

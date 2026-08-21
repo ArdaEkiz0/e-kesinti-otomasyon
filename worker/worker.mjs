@@ -12,7 +12,7 @@ export default{async fetch(r,e){
     if(u.pathname==='/api/admin/authorize'&&r.method==='POST')return await act(r,e,'authorize');
     if(u.pathname==='/api/admin/deauthorize'&&r.method==='POST')return await act(r,e,'deauthorize');
     if(u.pathname==='/api/admin/stats'&&r.method==='GET')return await stats(u,e);
-    if(u.pathname==='/admin')return new Response(HTML,{'Content-Type':'text/html;charset=utf-8',...CORS});
+    if(u.pathname==='/admin')return new Response(HTML,{headers:{'Content-Type':'text/html;charset=utf-8',...CORS}});
     return j({error:'Not found'},404);
   }catch(x){return j({error:x.message},500);}
 }};

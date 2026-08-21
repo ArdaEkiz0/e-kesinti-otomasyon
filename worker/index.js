@@ -3,7 +3,7 @@
  * Cloudflare Worker + D1 Database
  */
 
-const ADMIN_PASSWORD_HASH = 'ESKI-HASH-KALDIRILDI'; // "***KALDIRILDI***" SHA-256
+const ADMIN_PASSWORD_HASH = '37688acf5fd477512d3077e7043ba1cf2e6ef943affb2f8e0fc7c404afeb27e4';
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',

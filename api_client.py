@@ -17,7 +17,6 @@ from typing import Optional, Dict, Any
 
 # Worker URL - deploy edildikten sonra guncellenmeli
 WORKER_URL = "https://sgk-api-v2.ardaekiz72.workers.dev"
-ADMIN_PASSWORD = "***KALDIRILDI***"  # Admin paneli icin (sadece admin tarafindan kullanilir)
 
 # Timeout
 REQUEST_TIMEOUT = 10
@@ -178,5 +177,6 @@ if __name__ == "__main__":
     print(f"\n[2] Authorization: {'AKTIF' if result.get('authorized') else 'PASIF'}")
 
     print("\n[3] Admin Stats...")
-    stats = admin_stats(ADMIN_PASSWORD)
+    admin_pw = input("    Admin sifresi: ").strip()
+    stats = admin_stats(admin_pw)
     print(f"    Stats: {json.dumps(stats, indent=2)}")

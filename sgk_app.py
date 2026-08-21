@@ -256,9 +256,6 @@ class SGKApp(QMainWindow):
         self.is_authorized = False
         self._apply_global_style()
 
-        # Startup: HWID + IP kaydet ve yetki kontrol et
-        self._startup_license_check()
-
         central = QWidget()
         self.setCentralWidget(central)
         main_layout = QVBoxLayout(central)
@@ -291,6 +288,9 @@ class SGKApp(QMainWindow):
         self._update_clock()
 
         self._load_settings()
+
+        # Startup: HWID + IP kaydet ve yetki kontrol et (widget'lar kurulduktan sonra)
+        self._startup_license_check()
 
     def _apply_global_style(self):
         self.setStyleSheet(f"""

@@ -24,23 +24,25 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.2.0"
+SURUM = "1.3.0"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda Yazilim"
 
-# --- Renkler (Profesyonel Dark Palette) ---
-BG_MAIN = "#1e1e2e"
-BG_CARD = "#2a2a3e"
-ACCENT_PRIMARY = "#7c3aed"
-ACCENT_SECONDARY = "#06b6d4"
-SUCCESS = "#10b981"
-ERROR = "#ef4444"
-WARNING = "#f59e0b"
+# --- Renkler (Resmi Siyah-Bez Palette) ---
+BG_MAIN = "#1a1a1a"
+BG_CARD = "#2d2d2d"
+BG_HEADER = "#111111"
+ACCENT_PRIMARY = "#c9a86c"
+ACCENT_SECONDARY = "#8b7355"
+SUCCESS = "#4caf50"
+ERROR = "#f44336"
+WARNING = "#ff9800"
 TEXT_PRIMARY = "#ffffff"
-TEXT_SECONDARY = "#a1a1aa"
-BORDER_COLOR = "#3f3f5e"
-INPUT_BG = "#1a1a2e"
-NAV_BG = "#16162a"
+TEXT_SECONDARY = "#cccccc"
+BORDER_COLOR = "#404040"
+INPUT_BG = "#1a1a1a"
+NAV_BG = "#111111"
+NAV_ACTIVE = "#c9a86c"
 
 # --- Demo Lisans ---
 DEMO_LISANS = "SGK-DEMO0001-2025-ARDA-2026"
@@ -115,7 +117,7 @@ class StyledButton(QPushButton):
         self.setStyleSheet(f"""
             QPushButton {{
                 background-color: {self.base_color};
-                color: #ffffff;
+                color: #1a1a1a;
                 border: 2px solid {self.base_color};
                 border-radius: 8px;
                 padding: 12px 24px;
@@ -127,11 +129,11 @@ class StyledButton(QPushButton):
                 border-color: {ACCENT_SECONDARY};
             }}
             QPushButton:pressed {{
-                background-color: #059669;
+                background-color: #6d5a3a;
             }}
             QPushButton:disabled {{
                 background-color: {BORDER_COLOR};
-                color: {TEXT_SECONDARY};
+                color: #666666;
                 border-color: {BORDER_COLOR};
             }}
         """)
@@ -154,10 +156,10 @@ class NavButton(QPushButton):
         if checked:
             self.setStyleSheet(f"""
                 QPushButton {{
-                    background-color: rgba(124, 58, 237, 0.15);
-                    color: {ACCENT_PRIMARY};
+                    background-color: rgba(201, 168, 108, 0.2);
+                    color: {NAV_ACTIVE};
                     border: none;
-                    border-top: 3px solid {ACCENT_PRIMARY};
+                    border-top: 3px solid {NAV_ACTIVE};
                     padding: 10px 12px;
                     font-size: 14px;
                     font-weight: bold;
@@ -175,7 +177,7 @@ class NavButton(QPushButton):
                 }}
                 QPushButton:hover {{
                     color: {TEXT_PRIMARY};
-                    background-color: rgba(124, 58, 237, 0.08);
+                    background-color: rgba(201, 168, 108, 0.1);
                 }}
             """)
 
@@ -340,8 +342,8 @@ class SGKApp(QMainWindow):
                 background-color: {NAV_BG};
             }}
             QTextEdit {{
-                background-color: #0a0a14;
-                color: {SUCCESS};
+                background-color: #111111;
+                color: {TEXT_PRIMARY};
                 border: 2px solid {BORDER_COLOR};
                 border-radius: 8px;
                 padding: 12px;
@@ -435,7 +437,7 @@ class SGKApp(QMainWindow):
             }}
             QMessageBox QPushButton {{
                 background-color: {ACCENT_PRIMARY};
-                color: white;
+                color: #1a1a1a;
                 border: none;
                 border-radius: 6px;
                 padding: 8px 20px;
@@ -678,8 +680,8 @@ class SGKApp(QMainWindow):
         self.log_output.setMinimumHeight(180)
         self.log_output.setStyleSheet(f"""
             QTextEdit {{
-                background-color: #0a0a14;
-                color: {SUCCESS};
+                background-color: #111111;
+                color: {TEXT_PRIMARY};
                 border: 2px solid {BORDER_COLOR};
                 border-radius: 8px;
                 padding: 12px;

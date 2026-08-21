@@ -14,7 +14,6 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=True,
     optimize=0,
 )
 

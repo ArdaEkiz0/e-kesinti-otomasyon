@@ -232,25 +232,37 @@ pause"""
 
 
 def bot_dosyalari_hazirla():
-    """sgk_bot.py ve BAT_BASLAT.bat eksikse indirir/oluşturur."""
+    """sgk_bot.py ve BAT_BASLAT.bat eksikse gömülü kopyadan/GitHub'dan temin eder."""
     yaz("\n📁 1/6 ADIM - Bot dosyaları kontrol ediliyor...", Renk.TURKUAZ, kalin=True)
     bot = os.path.join(BASE_DIR, "sgk_bot.py")
 
-    def bot_icerik():
+    def bot_icerik(yol=None):
         try:
-            with open(bot, encoding="utf-8", errors="replace") as f:
+            with open(yol or bot, encoding="utf-8", errors="replace") as f:
                 return f.read()
         except OSError:
             return ""
 
-    if os.path.exists(bot) and os.path.getsize(bot) > 5000 and "SGKBot" in bot_icerik():
+    def bot_gecerli(yol=None):
+        try:
+            return os.path.getsize(yol or bot) > 5000 and "SGKBot" in bot_icerik(yol)
+        except OSError:
+            return False
+
+    if bot_gecerli():
         yaz("   ✅ sgk_bot.py mevcut", Renk.YESIL)
     else:
-        yaz("   sgk_bot.py bulunamadı veya eksik, GitHub'dan indiriliyor...", Renk.SARI)
-        indir(SGK_BOT_RAW, bot)
-        if os.path.getsize(bot) < 5000 or "SGKBot" not in bot_icerik():
-            raise RuntimeError("Bot dosyası indirilemedi! İnternet bağlantınızı kontrol edip tekrar deneyin.")
-        yaz("   ✅ sgk_bot.py indirildi", Renk.YESIL)
+        gomulu = os.path.join(getattr(sys, "_MEIPASS", ""), "sgk_bot.py")
+        if getattr(sys, "_MEIPASS", None) and bot_gecerli(gomulu):
+            yaz("   sgk_bot.py gömülü kopyadan çıkarılıyor...", Renk.SARI)
+            with open(gomulu, "rb") as k, open(bot, "wb") as h:
+                h.write(k.read())
+        else:
+            yaz("   sgk_bot.py bulunamadı veya eksik, GitHub'dan indiriliyor...", Renk.SARI)
+            indir(SGK_BOT_RAW, bot)
+        if not bot_gecerli():
+            raise RuntimeError("Bot dosyası hazırlanamadı! İnternet bağlantınızı kontrol edip tekrar deneyin.")
+        yaz("   ✅ sgk_bot.py hazır", Renk.YESIL)
     bat = os.path.join(BASE_DIR, "BAT_BASLAT.bat")
     if not os.path.exists(bat):
         with open(bat, "w", encoding="utf-8", newline="\r\n") as f:

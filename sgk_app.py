@@ -300,7 +300,7 @@ class SGKApp(QMainWindow):
             QWidget {{
                 background-color: transparent;
                 color: {TEXT_PRIMARY};
-                font-family: 'Segoe UI', Arial, sans-serif;
+                font-family: 'Segoe UI';
                 font-size: 14px;
             }}
             QScrollBar:vertical {{

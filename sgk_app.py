@@ -20,6 +20,13 @@ from PyQt5.QtWidgets import (
     QComboBox, QMessageBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect,
     QDesktopWidget
 )
+
+# API Client import (opsiyonel - Worker entegrasyonu icin)
+try:
+    from api_client import register_and_check, check_authorization, WORKER_URL
+    API_AVAILABLE = True
+except ImportError:
+    API_AVAILABLE = False
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
@@ -246,7 +253,11 @@ class SGKApp(QMainWindow):
         self.resize(1050, 750)
         self.hardware_id = get_hardware_id()
         self.bot_thread = None
+        self.is_authorized = False
         self._apply_global_style()
+
+        # Startup: HWID + IP kaydet ve yetki kontrol et
+        self._startup_license_check()
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -1003,6 +1014,70 @@ class SGKApp(QMainWindow):
         self.copy_hw_btn.setText("Kopyalandi!")
         QTimer.singleShot(2000, lambda: self.copy_hw_btn.setText("Kopyala"))
 
+    def _startup_license_check(self):
+        """Uygulama basladiginda API'ye HWID + IP gonder ve yetki kontrol et"""
+        if not API_AVAILABLE:
+            self.is_authorized = False
+            self.license_status.setText("Lisans: Offline")
+            self.license_status.setStyleSheet(f"""
+                color: {WARNING};
+                background-color: rgba(245, 158, 11, 0.15);
+                border: 2px solid {WARNING};
+                border-radius: 8px;
+                padding: 6px 16px;
+                font-size: 14px;
+                font-weight: bold;
+            """)
+            self.start_btn.setEnabled(False)
+            self.start_btn.setText("Yetkisiz - Internet Baglantisi Gerekli")
+            return
+
+        try:
+            result = register_and_check(self.hardware_id)
+            self.is_authorized = result.get("authorized", False)
+
+            if self.is_authorized:
+                self.license_status.setText("Lisans: Aktif (Sunucu)")
+                self.license_status.setStyleSheet(f"""
+                    color: {SUCCESS};
+                    background-color: rgba(16, 185, 129, 0.15);
+                    border: 2px solid {SUCCESS};
+                    border-radius: 8px;
+                    padding: 6px 16px;
+                    font-size: 14px;
+                    font-weight: bold;
+                """)
+                self.start_btn.setEnabled(True)
+                self.start_btn.setText("Botu Baslat")
+            else:
+                msg = result.get("message", "Yetkisiz")
+                self.license_status.setText(f"Lisans: {msg}")
+                self.license_status.setStyleSheet(f"""
+                    color: {ERROR};
+                    background-color: rgba(244, 67, 54, 0.15);
+                    border: 2px solid {ERROR};
+                    border-radius: 8px;
+                    padding: 6px 16px;
+                    font-size: 14px;
+                    font-weight: bold;
+                """)
+                self.start_btn.setEnabled(False)
+                self.start_btn.setText("Yetkisiz - Admin ile iletisime gecin")
+        except Exception:
+            self.is_authorized = False
+            self.license_status.setText("Lisans: Hata")
+            self.license_status.setStyleSheet(f"""
+                color: {WARNING};
+                background-color: rgba(245, 158, 11, 0.15);
+                border: 2px solid {WARNING};
+                border-radius: 8px;
+                padding: 6px 16px;
+                font-size: 14px;
+                font-weight: bold;
+            """)
+            self.start_btn.setEnabled(False)
+            self.start_btn.setText("Baglanti Hatasi - Tekrar Deneyin")
+
     def _verify_license(self):
         key = self.license_input.text().strip()
         if not key:
@@ -1026,19 +1101,58 @@ class SGKApp(QMainWindow):
         else:
             simple_check = (key.startswith("SGK-") and len(key) == 24 and key.count("-") == 4)
             if simple_check:
-                self.license_status.setText("Lisans: Aktif")
-                self.license_status.setStyleSheet(f"""
-                    color: {SUCCESS};
-                    background-color: rgba(16, 185, 129, 0.15);
-                    border: 2px solid {SUCCESS};
-                    border-radius: 8px;
-                    padding: 6px 16px;
-                    font-size: 14px;
-                    font-weight: bold;
-                """)
-                self.license_info.setText("Lisans durumu: Aktif - Tum ozellikler acik")
-                self.license_info.setStyleSheet(f"color: {SUCCESS}; font-size: 16px; font-weight: bold;")
-                QMessageBox.information(self, "Basarili", "Lisans dogrulandi!\nTum ozellikler aktif.")
+                # API ile sunucu tarafindan dogrula
+                if API_AVAILABLE:
+                    try:
+                        result = register_and_check(self.hardware_id)
+                        self.is_authorized = result.get("authorized", False)
+                        if self.is_authorized:
+                            self.license_status.setText("Lisans: Aktif (Sunucu)")
+                            self.license_status.setStyleSheet(f"""
+                                color: {SUCCESS};
+                                background-color: rgba(16, 185, 129, 0.15);
+                                border: 2px solid {SUCCESS};
+                                border-radius: 8px;
+                                padding: 6px 16px;
+                                font-size: 14px;
+                                font-weight: bold;
+                            """)
+                            self.license_info.setText("Lisans durumu: Aktif - Sunucu tarafindan dogrulandi")
+                            self.license_info.setStyleSheet(f"color: {SUCCESS}; font-size: 16px; font-weight: bold;")
+                            QMessageBox.information(self, "Basarili", "Lisans dogrulandi!\nTum ozellikler aktif.")
+                        else:
+                            self.license_status.setText("Lisans: Yetkisiz")
+                            self.license_status.setStyleSheet(f"""
+                                color: {ERROR};
+                                background-color: rgba(244, 67, 54, 0.15);
+                                border: 2px solid {ERROR};
+                                border-radius: 8px;
+                                padding: 6px 16px;
+                                font-size: 14px;
+                                font-weight: bold;
+                            """)
+                            msg = result.get("message", "HWID yetkisiz")
+                            self.license_info.setText(f"Lisans durumu: {msg}")
+                            self.license_info.setStyleSheet(f"color: {ERROR}; font-size: 16px; font-weight: bold;")
+                            QMessageBox.warning(self, "Yetkisiz", f"{msg}\n\nAdmin panelinden yetkilendirme gerektirir.")
+                    except Exception as e:
+                        QMessageBox.warning(self, "Hata", f"Sunucu baglantisi hatasi:\n{str(e)}")
+                else:
+                    # Offline mod - sadece format kontrolu
+                    self.is_authorized = True
+                    self.license_status.setText("Lisans: Aktif (Offline)")
+                    self.license_status.setStyleSheet(f"""
+                        color: {SUCCESS};
+                        background-color: rgba(16, 185, 129, 0.15);
+                        border: 2px solid {SUCCESS};
+                        border-radius: 8px;
+                        padding: 6px 16px;
+                        font-size: 14px;
+                        font-weight: bold;
+                    """)
+                    self.license_info.setText("Lisans durumu: Offline mod - sunucu baglantisi yok")
+                    self.license_info.setStyleSheet(f"color: {SUCCESS}; font-size: 16px; font-weight: bold;")
+                    QMessageBox.information(self, "Basarili", "Lisans formati dogru.\nOffline modda calisiyor.")
             else:
                 QMessageBox.warning(self, "Hata", "Gecersiz lisans formati!\nBeklenen: SGK-XXXX-XXXX-XXXX-XXXX")
 

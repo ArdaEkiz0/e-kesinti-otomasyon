@@ -198,6 +198,14 @@ class TestSurucu:
 # ANA BOT SINIFI
 # ============================================================
 
+MAX_DENEME = 3          # hata olursa her kayit en fazla 3 kez denenir
+MAKS_YENIDEN_LOGIN = 5  # tek turda en fazla kac kez oturum yenileme istenir
+
+
+class OturumHatasi(Exception):
+    """SGK oturumu dusmustu / login sayfasina yonlendirildi."""
+
+
 class SGKBot:
     def __init__(self, surucu=None, test_modu=False):
         self.test_modu = test_modu
@@ -352,6 +360,188 @@ class SGKBot:
         wb.save(dosya_yolu)
         return True
 
+    def _form_sayfasina_git(self):
+        """Login sonrasi islem formuna geri doner (oturum yenilendikten sonra)."""
+        print(renkli("\n📍 Form sayfasına gidiliyor...", Renk.TURKUAZ))
+        try:
+            self.driver.execute_script("goToPage('/GooKesintiIcinUreticiSorgulaAction.do')")
+            time.sleep(3)
+        except Exception:
+            pass
+        try:
+            self.driver.execute_script("acikDosyaSayisiniKontrolEt()")
+            time.sleep(3)
+        except Exception:
+            pass
+        month, year = self.get_previous_month_and_year()
+        try:
+            Select(self.driver.find_element(By.ID, "ay")).select_by_value(str(month))
+            Select(self.driver.find_element(By.ID, "yil")).select_by_value(str(year))
+            print(f"   ✅ Ay: {month:02d}, Yıl: {year}")
+        except Exception as e:
+            print(renkli(f"   ❌ Ay/Yıl hatası: {e}", Renk.KIRMIZI))
+        try:
+            self.driver.execute_script("document.getElementById('yeniDosyaOlustur').click()")
+            time.sleep(4)
+            print(renkli("   ✅ YENİ Dosya oluşturuldu", Renk.YESIL))
+        except Exception as e:
+            print(renkli(f"   ❌ Hata: {e}", Renk.KIRMIZI))
+        try:
+            time.sleep(2)
+            rows = self.driver.find_elements(By.XPATH, "//table[@id='users2']//tbody//tr[@class='row1' or @class='row2']")
+            if len(rows) > 0:
+                rows[0].click()
+                time.sleep(1)
+                print(renkli("   ✅ YENİ Dosya seçildi", Renk.YESIL))
+        except Exception:
+            pass
+        button = self.driver.find_element(By.ID, "secilenDosyayiAc")
+        button.click()
+        time.sleep(3)
+        print(renkli("   ✅ Form açıldı - işleme devam ediliyor...", Renk.YESIL))
+
+    def _kayit_isle(self, record, odeme_tarihi):
+        """Tek bir kaydi siteye girer. Basarili olursa doner, hata olursa exception firlatir."""
+        try:
+            tc_field = self.driver.find_element(By.ID, "mernisno")
+        except NoSuchElementException:
+            # TC alani yok -> oturum dussm ya da baska sayfaya yonlendirilmis olabilir
+            try:
+                url = (self.driver.current_url or "").lower()
+            except Exception:
+                url = ""
+            if "sgk.gov.tr" not in url:
+                raise OturumHatasi("SGK oturumu dusmus / login gerekiyor")
+            raise
+        tc_field.clear()
+        tc_field.send_keys(record['tc'])
+        time.sleep(0.5)
+        print(renkli(f"   ✅ TC yazıldı: {record['tc']}", Renk.YESIL))
+
+        tarih_field = self.driver.find_element(By.ID, "odemeTarihi")
+        tarih_field.clear()
+        tarih_field.send_keys(odeme_tarihi)
+        time.sleep(0.5)
+        print(renkli(f"   ✅ Tarih yazıldı: {odeme_tarihi}", Renk.YESIL))
+
+        self.driver.execute_script("""
+            var radio = document.querySelector('input[name="answer"][value="Alim Gerceklesti"]');
+            if (radio) {
+                var link = radio.parentElement.querySelector('a');
+                if (link) {
+                    link.click();
+                }
+            }
+        """)
+        time.sleep(0.5)
+        print(renkli("   ✅ 'Alım Gerceklesti' seçildi (YEŞİL)", Renk.YESIL))
+
+        print(renkli("   🔎 Ara tıklanıyor...", Renk.TURKUAZ))
+        self.driver.execute_script("tcAraButtonPressed()")
+        time.sleep(3)
+        print(renkli("   ✅ Üretici bilgileri yüklendi", Renk.YESIL))
+
+        matrah_tam = int(record['matrah'])
+        matrah_kurus = round((record['matrah'] - matrah_tam) * 100)
+        # Kuruş HER ZAMAN 2 haneli yazılır (ör: 9 -> '09', 5 -> '05', 90 -> '90')
+        # '9' yazılırsa site bunu 0.9 (13014,90) olarak algılar!
+        matrah_kurus_str = f"{matrah_kurus:02d}"
+
+        # Matrah yazı - SİSTEM FONKSİYONLARINI TETIKLE
+        self.driver.execute_script(f"""
+            var input = document.kesinti.urunAlimBedeliTam;
+            input.value = '{matrah_tam}';
+            textFocus(input);
+            formatCurrency(input);
+            hesaplaYaz(input);
+        """)
+        time.sleep(0.5)
+
+        # Kuruş yazılır; sitenin formatCurrency/hesaplaYaz fonksiyonları
+        # baştaki sıfırı silebileceği için değer EN SONDA tekrar '09' olarak
+        # yazılır ve hesaplama bir kez daha tetiklenir.
+        self.driver.execute_script(f"""
+            var input = document.kesinti.urunAlimBedeliKrs;
+            input.value = '{matrah_kurus_str}';
+            textFocus(input);
+            formatCurrency(input);
+            hesaplaYaz(input);
+            input.value = '{matrah_kurus_str}';
+            hesaplaYaz(input);
+        """)
+        time.sleep(0.5)
+        print(renkli(f"   💰 Matrah yazıldı: {matrah_tam}.{matrah_kurus_str} (RENK DEĞİŞTİ)", Renk.YESIL))
+
+        print(f"   🔢 Kesinti Tutarı: {record['kesinti']}")
+
+        print(renkli("   ➕ EKLE tıklanıyor...", Renk.TURKUAZ))
+        self.driver.execute_script("kesintiKaydet('9999999999.00')")
+        time.sleep(2)
+
+    def _toplu_isle(self, kayitlar, odeme_tarihi):
+        """Verilen kayitlari sirayla isler. Dondugunde (basarili_sayisi, hatali_listesi).
+
+        Oturum duserse kullanicidan tekrar login istenip kaldigi yerden devam edilir;
+        boylece 200+ kayitlik listelerde oturum kaybi tum listeyi felc etmez."""
+        basarili_sayi = 0
+        hatali = []
+        toplam = len(kayitlar)
+        tahmin_sn = toplam * 9  # kayit basi ~9 saniye (site bekleme sureleri dahil)
+        print(renkli(f"   ⏱️  Tahmini süre: ~{tahmin_sn // 60} dk {tahmin_sn % 60} sn", Renk.TURKUAZ))
+
+        tur_baslangici = time.time()
+        try:
+            for idx, record in enumerate(kayitlar, 1):
+                gecen = time.time() - tur_baslangici
+                kalan = gecen / idx * (toplam - idx) if idx > 1 else tahmin_sn
+                print(renkli(f"\n📍 Kayıt {idx}/{toplam}", Renk.BOLD + Renk.MAVI, kalin=True))
+                print(f"   {ilerleme_cubugu(idx - 1, toplam)}  TC={record['tc']}  "
+                      f"(kalan ~{int(kalan // 60)} dk {int(kalan % 60)} sn)")
+                basarili = False
+                son_hata = None
+                deneme = 0
+                girisim = 0
+                while deneme < MAX_DENEME and girisim < MAX_DENEME + MAKS_YENIDEN_LOGIN:
+                    girisim += 1
+                    try:
+                        self._kayit_isle(record, odeme_tarihi)
+                        basarili = True
+                        break
+                    except OturumHatasi:
+                        if self.test_modu:
+                            son_hata = OturumHatasi("test")
+                            deneme += 1
+                            continue
+                        print(renkli("   🔒 SGK oturumu düşmüş görünüyor!", Renk.SARI, kalin=True))
+                        try:
+                            input(renkli("   Tarayıcıdan TEKRAR LOGIN yapın, sonra buraya dönüp ENTER'a basınız...", Renk.SARI))
+                        except EOFError:
+                            pass
+                        try:
+                            self._form_sayfasina_git()
+                            continue  # ayni kaydi tekrar dene, deneme hakkini yakma
+                        except Exception as e_form:
+                            son_hata = e_form
+                            deneme += 1
+                    except Exception as e:
+                        son_hata = e
+                        deneme += 1
+                        if deneme < MAX_DENEME:
+                            print(renkli(f"   ⚠️ Hata ({deneme}. deneme): {hata_aciklamasi(e)}", Renk.SARI))
+                            print(renkli(f"   🔄 {deneme + 1}. deneme yapılıyor...", Renk.TURKUAZ))
+                            time.sleep(2)
+                if basarili:
+                    print(renkli("   ✅ TC başarıyla işlendi!", Renk.YESIL, kalin=True))
+                    basarili_sayi += 1
+                else:
+                    mesaj = hata_aciklamasi(son_hata) if son_hata else "Bilinmeyen hata"
+                    print(renkli(f"   ❌ Hata ({MAX_DENEME} deneme): {mesaj}", Renk.KIRMIZI))
+                    hatali.append({'tc': record['tc'], 'matrah': record['matrah'],
+                                   'kesinti': record['kesinti'], 'hata': mesaj})
+        except KeyboardInterrupt:
+            print(renkli("\n⏸️  Kullanıcı durdurdu — şu ana kadarki özet aşağıda.", Renk.SARI, kalin=True))
+        return basarili_sayi, hatali
+
     def run(self, excel_file):
         baslangic = time.time()
         print("\n" + "="*60)
@@ -435,97 +625,21 @@ class SGKBot:
 
         print(renkli("\n📝 Kayıtlar işleniyor...", Renk.TURKUAZ, kalin=True))
         odeme_tarihi = self.get_previous_month_date()
-        MAX_DENEME = 3  # hata olursa her kayıt en fazla 3 kez denenir
-        success = 0
-        hatali = []
-        for idx, record in enumerate(data, 1):
-            print(renkli(f"\n📍 Kayıt {idx}/{len(data)}", Renk.BOLD + Renk.MAVI, kalin=True))
-            print(f"   {ilerleme_cubugu(idx - 1, len(data))}  TC={record['tc']}")
-            basarili = False
-            son_hata = None
-            for deneme in range(1, MAX_DENEME + 1):
-                try:
-                    tc_field = self.driver.find_element(By.ID, "mernisno")
-                    tc_field.clear()
-                    tc_field.send_keys(record['tc'])
-                    time.sleep(0.5)
-                    print(renkli(f"   ✅ TC yazıldı: {record['tc']}", Renk.YESIL))
+        success, hatali = self._toplu_isle(data, odeme_tarihi)
 
-                    tarih_field = self.driver.find_element(By.ID, "odemeTarihi")
-                    tarih_field.clear()
-                    tarih_field.send_keys(odeme_tarihi)
-                    time.sleep(0.5)
-                    print(renkli(f"   ✅ Tarih yazıldı: {odeme_tarihi}", Renk.YESIL))
-
-                    self.driver.execute_script("""
-                        var radio = document.querySelector('input[name="answer"][value="Alim Gerceklesti"]');
-                        if (radio) {
-                            var link = radio.parentElement.querySelector('a');
-                            if (link) {
-                                link.click();
-                            }
-                        }
-                    """)
-                    time.sleep(0.5)
-                    print(renkli("   ✅ 'Alım Gerceklesti' seçildi (YEŞİL)", Renk.YESIL))
-
-                    print(renkli("   🔎 Ara tıklanıyor...", Renk.TURKUAZ))
-                    self.driver.execute_script("tcAraButtonPressed()")
-                    time.sleep(3)
-                    print(renkli("   ✅ Üretici bilgileri yüklendi", Renk.YESIL))
-
-                    matrah_tam = int(record['matrah'])
-                    matrah_kurus = round((record['matrah'] - matrah_tam) * 100)
-                    # Kuruş HER ZAMAN 2 haneli yazılır (ör: 9 -> '09', 5 -> '05', 90 -> '90')
-                    # '9' yazılırsa site bunu 0.9 (13014,90) olarak algılar!
-                    matrah_kurus_str = f"{matrah_kurus:02d}"
-
-                    # Matrah yazı - SİSTEM FONKSİYONLARINI TETIKLE
-                    self.driver.execute_script(f"""
-                        var input = document.kesinti.urunAlimBedeliTam;
-                        input.value = '{matrah_tam}';
-                        textFocus(input);
-                        formatCurrency(input);
-                        hesaplaYaz(input);
-                    """)
-                    time.sleep(0.5)
-
-                    # Kuruş yazılır; sitenin formatCurrency/hesaplaYaz fonksiyonları
-                    # baştaki sıfırı silebileceği için değer EN SONDA tekrar '09' olarak
-                    # yazılır ve hesaplama bir kez daha tetiklenir.
-                    self.driver.execute_script(f"""
-                        var input = document.kesinti.urunAlimBedeliKrs;
-                        input.value = '{matrah_kurus_str}';
-                        textFocus(input);
-                        formatCurrency(input);
-                        hesaplaYaz(input);
-                        input.value = '{matrah_kurus_str}';
-                        hesaplaYaz(input);
-                    """)
-                    time.sleep(0.5)
-                    print(renkli(f"   💰 Matrah yazıldı: {matrah_tam}.{matrah_kurus_str} (RENK DEĞİŞTİ)", Renk.YESIL))
-
-                    print(f"   🔢 Kesinti Tutarı: {record['kesinti']}")
-
-                    print(renkli("   ➕ EKLE tıklanıyor...", Renk.TURKUAZ))
-                    self.driver.execute_script("kesintiKaydet('9999999999.00')")
-                    time.sleep(2)
-
-                    basarili = True
-                    break
-                except Exception as e:
-                    son_hata = e
-                    if deneme < MAX_DENEME:
-                        print(renkli(f"   ⚠️ Hata ({deneme}. deneme): {hata_aciklamasi(e)}", Renk.SARI))
-                        print(renkli(f"   🔄 {deneme + 1}. deneme yapılıyor...", Renk.TURKUAZ))
-                        time.sleep(2)
-            if basarili:
-                print(renkli("   ✅ TC başarıyla işlendi!", Renk.YESIL, kalin=True))
-                success += 1
-            else:
-                mesaj = hata_aciklamasi(son_hata)
-                print(renkli(f"   ❌ Hata ({MAX_DENEME} deneme): {mesaj}", Renk.KIRMIZI))
-                hatali.append({'tc': record['tc'], 'hata': mesaj})
+        # Hatali kayitlar icin bir kez daha deneme turu (oturum dususu gibi gecici
+        # hatalardan kaynaklanan kayitlar bu sayede kurtarilir)
+        if hatali and not self.test_modu:
+            try:
+                cevap = input(renkli(
+                    f"\n🔁 {len(hatali)} kayıt hatalı. Bir kez daha denenmesini ister misiniz? (E/H): ",
+                    Renk.SARI, kalin=True)).strip().lower()
+            except EOFError:
+                cevap = "h"
+            if cevap.startswith("e"):
+                print(renkli("\n🔄 Hatalı kayıtlar tekrar deneniyor...", Renk.SARI, kalin=True))
+                s2, hatali = self._toplu_isle(hatali, odeme_tarihi)
+                success += s2
 
         sure = time.time() - baslangic
         print("\n" + "="*60)

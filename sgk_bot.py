@@ -57,6 +57,7 @@ class Renk:
     MAVI    = "\033[34m"
     MOR     = "\033[35m"
     TURKUAZ = "\033[36m"
+    ALTIN   = "\033[38;2;201;168;108m"  # marka altini (#c9a86c)
 
 
 def renk_aktif_mi():
@@ -545,8 +546,14 @@ class SGKBot:
     def run(self, excel_file):
         baslangic = time.time()
         print("\n" + "="*60)
-        print(renkli("🤖 SGK TARIMSAL KESİNTİ OTOMASYONU BOT", Renk.MAVI, kalin=True))
-        print(renkli("   Kullanıcı Dostu Arayüz v1.1", Renk.TURKUAZ))
+        print(renkli(r"""
+  ███████╗ ██████╗ ██╗  ██╗
+  ██╔════╝██╔═══██╗██║ ██╔╝
+  ███████╗██║   ██║█████╔╝
+  ╚════██║██║   ██║██╔═██╗
+  ███████║╚██████╔╝██║  ██╗
+  ╚══════╝ ╚═════╝ ╚═╝  ╚═╝""", Renk.ALTIN, kalin=True))
+        print(renkli("   SGK TARIMSAL KESİNTİ OTOMASYONU BOT", Renk.MAVI, kalin=True))
         print(renkli("   Developer: Arda M. Ekiz", Renk.MOR))
         print("="*60)
 

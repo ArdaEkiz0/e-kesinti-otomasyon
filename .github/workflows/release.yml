@@ -23,6 +23,7 @@ jobs:
           Copy-Item BAT_BASLAT.bat paket/
           Copy-Item BAT_KURULUM.bat paket/
           Copy-Item BENI_OKU.txt paket/
+          Copy-Item docs/app_logo.ico paket/
           Compress-Archive -Path paket/* -DestinationPath SGK_E_Kesinti_Otomasyon.zip -Force
           Get-Item SGK_E_Kesinti_Otomasyon.zip | Select-Object Name, Length
 

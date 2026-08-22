@@ -1,0 +1,29 @@
+# UTF-8
+# PyInstaller version info - Windows Defender yanlis alarmlarini azaltir
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 6, 1, 0),
+    prodvers=(1, 6, 1, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo([
+      StringTable('040904B0', [
+        StringStruct('CompanyName', 'Arda Yazilim'),
+        StringStruct('FileDescription', 'SGK E-Kesinti Otomasyon Kurulum Araci'),
+        StringStruct('FileVersion', '1.6.1.0'),
+        StringStruct('InternalName', 'KURULUM'),
+        StringStruct('LegalCopyright', '(c) Arda Yazilim. Tum haklari saklidir.'),
+        StringStruct('OriginalFilename', 'KURULUM.exe'),
+        StringStruct('ProductName', 'SGK E-Kesinti Otomasyon'),
+        StringStruct('ProductVersion', '1.6.1.0')
+      ])
+    ]),
+    VarFileInfo([VarStruct('Translation', [1033, 1200])])
+  ]
+)

@@ -1,4 +1,4 @@
-name: Profesyonel EXE Derle ve Release Olustur
+name: Exe Derle ve Release Olustur
 
 on:
   push:
@@ -20,27 +20,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Gerekli paketleri kur
-        run: |
-          pip install pyinstaller
-          pip install -r requirements.txt
-          pip install pyqt5
+      - name: PyInstaller kur
+        run: pip install pyinstaller
 
-      - name: Uygulama icon (ico) oluştur
-        run: |
-          pip install pillow
-          python -c "from PIL import Image; img=Image.open('docs/icon-512.png').convert('RGBA'); img.save('docs/app_icon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])"
+      - name: KURULUM.exe derle (sgk_bot.py gömülü)
+        run: pyinstaller --onefile --console --clean --name KURULUM --add-data "sgk_bot.py;." KURULUM.py
 
-      - name: Profesyonel GUI EXE derle (sgk_app.spec)
-        run: pyinstaller --noconfirm --clean sgk_app.spec
-
-      - name: Derlen EXE'i gömülü klasordda bul
-        run: |
-          dir "dist"
-          if (-not (Test-Path "dist\SGK_E_Kesinti_Otomasyon.exe")) { echo "HATA: EXE bulunamadi"; exit 1 }
-
-      - name: Release olustur ve EXE'yi yukle
+      - name: Release olustur ve exe'yi yukle
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/SGK_E_Kesinti_Otomasyon.exe
+          files: dist/KURULUM.exe
           generate_release_notes: true

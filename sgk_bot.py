@@ -36,11 +36,11 @@ if os.name == "nt":
     except Exception:
         pass
 
-# Cmd penceresi başlığını ayarla
+# Cmd pencere başlığını ayarla (sürüm bilgisiyle birlikte)
 if os.name == "nt":
     try:
         import ctypes
-        ctypes.windll.kernel32.SetConsoleTitleW("Developer Arda M. Ekiz")
+        ctypes.windll.kernel32.SetConsoleTitleW(f"SGK E-Kesinti Otomasyon v{BOT_SURUM} | Developer Arda M. Ekiz")
     except Exception:
         pass
 
@@ -588,6 +588,7 @@ class SGKBot:
   ███████║╚██████╔╝██║  ██╗
   ╚══════╝ ╚═════╝ ╚═╝  ╚═╝""", Renk.ALTIN, kalin=True))
         print(renkli("   SGK TARIMSAL KESİNTİ OTOMASYONU BOT", Renk.MAVI, kalin=True))
+        print(renkli(f"   Sürüm: v{BOT_SURUM}", Renk.TURKUAZ, kalin=True))
         print(renkli("   Developer: Arda M. Ekiz", Renk.MOR))
         print("="*60)
 

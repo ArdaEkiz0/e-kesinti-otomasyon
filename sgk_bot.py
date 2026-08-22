@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.6.5"  # GitHub release etiketiyle karşılaştırılır
+BOT_SURUM = "1.7.2"  # GitHub release etiketiyle karşılaştırılır
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -110,8 +110,8 @@ def hata_aciklamasi(e):
     return (metin[:200] if metin else f"Bilinmeyen hata ({sinif})")
 
 
-def guncelleme_kontrol_goster():
-    """GitHub'da daha yeni bir sürüm varsa kullanıcıyı uyarır (hata olursa sessizce geçer)."""
+def guncelleme_var_mi():
+    """GitHub'da daha yeni surum varsa (surum, zip_url) doner; yoksa (None, None)."""
     try:
         istek = urllib.request.Request(
             GITHUB_API, headers={"User-Agent": "SGK-BOT", "Accept": "application/vnd.github+json"})
@@ -119,17 +119,51 @@ def guncelleme_kontrol_goster():
             veri = json.loads(r.read().decode("utf-8"))
         uzak_surum = str(veri.get("tag_name", "")).lstrip("v")
         if not uzak_surum:
-            return
+            return None, None
         yerel = [int(x) for x in re.findall(r"\d+", BOT_SURUM)]
         uzak = [int(x) for x in re.findall(r"\d+", uzak_surum)]
         uzunluk = max(len(yerel), len(uzak))
         yerel += [0] * (uzunluk - len(yerel))
         uzak += [0] * (uzunluk - len(uzak))
-        if uzak > yerel:
-            print(renkli(f"\n🔄 YENİ SÜRÜM VAR: v{uzak_surum} (senin sürüm: v{BOT_SURUM})", Renk.SARI, kalin=True))
-            print(renkli("   Güncellemek için siteden yeni ZIP paketini indirip BAT_KURULUM.bat'ı çalıştırın.", Renk.SARI))
+        if uzak <= yerel:
+            return None, None
+        for a in veri.get("assets", []):
+            if a.get("name", "").lower() == "sgk_e_kesinti_otomasyon.zip":
+                return uzak_surum, a.get("browser_download_url")
     except Exception:
-        pass  # internet yoksa veya hata olursa sessizce geç
+        pass  # internet yoksa veya hata olursa sessizce gec
+    return None, None
+
+
+def otomatik_guncelle(zip_url):
+    """Yeni ZIP paketini indirip bot klasorune acar (dosyalari gunceller)."""
+    import zipfile
+    hedef_klasor = os.path.dirname(os.path.abspath(__file__))
+    zip_yol = os.path.join(hedef_klasor, "_guncelleme.zip")
+    yaz_ilerleme = True
+    print(renkli("   ⬇️ Yeni sürüm indiriliyor...", Renk.SARI))
+    istek = urllib.request.Request(zip_url, headers={"User-Agent": "SGK-BOT"})
+    with urllib.request.urlopen(istek, timeout=180) as r, open(zip_yol, "wb") as f:
+        toplam = int(r.headers.get("Content-Length", 0))
+        yazilan = 0
+        while True:
+            parca = r.read(65536)
+            if not parca:
+                break
+            f.write(parca)
+            yazilan += len(parca)
+            if toplam:
+                print(f"\r   %3d%%" % (yazilan * 100 // toplam), end="", flush=True)
+    print()
+    if os.path.getsize(zip_yol) < 1000:
+        raise RuntimeError("ZIP indirilemedi (dosya eksik)")
+    print(renkli("   📦 Dosyalar güncelleniyor...", Renk.SARI))
+    with zipfile.ZipFile(zip_yol) as z:
+        z.extractall(hedef_klasor)
+    try:
+        os.remove(zip_yol)
+    except OSError:
+        pass
 
 
 def windows_bildirim(baslik, metin):
@@ -703,7 +737,23 @@ def excel_dosyasi_sec():
 
 
 if __name__ == "__main__":
-    guncelleme_kontrol_goster()
+    # Otomatik guncelleme: yeni surum varsa sorar, onaylanirsa indirip uygular
+    if "--test" not in sys.argv:
+        yeni_surum, zip_url = guncelleme_var_mi()
+        if yeni_surum and zip_url:
+            print(renkli(f"\n🔄 YENİ SÜRÜM VAR: v{yeni_surum} (senin sürüm: v{BOT_SURUM})", Renk.SARI, kalin=True))
+            try:
+                cevap = input(renkli("   Şimdi otomatik güncellensin mi? (E/H): ", Renk.SARI)).strip().lower()
+            except EOFError:
+                cevap = "h"
+            if cevap in ("e", "evet", ""):
+                try:
+                    otomatik_guncelle(zip_url)
+                    print(renkli(f"   ✅ v{yeni_surum} güncellendi! Bot yeniden başlatılıyor...", Renk.YESIL, kalin=True))
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                except Exception as e:
+                    print(renkli(f"   ❌ Otomatik güncelleme başarısız: {e}", Renk.KIRMIZI))
+                    print(renkli("   Elle güncellemek için siteden ZIP'i indirip dosyaları değiştirin.", Renk.SARI))
     test_modu = "--test" in sys.argv
     # Kullanıcı Excel dosyası verirse onu kullan, vermezse klasördeki Excel'i otomatik bul
     # Kullanım:  python sgk_bot.py [excel_dosya.xlsx]  veya  dosyayı BAT_BASLAT.bat üzerine sürükle

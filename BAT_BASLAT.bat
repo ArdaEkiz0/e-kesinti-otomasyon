@@ -9,7 +9,10 @@ if not defined PY (
     if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PY=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
 )
 if not defined PY (
-    echo HATA: Python bulunamadi! Once KURULUM.exe calistirin.
+    if exist "%ProgramFiles%\Python312\python.exe" set "PY=%ProgramFiles%\Python312\python.exe"
+)
+if not defined PY (
+    echo HATA: Python bulunamadi! Once BAT_KURULUM.bat calistirin.
     pause
     exit /b 1
 )

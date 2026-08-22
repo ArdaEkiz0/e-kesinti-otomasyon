@@ -1,4 +1,4 @@
-name: Exe Derle ve Release Olustur
+name: Zip Paket Derle ve Release Olustur
 
 on:
   push:
@@ -15,22 +15,19 @@ jobs:
       - name: Depoyu al
         uses: actions/checkout@v4
 
-      - name: Python kur
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: ZIP paketi olustur (kaynak dosyalar - antivirüs sorunu yok)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path paket | Out-Null
+          Copy-Item sgk_bot.py paket/
+          Copy-Item BAT_BASLAT.bat paket/
+          Copy-Item BAT_KURULUM.bat paket/
+          Copy-Item BENI_OKU.txt paket/
+          Compress-Archive -Path paket/* -DestinationPath SGK_E_Kesinti_Otomasyon.zip -Force
+          Get-Item SGK_E_Kesinti_Otomasyon.zip | Select-Object Name, Length
 
-      - name: PyInstaller kur
-        run: pip install pyinstaller pillow
-
-      - name: Ikon olustur
-        run: python -c "from PIL import Image; img = Image.open('docs/icon-512.png'); img.save('app_icon.ico', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
-
-      - name: KURULUM.exe derle (sgk_bot.py gömülü, ikon + sürüm bilgisi)
-        run: pyinstaller --onefile --console --clean --name KURULUM --add-data "sgk_bot.py;." --icon app_icon.ico --version-file version.txt KURULUM.py
-
-      - name: Release olustur ve exe'yi yukle
+      - name: Release olustur ve zip'i yukle
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/KURULUM.exe
+          files: SGK_E_Kesinti_Otomasyon.zip
           generate_release_notes: true

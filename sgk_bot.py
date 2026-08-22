@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.3.0"  # GitHub release etiketiyle karşılaştırılır
+BOT_SURUM = "1.6.5"  # GitHub release etiketiyle karşılaştırılır
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -126,7 +126,7 @@ def guncelleme_kontrol_goster():
         uzak += [0] * (uzunluk - len(uzak))
         if uzak > yerel:
             print(renkli(f"\n🔄 YENİ SÜRÜM VAR: v{uzak_surum} (senin sürüm: v{BOT_SURUM})", Renk.SARI, kalin=True))
-            print(renkli("   Güncellemek için 'KURULUM.exe'yi çalıştırın — kendini otomatik günceller.", Renk.SARI))
+            print(renkli("   Güncellemek için siteden yeni ZIP paketini indirip BAT_KURULUM.bat'ı çalıştırın.", Renk.SARI))
     except Exception:
         pass  # internet yoksa veya hata olursa sessizce geç
 

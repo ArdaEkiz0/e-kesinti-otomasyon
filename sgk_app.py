@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.20"
+SURUM = "1.7.21"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda Yazilim"
 
@@ -296,37 +296,35 @@ class NavButton(QPushButton):
     def __init__(self, text, parent=None):
         super().__init__(text, parent)
         self.setCheckable(True)
-        self.setFixedHeight(52)
-        self.setMinimumWidth(100)
+        self.setFixedHeight(44)
+        self.setCursor(Qt.PointingHandCursor)
         self._update_style(False)
 
     def _update_style(self, checked):
         if checked:
             self.setStyleSheet(f"""
                 QPushButton {{
-                    background-color: rgba(201, 168, 108, 0.25);
-                    color: {NAV_ACTIVE};
+                    background-color: rgba(201, 168, 108, 0.2);
+                    color: #c9a86c;
                     border: none;
-                    border-top: 3px solid {NAV_ACTIVE};
-                    padding: 10px 16px;
-                    font-size: 15px;
+                    border-radius: 6px;
+                    margin: 2px 4px;
+                    font-size: 13px;
                     font-weight: bold;
-                    min-width: 100px;
                 }}
             """)
         else:
             self.setStyleSheet(f"""
                 QPushButton {{
                     background-color: transparent;
-                    color: {TEXT_SECONDARY};
+                    color: #999999;
                     border: none;
-                    border-top: 3px solid transparent;
-                    padding: 10px 16px;
-                    font-size: 15px;
-                    min-width: 100px;
+                    border-radius: 6px;
+                    margin: 2px 4px;
+                    font-size: 13px;
                 }}
                 QPushButton:hover {{
-                    color: {TEXT_PRIMARY};
+                    color: #ffffff;
                     background-color: rgba(201, 168, 108, 0.1);
                 }}
             """)
@@ -342,46 +340,37 @@ class CardFrame(QFrame):
         super().__init__(parent)
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {BG_CARD};
-                border: 1px solid {BORDER_COLOR};
-                border-radius: {SC(12)}px;
-                padding: {SC(24)}px;
+                background-color: #242424;
+                border: 1px solid #333333;
+                border-radius: 10px;
             }}
         """)
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(SC(20))
-        shadow.setXOffset(0)
-        shadow.setYOffset(SC(4))
-        shadow.setColor(QColor(0, 0, 0, 80))
-        self.setGraphicsEffect(shadow)
 
 
 # --- Stat Card Widget ---
 class StatCard(QFrame):
     def __init__(self, title, value, color, parent=None):
         super().__init__(parent)
-        self.setFixedHeight(SC(100))
-        self.setMinimumWidth(180)
+        self.setMinimumHeight(90)
         self.setStyleSheet(f"""
             QFrame {{
-                background-color: {BG_CARD};
-                border: 1px solid {BORDER_COLOR};
-                border-left: {SC(5)}px solid {color};
-                border-radius: {SC(12)}px;
-                padding: {SC(16)}px {SC(24)}px;
+                background-color: #242424;
+                border: 1px solid #333333;
+                border-left: 4px solid {color};
+                border-radius: 10px;
             }}
         """)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(SC(24), SC(14), SC(24), SC(14))
-        layout.setSpacing(SC(8))
+        layout.setContentsMargins(20, 14, 20, 14)
+        layout.setSpacing(6)
 
         title_lbl = QLabel(title)
-        title_lbl.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: {SC(15)}px; background: transparent;")
+        title_lbl.setStyleSheet(f"color: #999999; font-size: 13px; font-weight: normal; background: transparent; border: none;")
         layout.addWidget(title_lbl)
 
         self.value_lbl = QLabel(str(value))
-        self.value_lbl.setStyleSheet(f"color: {color}; font-size: {SC(32)}px; font-weight: bold; background: transparent;")
+        self.value_lbl.setStyleSheet(f"color: {color}; font-size: 28px; font-weight: bold; background: transparent; border: none;")
         layout.addWidget(self.value_lbl)
 
     def set_value(self, v):
@@ -608,47 +597,47 @@ class SGKApp(QMainWindow):
 
     def _create_top_bar(self):
         bar = QFrame()
-        bar.setFixedHeight(SC(64))
+        bar.setFixedHeight(56)
         bar.setStyleSheet(f"""
             QFrame {{
-                background-color: {NAV_BG};
-                border-bottom: {SC(2)}px solid {BORDER_COLOR};
+                background-color: #1a1a1a;
+                border-bottom: 1px solid #333333;
             }}
         """)
         layout = QHBoxLayout(bar)
-        layout.setContentsMargins(SC(24), 0, SC(24), 0)
-        layout.setSpacing(SC(8))
+        layout.setContentsMargins(16, 0, 16, 0)
+        layout.setSpacing(10)
 
         title_icon = QLabel("SGK")
         title_icon.setStyleSheet(f"""
-            color: {ACCENT_PRIMARY};
-            font-size: {SC(20)}px;
+            color: #c9a86c;
+            font-size: 16px;
             font-weight: bold;
             background: transparent;
-            padding: {SC(4)}px {SC(12)}px;
-            border: {SC(2)}px solid {ACCENT_PRIMARY};
-            border-radius: {SC(6)}px;
+            padding: 4px 10px;
+            border: 2px solid #c9a86c;
+            border-radius: 6px;
         """)
         layout.addWidget(title_icon)
 
         title = QLabel(UYGULAMA_ADI)
-        title.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: {SC(18)}px; font-weight: bold; background: transparent;")
+        title.setStyleSheet(f"color: #ffffff; font-size: 15px; font-weight: bold; background: transparent;")
         layout.addWidget(title)
 
         ver_label = QLabel(f"v{SURUM}")
-        ver_label.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: {SC(14)}px; background: transparent;")
+        ver_label.setStyleSheet(f"color: #888888; font-size: 12px; background: transparent;")
         layout.addWidget(ver_label)
 
         layout.addStretch()
 
         self.clock_label = QLabel("00:00:00")
         self.clock_label.setStyleSheet(f"""
-            color: {ACCENT_SECONDARY};
-            background-color: rgba(6, 182, 212, 0.1);
-            border: {SC(2)}px solid {ACCENT_SECONDARY};
-            border-radius: {SC(8)}px;
-            padding: {SC(4)}px {SC(14)}px;
-            font-size: {SC(16)}px;
+            color: #c9a86c;
+            background-color: rgba(201, 168, 108, 0.1);
+            border: 1px solid rgba(201, 168, 108, 0.3);
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 14px;
             font-weight: bold;
             font-family: 'Consolas', monospace;
         """)
@@ -656,34 +645,34 @@ class SGKApp(QMainWindow):
 
         self.license_status = QLabel("Lisans: Demo")
         self.license_status.setStyleSheet(f"""
-            color: {WARNING};
-            background-color: rgba(245, 158, 11, 0.15);
-            border: {SC(2)}px solid {WARNING};
-            border-radius: {SC(8)}px;
-            padding: {SC(4)}px {SC(14)}px;
-            font-size: {SC(14)}px;
+            color: #ff9800;
+            background-color: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 12px;
             font-weight: bold;
         """)
         layout.addWidget(self.license_status)
 
         dev_label = QLabel(SIRKET)
-        dev_label.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: {SC(14)}px; background: transparent;")
+        dev_label.setStyleSheet(f"color: #666666; font-size: 12px; background: transparent;")
         layout.addWidget(dev_label)
 
         return bar
 
     def _create_bottom_bar(self):
         bar = QFrame()
-        bar.setFixedHeight(52)
+        bar.setFixedHeight(44)
         bar.setStyleSheet(f"""
             QFrame {{
-                background-color: {NAV_BG};
-                border-top: 2px solid {BORDER_COLOR};
+                background-color: #1a1a1a;
+                border-top: 1px solid #333333;
             }}
         """)
         layout = QHBoxLayout(bar)
-        layout.setContentsMargins(8, 0, 8, 0)
-        layout.setSpacing(4)
+        layout.setContentsMargins(16, 4, 16, 4)
+        layout.setSpacing(6)
 
         nav_data = [
             ("Ana Sayfa", 0),
@@ -703,18 +692,18 @@ class SGKApp(QMainWindow):
 
     def _create_status_bar(self):
         bar = QFrame()
-        bar.setFixedHeight(32)
+        bar.setFixedHeight(28)
         bar.setStyleSheet(f"""
             QFrame {{
-                background-color: {NAV_BG};
-                border-top: 1px solid {BORDER_COLOR};
+                background-color: #141414;
+                border-top: 1px solid #2a2a2a;
             }}
         """)
         layout = QHBoxLayout(bar)
-        layout.setContentsMargins(20, 0, 20, 0)
+        layout.setContentsMargins(16, 0, 16, 0)
 
         status_text = QLabel(f"Hazir | Son guncelleme: {datetime.now().strftime('%d.%m.%Y')} | v{SURUM}")
-        status_text.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: 14px; background: transparent;")
+        status_text.setStyleSheet(f"color: #666666; font-size: 11px; background: transparent;")
         layout.addWidget(status_text)
 
         layout.addStretch()
@@ -737,44 +726,57 @@ class SGKApp(QMainWindow):
     def _create_home_page(self):
         page = QWidget()
         layout = QVBoxLayout(page)
-        layout.setContentsMargins(SC(32), SC(24), SC(32), SC(20))
-        layout.setSpacing(SC(20))
+        layout.setContentsMargins(24, 20, 24, 16)
+        layout.setSpacing(16)
 
         header = QLabel("Ana Sayfa")
-        header.setStyleSheet(f"font-size: {SC(26)}px; font-weight: bold; color: {ACCENT_PRIMARY}; background: transparent;")
+        header.setStyleSheet(f"font-size: 22px; font-weight: bold; color: #c9a86c; background: transparent;")
         layout.addWidget(header)
 
         stats_row = QHBoxLayout()
-        stats_row.setSpacing(SC(16))
+        stats_row.setSpacing(12)
 
-        self.stat_total = StatCard("Toplam Islem", "0", ACCENT_SECONDARY)
+        self.stat_total = StatCard("Toplam Islem", "0", "#c9a86c")
         stats_row.addWidget(self.stat_total, 1)
 
-        self.stat_success = StatCard("Basarili", "0", SUCCESS)
+        self.stat_success = StatCard("Basarili", "0", "#4caf50")
         stats_row.addWidget(self.stat_success, 1)
 
-        self.stat_error = StatCard("Hatali", "0", ERROR)
+        self.stat_error = StatCard("Hatali", "0", "#f44336")
         stats_row.addWidget(self.stat_error, 1)
 
         layout.addLayout(stats_row)
 
         card1 = CardFrame()
         c1_layout = QVBoxLayout(card1)
-        c1_layout.setSpacing(SC(16))
+        c1_layout.setContentsMargins(16, 14, 16, 14)
+        c1_layout.setSpacing(10)
 
         excel_label = QLabel("Excel Dosyasi Secin")
-        excel_label.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: {SC(17)}px; font-weight: bold; background: transparent;")
+        excel_label.setStyleSheet(f"color: #ffffff; font-size: 14px; font-weight: bold; background: transparent;")
         c1_layout.addWidget(excel_label)
 
         file_row = QHBoxLayout()
-        file_row.setSpacing(SC(16))
+        file_row.setSpacing(10)
         self.excel_path_input = QLineEdit()
-        self.excel_path_input.setPlaceholderText("Dosya yolunu secin veya yapistirin...")
-        self.excel_path_input.setMinimumHeight(40)
+        self.excel_path_input.setPlaceholderText("Excel dosyasini secin veya surukleyip birakin...")
+        self.excel_path_input.setMinimumHeight(36)
         file_row.addWidget(self.excel_path_input, 1)
 
-        self.browse_btn = StyledButton("Gozat", ACCENT_SECONDARY)
-        self.browse_btn.setFixedWidth(SC(140))
+        self.browse_btn = QPushButton("Gozat")
+        self.browse_btn.setFixedSize(90, 36)
+        self.browse_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #c9a86c;
+                color: #1a1a1a;
+                border: none;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{ background-color: #d4b87a; }}
+            QPushButton:pressed {{ background-color: #b8975b; }}
+        """)
         self.browse_btn.clicked.connect(self._browse_file)
         file_row.addWidget(self.browse_btn)
         c1_layout.addLayout(file_row)
@@ -783,34 +785,71 @@ class SGKApp(QMainWindow):
 
         card2 = CardFrame()
         c2_layout = QVBoxLayout(card2)
-        c2_layout.setSpacing(SC(20))
-
-        progress_side = QVBoxLayout()
-        progress_side.setSpacing(SC(12))
+        c2_layout.setContentsMargins(16, 14, 16, 14)
+        c2_layout.setSpacing(12)
 
         progress_title = QLabel("Islem Durumu")
-        progress_title.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: {SC(17)}px; font-weight: bold; background: transparent;")
-        progress_side.addWidget(progress_title)
+        progress_title.setStyleSheet(f"color: #ffffff; font-size: 14px; font-weight: bold; background: transparent;")
+        c2_layout.addWidget(progress_title)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         self.progress_bar.setFormat("%p% - Hazir")
-        self.progress_bar.setMinimumHeight(36)
-        progress_side.addWidget(self.progress_bar)
-
-        c2_layout.addLayout(progress_side)
+        self.progress_bar.setFixedHeight(28)
+        self.progress_bar.setStyleSheet(f"""
+            QProgressBar {{
+                border: 1px solid #333333;
+                border-radius: 6px;
+                text-align: center;
+                background-color: #1a1a1a;
+                color: #ffffff;
+                font-size: 12px;
+                font-weight: bold;
+            }}
+            QProgressBar::chunk {{
+                background-color: #c9a86c;
+                border-radius: 5px;
+            }}
+        """)
+        c2_layout.addWidget(self.progress_bar)
 
         btn_row = QHBoxLayout()
-        btn_row.setSpacing(SC(16))
+        btn_row.setSpacing(10)
 
-        self.start_btn = StyledButton("Botu Baslat", SUCCESS)
-        self.start_btn.setMinimumHeight(40)
+        self.start_btn = QPushButton("Botu Baslat")
+        self.start_btn.setFixedSize(120, 38)
+        self.start_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #4caf50;
+                color: #ffffff;
+                border: none;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{ background-color: #5cbf60; }}
+            QPushButton:pressed {{ background-color: #3d8b40; }}
+            QPushButton:disabled {{ background-color: #333333; color: #666666; }}
+        """)
         self.start_btn.clicked.connect(self._start_bot)
         btn_row.addWidget(self.start_btn)
 
-        self.stop_btn = StyledButton("Durdur", ERROR)
-        self.stop_btn.setMinimumHeight(40)
+        self.stop_btn = QPushButton("Durdur")
+        self.stop_btn.setFixedSize(100, 38)
         self.stop_btn.setEnabled(False)
+        self.stop_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #f44336;
+                color: #ffffff;
+                border: none;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: bold;
+            }}
+            QPushButton:hover {{ background-color: #ff5745; }}
+            QPushButton:pressed {{ background-color: #d32f2f; }}
+            QPushButton:disabled {{ background-color: #333333; color: #666666; }}
+        """)
         self.stop_btn.clicked.connect(self._stop_bot)
         btn_row.addWidget(self.stop_btn)
 
@@ -821,30 +860,41 @@ class SGKApp(QMainWindow):
 
         card3 = CardFrame()
         c3_layout = QVBoxLayout(card3)
-        c3_layout.setSpacing(SC(12))
+        c3_layout.setContentsMargins(16, 14, 16, 14)
+        c3_layout.setSpacing(10)
 
         log_header = QLabel("Islem Logu")
-        log_header.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: {SC(17)}px; font-weight: bold; background: transparent;")
+        log_header.setStyleSheet(f"color: #ffffff; font-size: 14px; font-weight: bold; background: transparent;")
         c3_layout.addWidget(log_header)
 
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
-        self.log_output.setMinimumHeight(SC(180))
+        self.log_output.setMinimumHeight(120)
         self.log_output.setStyleSheet(f"""
             QTextEdit {{
                 background-color: #111111;
-                color: {TEXT_PRIMARY};
-                border: 2px solid {BORDER_COLOR};
-                border-radius: {SC(8)}px;
-                padding: {SC(12)}px;
+                color: #cccccc;
+                border: 1px solid #333333;
+                border-radius: 6px;
+                padding: 8px;
                 font-family: 'Consolas', 'Courier New', monospace;
-                font-size: {SC(14)}px;
+                font-size: 12px;
             }}
         """)
         c3_layout.addWidget(self.log_output)
 
-        clear_btn = StyledButton("Logu Temizle", BORDER_COLOR)
-        clear_btn.setFixedWidth(SC(180))
+        clear_btn = QPushButton("Logu Temizle")
+        clear_btn.setFixedSize(120, 30)
+        clear_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #333333;
+                color: #cccccc;
+                border: none;
+                border-radius: 4px;
+                font-size: 12px;
+            }}
+            QPushButton:hover {{ background-color: #444444; }}
+        """)
         clear_btn.clicked.connect(lambda: self.log_output.clear())
         c3_layout.addWidget(clear_btn, 0, Qt.AlignRight)
 

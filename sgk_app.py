@@ -36,9 +36,9 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.23"
+SURUM = "1.7.24"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
-SIRKET = "Arda Yazilim"
+SIRKET = "Arda M. Ekiz"
 
 # --- DPI scale faktör (yüksek çözünürlüklü ekranlarda arayüzü dogur ogulmesi icin) ---
 try:
@@ -733,36 +733,44 @@ class SGKApp(QMainWindow):
 
         stats_row = QHBoxLayout()
         stats_row.setSpacing(12)
-
         self.stat_total = StatCard("Toplam Islem", "0", "#c9a86c")
         stats_row.addWidget(self.stat_total, 1)
-
         self.stat_success = StatCard("Basarili", "0", "#4caf50")
         stats_row.addWidget(self.stat_success, 1)
-
         self.stat_error = StatCard("Hatali", "0", "#f44336")
         stats_row.addWidget(self.stat_error, 1)
-
         layout.addLayout(stats_row)
 
-        card1 = CardFrame()
-        c1_layout = QVBoxLayout(card1)
-        c1_layout.setContentsMargins(16, 14, 16, 14)
-        c1_layout.setSpacing(10)
+        card_excel = CardFrame()
+        ce = QVBoxLayout(card_excel)
+        ce.setContentsMargins(20, 18, 20, 18)
+        ce.setSpacing(12)
 
-        excel_label = QLabel("Excel Dosyasi Secin")
-        excel_label.setStyleSheet(f"color: #ffffff; font-size: 14px; font-weight: bold; background: transparent;")
-        c1_layout.addWidget(excel_label)
+        excel_title = QLabel("Excel Dosyasi")
+        excel_title.setStyleSheet(f"color: #ffffff; font-size: 15px; font-weight: bold; background: transparent; border: none;")
+        ce.addWidget(excel_title)
 
-        file_row = QHBoxLayout()
-        file_row.setSpacing(10)
         self.excel_path_input = QLineEdit()
         self.excel_path_input.setPlaceholderText("Excel dosyasini secin veya surukleyip birakin...")
-        self.excel_path_input.setMinimumHeight(36)
-        file_row.addWidget(self.excel_path_input, 1)
+        self.excel_path_input.setMinimumHeight(38)
+        self.excel_path_input.setStyleSheet(f"""
+            QLineEdit {{
+                background-color: #1a1a1a;
+                color: #ffffff;
+                border: 1px solid #444444;
+                border-radius: 6px;
+                padding: 8px 12px;
+                font-size: 13px;
+            }}
+            QLineEdit:focus {{
+                border: 1px solid #c9a86c;
+            }}
+        """)
+        ce.addWidget(self.excel_path_input)
 
         self.browse_btn = QPushButton("Gozat")
-        self.browse_btn.setFixedSize(90, 36)
+        self.browse_btn.setFixedHeight(36)
+        self.browse_btn.setCursor(Qt.PointingHandCursor)
         self.browse_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: #c9a86c;
@@ -776,32 +784,31 @@ class SGKApp(QMainWindow):
             QPushButton:pressed {{ background-color: #b8975b; }}
         """)
         self.browse_btn.clicked.connect(self._browse_file)
-        file_row.addWidget(self.browse_btn)
-        c1_layout.addLayout(file_row)
+        ce.addWidget(self.browse_btn)
 
-        layout.addWidget(card1)
+        layout.addWidget(card_excel)
 
-        card2 = CardFrame()
-        c2_layout = QVBoxLayout(card2)
-        c2_layout.setContentsMargins(16, 14, 16, 14)
-        c2_layout.setSpacing(12)
+        card_action = CardFrame()
+        ca = QVBoxLayout(card_action)
+        ca.setContentsMargins(20, 18, 20, 18)
+        ca.setSpacing(14)
 
-        progress_title = QLabel("Islem Durumu")
-        progress_title.setStyleSheet(f"color: #ffffff; font-size: 14px; font-weight: bold; background: transparent;")
-        c2_layout.addWidget(progress_title)
+        action_title = QLabel("Islem Kontrol")
+        action_title.setStyleSheet(f"color: #ffffff; font-size: 15px; font-weight: bold; background: transparent; border: none;")
+        ca.addWidget(action_title)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         self.progress_bar.setFormat("%p% - Hazir")
-        self.progress_bar.setFixedHeight(28)
+        self.progress_bar.setFixedHeight(26)
         self.progress_bar.setStyleSheet(f"""
             QProgressBar {{
-                border: 1px solid #333333;
+                border: 1px solid #444444;
                 border-radius: 6px;
                 text-align: center;
                 background-color: #1a1a1a;
                 color: #ffffff;
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: bold;
             }}
             QProgressBar::chunk {{
@@ -809,31 +816,33 @@ class SGKApp(QMainWindow):
                 border-radius: 5px;
             }}
         """)
-        c2_layout.addWidget(self.progress_bar)
+        ca.addWidget(self.progress_bar)
 
         btn_row = QHBoxLayout()
         btn_row.setSpacing(10)
 
         self.start_btn = QPushButton("Botu Baslat")
-        self.start_btn.setFixedSize(120, 38)
+        self.start_btn.setFixedHeight(40)
+        self.start_btn.setCursor(Qt.PointingHandCursor)
         self.start_btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: #4caf50;
                 color: #ffffff;
                 border: none;
                 border-radius: 6px;
-                font-size: 13px;
+                font-size: 14px;
                 font-weight: bold;
             }}
             QPushButton:hover {{ background-color: #5cbf60; }}
             QPushButton:pressed {{ background-color: #3d8b40; }}
-            QPushButton:disabled {{ background-color: #333333; color: #666666; }}
+            QPushButton:disabled {{ background-color: #2a2a2a; color: #555555; }}
         """)
         self.start_btn.clicked.connect(self._start_bot)
-        btn_row.addWidget(self.start_btn)
+        btn_row.addWidget(self.start_btn, 1)
 
         self.stop_btn = QPushButton("Durdur")
-        self.stop_btn.setFixedSize(100, 38)
+        self.stop_btn.setFixedHeight(40)
+        self.stop_btn.setCursor(Qt.PointingHandCursor)
         self.stop_btn.setEnabled(False)
         self.stop_btn.setStyleSheet(f"""
             QPushButton {{
@@ -841,33 +850,50 @@ class SGKApp(QMainWindow):
                 color: #ffffff;
                 border: none;
                 border-radius: 6px;
-                font-size: 13px;
+                font-size: 14px;
                 font-weight: bold;
             }}
             QPushButton:hover {{ background-color: #ff5745; }}
             QPushButton:pressed {{ background-color: #d32f2f; }}
-            QPushButton:disabled {{ background-color: #333333; color: #666666; }}
+            QPushButton:disabled {{ background-color: #2a2a2a; color: #555555; }}
         """)
         self.stop_btn.clicked.connect(self._stop_bot)
-        btn_row.addWidget(self.stop_btn)
+        btn_row.addWidget(self.stop_btn, 1)
 
-        btn_row.addStretch()
-        c2_layout.addLayout(btn_row)
+        ca.addLayout(btn_row)
+        layout.addWidget(card_action)
 
-        layout.addWidget(card2)
+        card_log = CardFrame()
+        cl = QVBoxLayout(card_log)
+        cl.setContentsMargins(20, 18, 20, 18)
+        cl.setSpacing(10)
 
-        card3 = CardFrame()
-        c3_layout = QVBoxLayout(card3)
-        c3_layout.setContentsMargins(16, 14, 16, 14)
-        c3_layout.setSpacing(10)
+        log_header_row = QHBoxLayout()
+        log_title = QLabel("Islem Logu")
+        log_title.setStyleSheet(f"color: #ffffff; font-size: 15px; font-weight: bold; background: transparent; border: none;")
+        log_header_row.addWidget(log_title)
+        log_header_row.addStretch()
 
-        log_header = QLabel("Islem Logu")
-        log_header.setStyleSheet(f"color: #ffffff; font-size: 14px; font-weight: bold; background: transparent;")
-        c3_layout.addWidget(log_header)
+        clear_btn = QPushButton("Temizle")
+        clear_btn.setFixedSize(70, 26)
+        clear_btn.setCursor(Qt.PointingHandCursor)
+        clear_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #333333;
+                color: #cccccc;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+            }}
+            QPushButton:hover {{ background-color: #444444; color: #ffffff; }}
+        """)
+        clear_btn.clicked.connect(lambda: self.log_output.clear())
+        log_header_row.addWidget(clear_btn)
+        cl.addLayout(log_header_row)
 
         self.log_output = QTextEdit()
         self.log_output.setReadOnly(True)
-        self.log_output.setMinimumHeight(120)
+        self.log_output.setMinimumHeight(100)
         self.log_output.setStyleSheet(f"""
             QTextEdit {{
                 background-color: #111111;
@@ -879,24 +905,9 @@ class SGKApp(QMainWindow):
                 font-size: 12px;
             }}
         """)
-        c3_layout.addWidget(self.log_output)
+        cl.addWidget(self.log_output)
 
-        clear_btn = QPushButton("Logu Temizle")
-        clear_btn.setFixedSize(120, 30)
-        clear_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color: #333333;
-                color: #cccccc;
-                border: none;
-                border-radius: 4px;
-                font-size: 12px;
-            }}
-            QPushButton:hover {{ background-color: #444444; }}
-        """)
-        clear_btn.clicked.connect(lambda: self.log_output.clear())
-        c3_layout.addWidget(clear_btn, 0, Qt.AlignRight)
-
-        layout.addWidget(card3, 1)
+        layout.addWidget(card_log, 1)
 
         return page
 

@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.21"
+SURUM = "1.7.22"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda Yazilim"
 
@@ -655,9 +655,7 @@ class SGKApp(QMainWindow):
         """)
         layout.addWidget(self.license_status)
 
-        dev_label = QLabel(SIRKET)
-        dev_label.setStyleSheet(f"color: #666666; font-size: 12px; background: transparent;")
-        layout.addWidget(dev_label)
+        layout.addStretch()
 
         return bar
 
@@ -1286,17 +1284,13 @@ class SGKApp(QMainWindow):
         ]
         for feat in features:
             lbl = QLabel(f"  •  {feat}")
-            lbl.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: 14px; padding: 6px 0;")
+            lbl.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: 14px; padding: 8px 4px; background: transparent;")
+            lbl.setWordWrap(True)
             c2_layout.addWidget(lbl)
 
         layout.addWidget(card2)
 
         layout.addStretch()
-
-        footer = QLabel(f"{SIRKET} tarafindan yapildi")
-        footer.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: 14px;")
-        footer.setAlignment(Qt.AlignCenter)
-        layout.addWidget(footer)
 
         return page
 

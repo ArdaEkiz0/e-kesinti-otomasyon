@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.30"
+SURUM = "1.7.31"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -927,16 +927,40 @@ class SGKApp(QMainWindow):
     # --- Excel Editor Page ---
     def _create_excel_editor_page(self):
         page = QWidget()
+        page.setAcceptDrops(True)
+        page.dragEnterEvent = self._excel_drag_enter
+        page.dropEvent = self._excel_drop_event
         layout = QVBoxLayout(page)
         layout.setContentsMargins(24, 20, 24, 16)
-        layout.setSpacing(12)
+        layout.setSpacing(14)
 
         header = QLabel("Excel Duzenleyici")
         header.setStyleSheet(f"font-size: 22px; font-weight: bold; color: #c9a86c; background: transparent;")
         layout.addWidget(header)
 
-        toolbar = QHBoxLayout()
-        toolbar.setSpacing(8)
+        info_card = CardFrame()
+        ic = QHBoxLayout(info_card)
+        ic.setContentsMargins(16, 12, 16, 12)
+        ic.setSpacing(12)
+        info_icon = QLabel("?")
+        info_icon.setFixedSize(28, 28)
+        info_icon.setStyleSheet(f"color: #1a1a1a; background-color: #c9a86c; border-radius: 14px; font-size: 14px; font-weight: bold;")
+        info_icon.setAlignment(Qt.AlignCenter)
+        ic.addWidget(info_icon)
+        info_text = QLabel("Excel formati: Satir 1 = kooperatif adi, Satir 5 = basliklar (Unvan | TC Kimlik No | Matrah | Kesinti), Satir 6+ = veriler. Verileri duzenleyip kaydedebilirsiniz.")
+        info_text.setStyleSheet(f"color: #cccccc; font-size: 12px; background: transparent;")
+        info_text.setWordWrap(True)
+        ic.addWidget(info_text, 1)
+        layout.addWidget(info_card)
+
+        file_card = CardFrame()
+        fc = QHBoxLayout(file_card)
+        fc.setContentsMargins(16, 14, 16, 14)
+        fc.setSpacing(10)
+
+        self.excel_file_label = QLabel("Dosya secin veya surukleyip birakin")
+        self.excel_file_label.setStyleSheet(f"color: #999999; font-size: 13px; background: transparent; border: none;")
+        fc.addWidget(self.excel_file_label, 1)
 
         self.excel_open_btn = QPushButton("Dosya Ac")
         self.excel_open_btn.setFixedHeight(34)
@@ -949,55 +973,22 @@ class SGKApp(QMainWindow):
                 border-radius: 6px;
                 font-size: 13px;
                 font-weight: bold;
-                padding: 0 16px;
+                padding: 0 18px;
             }}
             QPushButton:hover {{ background-color: #d4b87a; }}
         """)
         self.excel_open_btn.clicked.connect(self._excel_open_file)
-        toolbar.addWidget(self.excel_open_btn)
+        fc.addWidget(self.excel_open_btn)
 
-        self.excel_save_btn = QPushButton("Kaydet")
-        self.excel_save_btn.setFixedHeight(34)
-        self.excel_save_btn.setCursor(Qt.PointingHandCursor)
-        self.excel_save_btn.setEnabled(False)
-        self.excel_save_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color: #4caf50;
-                color: #ffffff;
-                border: none;
-                border-radius: 6px;
-                font-size: 13px;
-                font-weight: bold;
-                padding: 0 16px;
-            }}
-            QPushButton:hover {{ background-color: #5cbf60; }}
-            QPushButton:disabled {{ background-color: #2a2a2a; color: #555555; }}
-        """)
-        self.excel_save_btn.clicked.connect(self._excel_save_file)
-        toolbar.addWidget(self.excel_save_btn)
+        layout.addWidget(file_card)
 
-        self.excel_saveas_btn = QPushButton("Farkli Kaydet")
-        self.excel_saveas_btn.setFixedHeight(34)
-        self.excel_saveas_btn.setCursor(Qt.PointingHandCursor)
-        self.excel_saveas_btn.setEnabled(False)
-        self.excel_saveas_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color: #2196f3;
-                color: #ffffff;
-                border: none;
-                border-radius: 6px;
-                font-size: 13px;
-                font-weight: bold;
-                padding: 0 16px;
-            }}
-            QPushButton:hover {{ background-color: #42a5f5; }}
-            QPushButton:disabled {{ background-color: #2a2a2a; color: #555555; }}
-        """)
-        self.excel_saveas_btn.clicked.connect(self._excel_saveas_file)
-        toolbar.addWidget(self.excel_saveas_btn)
+        toolbar_card = CardFrame()
+        tc = QHBoxLayout(toolbar_card)
+        tc.setContentsMargins(12, 10, 12, 10)
+        tc.setSpacing(6)
 
-        self.excel_addrow_btn = QPushButton("+ Satir")
-        self.excel_addrow_btn.setFixedHeight(34)
+        self.excel_addrow_btn = QPushButton("+ Satir Ekle")
+        self.excel_addrow_btn.setFixedHeight(32)
         self.excel_addrow_btn.setCursor(Qt.PointingHandCursor)
         self.excel_addrow_btn.setEnabled(False)
         self.excel_addrow_btn.setStyleSheet(f"""
@@ -1005,18 +996,18 @@ class SGKApp(QMainWindow):
                 background-color: #333333;
                 color: #cccccc;
                 border: none;
-                border-radius: 6px;
-                font-size: 13px;
+                border-radius: 5px;
+                font-size: 12px;
                 padding: 0 14px;
             }}
             QPushButton:hover {{ background-color: #444444; color: #ffffff; }}
-            QPushButton:disabled {{ background-color: #2a2a2a; color: #555555; }}
+            QPushButton:disabled {{ background-color: #222222; color: #444444; }}
         """)
         self.excel_addrow_btn.clicked.connect(self._excel_add_row)
-        toolbar.addWidget(self.excel_addrow_btn)
+        tc.addWidget(self.excel_addrow_btn)
 
-        self.excel_delrow_btn = QPushButton("- Satir")
-        self.excel_delrow_btn.setFixedHeight(34)
+        self.excel_delrow_btn = QPushButton("Secili Satiri Sil")
+        self.excel_delrow_btn.setFixedHeight(32)
         self.excel_delrow_btn.setCursor(Qt.PointingHandCursor)
         self.excel_delrow_btn.setEnabled(False)
         self.excel_delrow_btn.setStyleSheet(f"""
@@ -1024,23 +1015,72 @@ class SGKApp(QMainWindow):
                 background-color: #333333;
                 color: #cccccc;
                 border: none;
-                border-radius: 6px;
-                font-size: 13px;
+                border-radius: 5px;
+                font-size: 12px;
                 padding: 0 14px;
             }}
             QPushButton:hover {{ background-color: #444444; color: #ffffff; }}
-            QPushButton:disabled {{ background-color: #2a2a2a; color: #555555; }}
+            QPushButton:disabled {{ background-color: #222222; color: #444444; }}
         """)
         self.excel_delrow_btn.clicked.connect(self._excel_del_row)
-        toolbar.addWidget(self.excel_delrow_btn)
+        tc.addWidget(self.excel_delrow_btn)
 
-        toolbar.addStretch()
+        sep = QLabel("|")
+        sep.setStyleSheet(f"color: #444444; font-size: 16px; background: transparent; padding: 0 4px;")
+        tc.addWidget(sep)
 
-        self.excel_file_label = QLabel("Dosya: -")
-        self.excel_file_label.setStyleSheet(f"color: #999999; font-size: 12px; background: transparent;")
-        toolbar.addWidget(self.excel_file_label)
+        self.excel_save_btn = QPushButton("Kaydet")
+        self.excel_save_btn.setFixedHeight(32)
+        self.excel_save_btn.setCursor(Qt.PointingHandCursor)
+        self.excel_save_btn.setEnabled(False)
+        self.excel_save_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #4caf50;
+                color: #ffffff;
+                border: none;
+                border-radius: 5px;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 0 16px;
+            }}
+            QPushButton:hover {{ background-color: #5cbf60; }}
+            QPushButton:disabled {{ background-color: #222222; color: #444444; }}
+        """)
+        self.excel_save_btn.clicked.connect(self._excel_save_file)
+        tc.addWidget(self.excel_save_btn)
 
-        layout.addLayout(toolbar)
+        self.excel_saveas_btn = QPushButton("Farkli Kaydet")
+        self.excel_saveas_btn.setFixedHeight(32)
+        self.excel_saveas_btn.setCursor(Qt.PointingHandCursor)
+        self.excel_saveas_btn.setEnabled(False)
+        self.excel_saveas_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #2196f3;
+                color: #ffffff;
+                border: none;
+                border-radius: 5px;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 0 16px;
+            }}
+            QPushButton:hover {{ background-color: #42a5f5; }}
+            QPushButton:disabled {{ background-color: #222222; color: #444444; }}
+        """)
+        self.excel_saveas_btn.clicked.connect(self._excel_saveas_file)
+        tc.addWidget(self.excel_saveas_btn)
+
+        tc.addStretch()
+
+        self.excel_status_label = QLabel("0 satir")
+        self.excel_status_label.setStyleSheet(f"color: #666666; font-size: 12px; background: transparent; border: none;")
+        tc.addWidget(self.excel_status_label)
+
+        layout.addWidget(toolbar_card)
+
+        table_card = CardFrame()
+        tcl = QVBoxLayout(table_card)
+        tcl.setContentsMargins(12, 12, 12, 12)
+        tcl.setSpacing(0)
 
         self.excel_table = QTableWidget()
         self.excel_table.setColumnCount(4)
@@ -1049,46 +1089,57 @@ class SGKApp(QMainWindow):
             QHeaderView::section {{
                 background-color: #1a1a1a;
                 color: #c9a86c;
-                border: 1px solid #333333;
-                padding: 6px 10px;
+                border: none;
+                border-bottom: 2px solid #c9a86c;
+                padding: 8px 12px;
                 font-size: 13px;
                 font-weight: bold;
             }}
         """)
         self.excel_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.excel_table.verticalHeader().setDefaultSectionSize(34)
         self.excel_table.verticalHeader().setStyleSheet(f"""
             QHeaderView::section {{
                 background-color: #1a1a1a;
-                color: #999999;
-                border: 1px solid #333333;
-                padding: 4px 8px;
-                font-size: 12px;
+                color: #666666;
+                border: none;
+                border-right: 1px solid #333333;
+                padding: 4px 6px;
+                font-size: 11px;
             }}
         """)
         self.excel_table.setStyleSheet(f"""
             QTableWidget {{
                 background-color: #111111;
                 color: #ffffff;
-                border: 1px solid #333333;
-                border-radius: 6px;
-                gridline-color: #333333;
+                border: none;
+                gridline-color: #2a2a2a;
                 font-size: 13px;
-                selection-background-color: rgba(201, 168, 108, 0.3);
+                selection-background-color: rgba(201, 168, 108, 0.25);
+                selection-color: #ffffff;
             }}
             QTableWidget::item {{
-                padding: 4px 8px;
+                padding: 4px 10px;
+                border-bottom: 1px solid #1a1a1a;
             }}
             QTableWidget::item:selected {{
-                background-color: rgba(201, 168, 108, 0.3);
-                color: #ffffff;
+                background-color: rgba(201, 168, 108, 0.25);
             }}
             QTableWidget::item:focus {{
+                background-color: rgba(201, 168, 108, 0.15);
                 border: 1px solid #c9a86c;
+            }}
+            QTableWidget::item:alternate {{
+                background-color: #141414;
             }}
         """)
         self.excel_table.setAlternatingRowColors(True)
         self.excel_table.setRowCount(0)
-        layout.addWidget(self.excel_table, 1)
+        self.excel_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.excel_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        tcl.addWidget(self.excel_table)
+
+        layout.addWidget(table_card, 1)
 
         self._excel_current_path = None
         self._excel_modified = False
@@ -1096,13 +1147,29 @@ class SGKApp(QMainWindow):
 
         return page
 
+    def _excel_drag_enter(self, event):
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                if url.toLocalFile().lower().endswith(('.xlsx', '.xls')):
+                    event.acceptProposedAction()
+                    return
+
+    def _excel_drop_event(self, event):
+        for url in event.mimeData().urls():
+            path = url.toLocalFile()
+            if path.lower().endswith(('.xlsx', '.xls')):
+                self._excel_load_file(path)
+                return
+
     def _excel_open_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self, "Excel Dosyasi Ac", "",
             "Excel Dosyalari (*.xlsx *.xls);;Tum Dosyalari (*)"
         )
-        if not path:
-            return
+        if path:
+            self._excel_load_file(path)
+
+    def _excel_load_file(self, path):
         try:
             import pandas as pd
             df = pd.read_excel(path, header=None)
@@ -1110,35 +1177,53 @@ class SGKApp(QMainWindow):
             self.excel_table.setRowCount(0)
             self.excel_table.setColumnCount(max(df.shape[1], 4))
 
-            headers = ["Unvan", "TC Kimlik No", "Matrah", "Kesinti"]
-            if df.shape[1] >= 4:
-                for c in range(min(df.shape[1], 4)):
-                    headers[c] = str(df.iloc[0, c]) if pd.notna(df.iloc[0, c]) else ["Unvan", "TC Kimlik No", "Matrah", "Kesinti"][c]
+            default_headers = ["Unvan", "TC Kimlik No", "Matrah", "Kesinti"]
+            headers = list(default_headers)
+            if df.shape[0] > 0:
+                row0 = [str(v).strip() if pd.notna(v) else "" for v in df.iloc[0]]
+                known = {"unvan", "tc", "tc kimlik", "tc kimlik no", "matrah", "kesinti", "bag-kur", "bagkur"}
+                if any(v.lower() in known for v in row0 if v):
+                    for c in range(min(df.shape[1], 4)):
+                        if row0[c]:
+                            headers[c] = row0[c]
             self.excel_table.setHorizontalHeaderLabels(headers[:4])
 
-            start_row = 1
-            if df.shape[0] > 0 and any(str(v).upper().strip() in ["UNVAN", "TC", "TC KIMLIK", "MATRAH", "KESINTI"] for v in df.iloc[0] if pd.notna(v)):
-                start_row = 1
+            start_row = 1 if df.shape[0] > 0 else 0
 
             for r in range(start_row, df.shape[0]):
                 self.excel_table.insertRow(self.excel_table.rowCount())
                 row_idx = self.excel_table.rowCount() - 1
                 for c in range(min(df.shape[1], 4)):
                     val = df.iloc[r, c]
-                    item = QTableWidgetItem(str(int(val)) if pd.notna(val) and isinstance(val, float) and val == int(val) else str(val) if pd.notna(val) else "")
+                    if pd.notna(val):
+                        if isinstance(val, float) and val == int(val):
+                            txt = str(int(val))
+                        else:
+                            txt = str(val)
+                    else:
+                        txt = ""
+                    item = QTableWidgetItem(txt)
                     item.setTextAlignment(Qt.AlignCenter)
                     self.excel_table.setItem(row_idx, c, item)
 
             self.excel_table.blockSignals(False)
             self._excel_current_path = path
             self._excel_modified = False
-            self.excel_file_label.setText(f"Dosya: {os.path.basename(path)} ({self.excel_table.rowCount()} satir)")
+            self._excel_update_labels()
             self.excel_save_btn.setEnabled(True)
             self.excel_saveas_btn.setEnabled(True)
             self.excel_addrow_btn.setEnabled(True)
             self.excel_delrow_btn.setEnabled(True)
         except Exception as e:
             QMessageBox.critical(self, "Hata", f"Excel okunamadi:\n{str(e)}")
+
+    def _excel_update_labels(self):
+        name = os.path.basename(self._excel_current_path) if self._excel_current_path else "Yeni"
+        count = self.excel_table.rowCount()
+        mod = " *" if self._excel_modified else ""
+        self.excel_file_label.setText(f"{name}{mod}")
+        self.excel_file_label.setStyleSheet(f"color: #ffffff; font-size: 13px; font-weight: bold; background: transparent; border: none;")
+        self.excel_status_label.setText(f"{count} satir | {self.excel_table.columnCount()} sutun")
 
     def _excel_save_file(self):
         if not self._excel_current_path:
@@ -1154,7 +1239,7 @@ class SGKApp(QMainWindow):
             return
         self._excel_write_to(path)
         self._excel_current_path = path
-        self.excel_file_label.setText(f"Dosya: {os.path.basename(path)} ({self.excel_table.rowCount()} satir)")
+        self._excel_update_labels()
 
     def _excel_write_to(self, path):
         try:
@@ -1173,6 +1258,7 @@ class SGKApp(QMainWindow):
             df = pd.DataFrame(data, columns=headers)
             df.to_excel(path, index=False, engine='openpyxl')
             self._excel_modified = False
+            self._excel_update_labels()
             QMessageBox.information(self, "Kaydedildi", f"Dosya kaydedildi:\n{path}")
         except Exception as e:
             QMessageBox.critical(self, "Hata", f"Kaydedilemedi:\n{str(e)}")
@@ -1184,7 +1270,7 @@ class SGKApp(QMainWindow):
             item = QTableWidgetItem("")
             item.setTextAlignment(Qt.AlignCenter)
             self.excel_table.setItem(row, c, item)
-        self.excel_file_label.setText(f"Dosya: {os.path.basename(self._excel_current_path or 'Yeni')} ({self.excel_table.rowCount()} satir)")
+        self._excel_update_labels()
 
     def _excel_del_row(self):
         rows = self.excel_table.selectionModel().selectedRows()
@@ -1193,14 +1279,12 @@ class SGKApp(QMainWindow):
             return
         for idx in sorted(rows, reverse=True):
             self.excel_table.removeRow(idx.row())
-        self.excel_file_label.setText(f"Dosya: {os.path.basename(self._excel_current_path or 'Yeni')} ({self.excel_table.rowCount()} satir)")
+        self._excel_update_labels()
 
     def _excel_on_modified(self):
         if not self._excel_modified:
             self._excel_modified = True
-            current = self.excel_file_label.text()
-            if "*" not in current:
-                self.excel_file_label.setText(current + " *")
+            self._excel_update_labels()
 
     # --- Settings Page ---
     def _create_settings_page(self):

@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.26"
+SURUM = "1.7.27"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -1636,11 +1636,14 @@ class SGKApp(QMainWindow):
 
 
 def main():
-    # Yüksek DPI ekranlarda (laptop/4K) metinlerin üst üste binmemesi icin gerekli
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
+
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "app_logo.ico")
+    if os.path.exists(icon_path):
+        app.setWindowIcon(QIcon(icon_path))
 
     font = QFont("Segoe UI", int(11 * _scale))
     font.setHintingPreference(QFont.PreferFullHinting)

@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.33"
+SURUM = "1.7.34"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -1490,7 +1490,7 @@ class SGKApp(QMainWindow):
 
         self.cred_tc_input = QLineEdit()
         self.cred_tc_input.setPlaceholderText("Kullanici Kodu")
-        self.cred_tc_input.setMaxLength(11)
+        self.cred_tc_input.setMaxLength(12)
         self.cred_tc_input.setMinimumHeight(40)
         form.addWidget(self.cred_tc_input, 1)
 

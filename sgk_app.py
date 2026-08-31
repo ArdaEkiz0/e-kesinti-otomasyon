@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.18"
+SURUM = "1.7.19"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda Yazilim"
 
@@ -1416,9 +1416,9 @@ class SGKApp(QMainWindow):
             return
         try:
             sonuc = _guncelleme_var_mi()
-            if not sonuc:
-                return
             yeni_surum, zip_url = sonuc
+            if not yeni_surum or not zip_url:
+                return
             cevap = QMessageBox.question(
                 self, "Guncelleme Mevcut",
                 f"Yeni surum bulundu: v{yeni_surum}\n"

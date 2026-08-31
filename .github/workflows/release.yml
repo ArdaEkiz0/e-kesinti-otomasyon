@@ -20,6 +20,8 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path paket | Out-Null
           Copy-Item sgk_bot.py paket/
+          Copy-Item sgk_app.py paket/
+          Copy-Item api_client.py paket/
           Copy-Item BAT_BASLAT.bat paket/
           Copy-Item BAT_KURULUM.bat paket/
           Copy-Item BENI_OKU.txt paket/

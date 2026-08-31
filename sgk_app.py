@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.22"
+SURUM = "1.7.23"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda Yazilim"
 
@@ -1234,41 +1234,43 @@ class SGKApp(QMainWindow):
     def _create_about_page(self):
         page = QWidget()
         layout = QVBoxLayout(page)
-        layout.setContentsMargins(30, 24, 30, 20)
-        layout.setSpacing(20)
+        layout.setContentsMargins(24, 20, 24, 16)
+        layout.setSpacing(16)
 
         header = QLabel("Hakkinda")
-        header.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {ACCENT_PRIMARY};")
+        header.setStyleSheet(f"font-size: 22px; font-weight: bold; color: #c9a86c; background: transparent;")
         layout.addWidget(header)
 
         card1 = CardFrame()
         c1_layout = QVBoxLayout(card1)
-        c1_layout.setSpacing(16)
+        c1_layout.setContentsMargins(20, 18, 20, 18)
+        c1_layout.setSpacing(10)
 
         app_title = QLabel(UYGULAMA_ADI)
-        app_title.setStyleSheet(f"font-size: 22px; font-weight: bold; color: {ACCENT_PRIMARY};")
+        app_title.setStyleSheet(f"font-size: 20px; font-weight: bold; color: #c9a86c; background: transparent; border: none;")
         c1_layout.addWidget(app_title)
 
         ver_info = QLabel(f"Surum: {SURUM}")
-        ver_info.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: 16px;")
+        ver_info.setStyleSheet(f"color: #ffffff; font-size: 14px; background: transparent; border: none;")
         c1_layout.addWidget(ver_info)
 
         dev_info = QLabel(f"Gelistirici: {SIRKET}")
-        dev_info.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: 16px;")
+        dev_info.setStyleSheet(f"color: #ffffff; font-size: 14px; background: transparent; border: none;")
         c1_layout.addWidget(dev_info)
 
         copy_info = QLabel("2025 Tum haklari saklidir.")
-        copy_info.setStyleSheet(f"color: {TEXT_SECONDARY}; font-size: 14px;")
+        copy_info.setStyleSheet(f"color: #999999; font-size: 13px; background: transparent; border: none;")
         c1_layout.addWidget(copy_info)
 
         layout.addWidget(card1)
 
         card2 = CardFrame()
         c2_layout = QVBoxLayout(card2)
-        c2_layout.setSpacing(12)
+        c2_layout.setContentsMargins(20, 18, 20, 18)
+        c2_layout.setSpacing(10)
 
         feat_title = QLabel("Ozellikler")
-        feat_title.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {TEXT_PRIMARY};")
+        feat_title.setStyleSheet(f"font-size: 16px; font-weight: bold; color: #ffffff; background: transparent; border: none;")
         c2_layout.addWidget(feat_title)
 
         features = [
@@ -1282,14 +1284,21 @@ class SGKApp(QMainWindow):
             "Coklu dil destegi (planlanan)",
             "Yapay zeka destekli asistan (yeni!)",
         ]
+
         for feat in features:
-            lbl = QLabel(f"  •  {feat}")
-            lbl.setStyleSheet(f"color: {TEXT_PRIMARY}; font-size: 14px; padding: 8px 4px; background: transparent;")
+            row = QHBoxLayout()
+            row.setSpacing(8)
+            bullet = QLabel("•")
+            bullet.setFixedWidth(16)
+            bullet.setStyleSheet(f"color: #c9a86c; font-size: 14px; font-weight: bold; background: transparent; border: none;")
+            row.addWidget(bullet)
+            lbl = QLabel(feat)
+            lbl.setStyleSheet(f"color: #ffffff; font-size: 13px; background: transparent; border: none;")
             lbl.setWordWrap(True)
-            c2_layout.addWidget(lbl)
+            row.addWidget(lbl, 1)
+            c2_layout.addLayout(row)
 
         layout.addWidget(card2)
-
         layout.addStretch()
 
         return page

@@ -3,7 +3,7 @@
  * Cloudflare Worker + D1 Database
  */
 
-const ADMIN_PASSWORD_HASH = 'b20b616dc4d5015c5d6a90a7d91ffabfac144e100437d8dbf72c85dd5bdcb385'; // "Arda2005!!" SHA-256
+const ADMIN_PASSWORD_HASH = '37688acf5fd477512d3077e7043ba1cf2e6ef943affb2f8e0fc7c404afeb27e4';
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -65,6 +65,22 @@ function verifyAdmin(url) {
 }
 
 // --- POST /api/register ---
+const DEMO_DAYS = 30;
+
+function demoActive(firstSeen) {
+  if (!firstSeen) return false;
+  const start = new Date(firstSeen).getTime();
+  const expires = start + DEMO_DAYS * 24 * 60 * 60 * 1000;
+  return Date.now() < expires;
+}
+
+function demoDaysLeft(firstSeen) {
+  if (!firstSeen) return 0;
+  const start = new Date(firstSeen).getTime();
+  const expires = start + DEMO_DAYS * 24 * 60 * 60 * 1000;
+  return Math.max(0, Math.ceil((expires - Date.now()) / (24 * 60 * 60 * 1000)));
+}
+
 async function handleRegister(request, env) {
   const body = await request.json();
   const { hwid, ip } = body;
@@ -85,9 +101,17 @@ async function handleRegister(request, env) {
       'UPDATE users SET ip = ?, last_seen = ? WHERE hwid = ?'
     ).bind(ip, now, hwid).run();
 
+    const adminOk = !!existing.authorized;
+    const demoOk = demoActive(existing.first_seen);
+
     return jsonResponse({
-      authorized: !!existing.authorized,
-      message: existing.authorized ? 'Access granted' : 'HWID not authorized',
+      authorized: adminOk || demoOk,
+      demo: demoOk && !adminOk,
+      admin_authorized: adminOk,
+      demo_days_left: demoOk ? demoDaysLeft(existing.first_seen) : 0,
+      message: adminOk
+        ? 'Access granted'
+        : (demoOk ? 'Demo access (30 gun)' : 'HWID not authorized'),
       hwid: existing.hwid,
       first_seen: existing.first_seen,
       last_seen: now,
@@ -99,8 +123,11 @@ async function handleRegister(request, env) {
   ).bind(hwid, ip, now, now).run();
 
   return jsonResponse({
-    authorized: false,
-    message: 'HWID registered, pending authorization',
+    authorized: true,
+    demo: true,
+    admin_authorized: false,
+    demo_days_left: DEMO_DAYS,
+    message: 'Demo access (30 gun)',
     hwid,
   }, 201);
 }

@@ -1,4 +1,4 @@
-name = "sgk-license-api"
+name = "sgk-api-v2"
 main = "worker.mjs"
 compatibility_date = "2024-01-01"
 

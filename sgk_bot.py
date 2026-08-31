@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error, subprocess
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.7.11"  # GitHub release etiketiyle karsilastirilir
+BOT_SURUM = "1.7.12"  # GitHub release etiketiyle karsilastirilir
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 

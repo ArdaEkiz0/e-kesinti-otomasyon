@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.3.0"  # GitHub release etiketiyle karşılaştırılır
+BOT_SURUM = "1.7.3"  # GitHub release etiketiyle karsilastirilir
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -36,11 +36,11 @@ if os.name == "nt":
     except Exception:
         pass
 
-# Cmd penceresi başlığını ayarla
+# Cmd pencere başlığını ayarla (sürüm bilgisiyle birlikte)
 if os.name == "nt":
     try:
         import ctypes
-        ctypes.windll.kernel32.SetConsoleTitleW("Developer Arda M. Ekiz")
+        ctypes.windll.kernel32.SetConsoleTitleW(f"SGK E-Kesinti Otomasyon v{BOT_SURUM} | Developer Arda M. Ekiz")
     except Exception:
         pass
 
@@ -57,6 +57,7 @@ class Renk:
     MAVI    = "\033[34m"
     MOR     = "\033[35m"
     TURKUAZ = "\033[36m"
+    ALTIN   = "\033[38;2;201;168;108m"  # marka altini (#c9a86c)
 
 
 def renk_aktif_mi():
@@ -109,8 +110,8 @@ def hata_aciklamasi(e):
     return (metin[:200] if metin else f"Bilinmeyen hata ({sinif})")
 
 
-def guncelleme_kontrol_goster():
-    """GitHub'da daha yeni bir sürüm varsa kullanıcıyı uyarır (hata olursa sessizce geçer)."""
+def guncelleme_var_mi():
+    """GitHub'da daha yeni surum varsa (surum, zip_url) doner; yoksa (None, None)."""
     try:
         istek = urllib.request.Request(
             GITHUB_API, headers={"User-Agent": "SGK-BOT", "Accept": "application/vnd.github+json"})
@@ -118,17 +119,51 @@ def guncelleme_kontrol_goster():
             veri = json.loads(r.read().decode("utf-8"))
         uzak_surum = str(veri.get("tag_name", "")).lstrip("v")
         if not uzak_surum:
-            return
+            return None, None
         yerel = [int(x) for x in re.findall(r"\d+", BOT_SURUM)]
         uzak = [int(x) for x in re.findall(r"\d+", uzak_surum)]
         uzunluk = max(len(yerel), len(uzak))
         yerel += [0] * (uzunluk - len(yerel))
         uzak += [0] * (uzunluk - len(uzak))
-        if uzak > yerel:
-            print(renkli(f"\n🔄 YENİ SÜRÜM VAR: v{uzak_surum} (senin sürüm: v{BOT_SURUM})", Renk.SARI, kalin=True))
-            print(renkli("   Güncellemek için 'KURULUM.exe'yi çalıştırın — kendini otomatik günceller.", Renk.SARI))
+        if uzak <= yerel:
+            return None, None
+        for a in veri.get("assets", []):
+            if a.get("name", "").lower() == "sgk_e_kesinti_otomasyon.zip":
+                return uzak_surum, a.get("browser_download_url")
     except Exception:
-        pass  # internet yoksa veya hata olursa sessizce geç
+        pass  # internet yoksa veya hata olursa sessizce gec
+    return None, None
+
+
+def otomatik_guncelle(zip_url):
+    """Yeni ZIP paketini indirip bot klasorune acar (dosyalari gunceller)."""
+    import zipfile
+    hedef_klasor = os.path.dirname(os.path.abspath(__file__))
+    zip_yol = os.path.join(hedef_klasor, "_guncelleme.zip")
+    yaz_ilerleme = True
+    print(renkli("   ⬇️ Yeni sürüm indiriliyor...", Renk.SARI))
+    istek = urllib.request.Request(zip_url, headers={"User-Agent": "SGK-BOT"})
+    with urllib.request.urlopen(istek, timeout=180) as r, open(zip_yol, "wb") as f:
+        toplam = int(r.headers.get("Content-Length", 0))
+        yazilan = 0
+        while True:
+            parca = r.read(65536)
+            if not parca:
+                break
+            f.write(parca)
+            yazilan += len(parca)
+            if toplam:
+                print(f"\r   %3d%%" % (yazilan * 100 // toplam), end="", flush=True)
+    print()
+    if os.path.getsize(zip_yol) < 1000:
+        raise RuntimeError("ZIP indirilemedi (dosya eksik)")
+    print(renkli("   📦 Dosyalar güncelleniyor...", Renk.SARI))
+    with zipfile.ZipFile(zip_yol) as z:
+        z.extractall(hedef_klasor)
+    try:
+        os.remove(zip_yol)
+    except OSError:
+        pass
 
 
 def windows_bildirim(baslik, metin):
@@ -198,6 +233,14 @@ class TestSurucu:
 # ANA BOT SINIFI
 # ============================================================
 
+MAX_DENEME = 3          # hata olursa her kayit en fazla 3 kez denenir
+MAKS_YENIDEN_LOGIN = 5  # tek turda en fazla kac kez oturum yenileme istenir
+
+
+class OturumHatasi(Exception):
+    """SGK oturumu dusmustu / login sayfasina yonlendirildi."""
+
+
 class SGKBot:
     def __init__(self, surucu=None, test_modu=False):
         self.test_modu = test_modu
@@ -228,14 +271,21 @@ class SGKBot:
         """Chrome sürücüsünü başlatır. webdriver-manager başarısız olursa yerel chromedriver.exe'yi dener."""
         chrome_options = Options()
         chrome_options.add_argument("--start-maximized")
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option("useAutomationExtension", False)
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         self._temizle_eski_kilitler()
         son_hata = None
         for deneme in range(2):
             try:
-                return webdriver.Chrome(
+                driver = webdriver.Chrome(
                     service=Service(ChromeDriverManager().install()),
                     options=chrome_options
                 )
+                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                    "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+                })
+                return driver
             except Exception as e:
                 son_hata = e
                 if "lock" in str(e).lower():
@@ -244,7 +294,11 @@ class SGKBot:
         yerel = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chromedriver.exe")
         if os.path.exists(yerel):
             try:
-                return webdriver.Chrome(service=Service(yerel), options=chrome_options)
+                driver = webdriver.Chrome(service=Service(yerel), options=chrome_options)
+                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                    "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+                })
+                return driver
             except Exception as e2:
                 son_hata = e2
         raise RuntimeError(
@@ -352,11 +406,200 @@ class SGKBot:
         wb.save(dosya_yolu)
         return True
 
+    def _form_sayfasina_git(self):
+        """Login sonrasi islem formuna geri doner (oturum yenilendikten sonra)."""
+        print(renkli("\n📍 Form sayfasına gidiliyor...", Renk.TURKUAZ))
+        try:
+            self.driver.execute_script("goToPage('/GooKesintiIcinUreticiSorgulaAction.do')")
+            time.sleep(3)
+        except Exception:
+            pass
+        try:
+            self.driver.execute_script("acikDosyaSayisiniKontrolEt()")
+            time.sleep(3)
+        except Exception:
+            pass
+        month, year = self.get_previous_month_and_year()
+        try:
+            Select(self.driver.find_element(By.ID, "ay")).select_by_value(str(month))
+            Select(self.driver.find_element(By.ID, "yil")).select_by_value(str(year))
+            print(f"   ✅ Ay: {month:02d}, Yıl: {year}")
+        except Exception as e:
+            print(renkli(f"   ❌ Ay/Yıl hatası: {e}", Renk.KIRMIZI))
+        try:
+            self.driver.execute_script("document.getElementById('yeniDosyaOlustur').click()")
+            time.sleep(4)
+            print(renkli("   ✅ YENİ Dosya oluşturuldu", Renk.YESIL))
+        except Exception as e:
+            print(renkli(f"   ❌ Hata: {e}", Renk.KIRMIZI))
+        try:
+            time.sleep(2)
+            rows = self.driver.find_elements(By.XPATH, "//table[@id='users2']//tbody//tr[@class='row1' or @class='row2']")
+            if len(rows) > 0:
+                rows[0].click()
+                time.sleep(1)
+                print(renkli("   ✅ YENİ Dosya seçildi", Renk.YESIL))
+        except Exception:
+            pass
+        button = self.driver.find_element(By.ID, "secilenDosyayiAc")
+        button.click()
+        time.sleep(3)
+        print(renkli("   ✅ Form açıldı - işleme devam ediliyor...", Renk.YESIL))
+
+    def _kayit_isle(self, record, odeme_tarihi):
+        """Tek bir kaydi siteye girer. Basarili olursa doner, hata olursa exception firlatir."""
+        try:
+            tc_field = self.driver.find_element(By.ID, "mernisno")
+        except NoSuchElementException:
+            # TC alani yok -> oturum dussm ya da baska sayfaya yonlendirilmis olabilir
+            try:
+                url = (self.driver.current_url or "").lower()
+            except Exception:
+                url = ""
+            if "sgk.gov.tr" not in url:
+                raise OturumHatasi("SGK oturumu dusmus / login gerekiyor")
+            raise
+        tc_field.clear()
+        tc_field.send_keys(record['tc'])
+        time.sleep(0.5)
+        print(renkli(f"   ✅ TC yazıldı: {record['tc']}", Renk.YESIL))
+
+        tarih_field = self.driver.find_element(By.ID, "odemeTarihi")
+        tarih_field.clear()
+        tarih_field.send_keys(odeme_tarihi)
+        time.sleep(0.5)
+        print(renkli(f"   ✅ Tarih yazıldı: {odeme_tarihi}", Renk.YESIL))
+
+        self.driver.execute_script("""
+            var radio = document.querySelector('input[name="answer"][value="Alim Gerceklesti"]');
+            if (radio) {
+                var link = radio.parentElement.querySelector('a');
+                if (link) {
+                    link.click();
+                }
+            }
+        """)
+        time.sleep(0.5)
+        print(renkli("   ✅ 'Alım Gerceklesti' seçildi (YEŞİL)", Renk.YESIL))
+
+        print(renkli("   🔎 Ara tıklanıyor...", Renk.TURKUAZ))
+        self.driver.execute_script("tcAraButtonPressed()")
+        time.sleep(3)
+        print(renkli("   ✅ Üretici bilgileri yüklendi", Renk.YESIL))
+
+        matrah_tam = int(record['matrah'])
+        matrah_kurus = round((record['matrah'] - matrah_tam) * 100)
+        # Kuruş HER ZAMAN 2 haneli yazılır (ör: 9 -> '09', 5 -> '05', 90 -> '90')
+        # '9' yazılırsa site bunu 0.9 (13014,90) olarak algılar!
+        matrah_kurus_str = f"{matrah_kurus:02d}"
+
+        # Matrah yazı - SİSTEM FONKSİYONLARINI TETIKLE
+        self.driver.execute_script(f"""
+            var input = document.kesinti.urunAlimBedeliTam;
+            input.value = '{matrah_tam}';
+            textFocus(input);
+            formatCurrency(input);
+            hesaplaYaz(input);
+        """)
+        time.sleep(0.5)
+
+        # Kuruş yazılır; sitenin formatCurrency/hesaplaYaz fonksiyonları
+        # baştaki sıfırı silebileceği için değer EN SONDA tekrar '09' olarak
+        # yazılır ve hesaplama bir kez daha tetiklenir.
+        self.driver.execute_script(f"""
+            var input = document.kesinti.urunAlimBedeliKrs;
+            input.value = '{matrah_kurus_str}';
+            textFocus(input);
+            formatCurrency(input);
+            hesaplaYaz(input);
+            input.value = '{matrah_kurus_str}';
+            hesaplaYaz(input);
+        """)
+        time.sleep(0.5)
+        print(renkli(f"   💰 Matrah yazıldı: {matrah_tam}.{matrah_kurus_str} (RENK DEĞİŞTİ)", Renk.YESIL))
+
+        print(f"   🔢 Kesinti Tutarı: {record['kesinti']}")
+
+        print(renkli("   ➕ EKLE tıklanıyor...", Renk.TURKUAZ))
+        self.driver.execute_script("kesintiKaydet('9999999999.00')")
+        time.sleep(2)
+
+    def _toplu_isle(self, kayitlar, odeme_tarihi):
+        """Verilen kayitlari sirayla isler. Dondugunde (basarili_sayisi, hatali_listesi).
+
+        Oturum duserse kullanicidan tekrar login istenip kaldigi yerden devam edilir;
+        boylece 200+ kayitlik listelerde oturum kaybi tum listeyi felc etmez."""
+        basarili_sayi = 0
+        hatali = []
+        toplam = len(kayitlar)
+        tahmin_sn = toplam * 9  # kayit basi ~9 saniye (site bekleme sureleri dahil)
+        print(renkli(f"   ⏱️  Tahmini süre: ~{tahmin_sn // 60} dk {tahmin_sn % 60} sn", Renk.TURKUAZ))
+
+        tur_baslangici = time.time()
+        try:
+            for idx, record in enumerate(kayitlar, 1):
+                gecen = time.time() - tur_baslangici
+                kalan = gecen / idx * (toplam - idx) if idx > 1 else tahmin_sn
+                print(renkli(f"\n📍 Kayıt {idx}/{toplam}", Renk.BOLD + Renk.MAVI, kalin=True))
+                print(f"   {ilerleme_cubugu(idx - 1, toplam)}  TC={record['tc']}  "
+                      f"(kalan ~{int(kalan // 60)} dk {int(kalan % 60)} sn)")
+                basarili = False
+                son_hata = None
+                deneme = 0
+                girisim = 0
+                while deneme < MAX_DENEME and girisim < MAX_DENEME + MAKS_YENIDEN_LOGIN:
+                    girisim += 1
+                    try:
+                        self._kayit_isle(record, odeme_tarihi)
+                        basarili = True
+                        break
+                    except OturumHatasi:
+                        if self.test_modu:
+                            son_hata = OturumHatasi("test")
+                            deneme += 1
+                            continue
+                        print(renkli("   🔒 SGK oturumu düşmüş görünüyor!", Renk.SARI, kalin=True))
+                        try:
+                            input(renkli("   Tarayıcıdan TEKRAR LOGIN yapın, sonra buraya dönüp ENTER'a basınız...", Renk.SARI))
+                        except EOFError:
+                            pass
+                        try:
+                            self._form_sayfasina_git()
+                            continue  # ayni kaydi tekrar dene, deneme hakkini yakma
+                        except Exception as e_form:
+                            son_hata = e_form
+                            deneme += 1
+                    except Exception as e:
+                        son_hata = e
+                        deneme += 1
+                        if deneme < MAX_DENEME:
+                            print(renkli(f"   ⚠️ Hata ({deneme}. deneme): {hata_aciklamasi(e)}", Renk.SARI))
+                            print(renkli(f"   🔄 {deneme + 1}. deneme yapılıyor...", Renk.TURKUAZ))
+                            time.sleep(2)
+                if basarili:
+                    print(renkli("   ✅ TC başarıyla işlendi!", Renk.YESIL, kalin=True))
+                    basarili_sayi += 1
+                else:
+                    mesaj = hata_aciklamasi(son_hata) if son_hata else "Bilinmeyen hata"
+                    print(renkli(f"   ❌ Hata ({MAX_DENEME} deneme): {mesaj}", Renk.KIRMIZI))
+                    hatali.append({'tc': record['tc'], 'matrah': record['matrah'],
+                                   'kesinti': record['kesinti'], 'hata': mesaj})
+        except KeyboardInterrupt:
+            print(renkli("\n⏸️  Kullanıcı durdurdu — şu ana kadarki özet aşağıda.", Renk.SARI, kalin=True))
+        return basarili_sayi, hatali
+
     def run(self, excel_file):
         baslangic = time.time()
         print("\n" + "="*60)
-        print(renkli("🤖 SGK TARIMSAL KESİNTİ OTOMASYONU BOT", Renk.MAVI, kalin=True))
-        print(renkli("   Kullanıcı Dostu Arayüz v1.1", Renk.TURKUAZ))
+        print(renkli(r"""
+  ███████╗ ██████╗ ██╗  ██╗
+  ██╔════╝██╔════╝ ██║ ██╔╝
+  ███████╗██║  ███╗█████╔╝
+  ╚════██║██║   ██║██╔═██╗
+  ███████║╚██████╔╝██║  ██╗
+  ╚══════╝ ╚═════╝ ╚═╝  ╚═╝""", Renk.ALTIN, kalin=True))
+        print(renkli("   SGK TARIMSAL KESİNTİ OTOMASYONU BOT", Renk.MAVI, kalin=True))
+        print(renkli(f"   Sürüm: v{BOT_SURUM}", Renk.TURKUAZ, kalin=True))
         print(renkli("   Developer: Arda M. Ekiz", Renk.MOR))
         print("="*60)
 
@@ -435,97 +678,21 @@ class SGKBot:
 
         print(renkli("\n📝 Kayıtlar işleniyor...", Renk.TURKUAZ, kalin=True))
         odeme_tarihi = self.get_previous_month_date()
-        MAX_DENEME = 3  # hata olursa her kayıt en fazla 3 kez denenir
-        success = 0
-        hatali = []
-        for idx, record in enumerate(data, 1):
-            print(renkli(f"\n📍 Kayıt {idx}/{len(data)}", Renk.BOLD + Renk.MAVI, kalin=True))
-            print(f"   {ilerleme_cubugu(idx - 1, len(data))}  TC={record['tc']}")
-            basarili = False
-            son_hata = None
-            for deneme in range(1, MAX_DENEME + 1):
-                try:
-                    tc_field = self.driver.find_element(By.ID, "mernisno")
-                    tc_field.clear()
-                    tc_field.send_keys(record['tc'])
-                    time.sleep(0.5)
-                    print(renkli(f"   ✅ TC yazıldı: {record['tc']}", Renk.YESIL))
+        success, hatali = self._toplu_isle(data, odeme_tarihi)
 
-                    tarih_field = self.driver.find_element(By.ID, "odemeTarihi")
-                    tarih_field.clear()
-                    tarih_field.send_keys(odeme_tarihi)
-                    time.sleep(0.5)
-                    print(renkli(f"   ✅ Tarih yazıldı: {odeme_tarihi}", Renk.YESIL))
-
-                    self.driver.execute_script("""
-                        var radio = document.querySelector('input[name="answer"][value="Alim Gerceklesti"]');
-                        if (radio) {
-                            var link = radio.parentElement.querySelector('a');
-                            if (link) {
-                                link.click();
-                            }
-                        }
-                    """)
-                    time.sleep(0.5)
-                    print(renkli("   ✅ 'Alım Gerceklesti' seçildi (YEŞİL)", Renk.YESIL))
-
-                    print(renkli("   🔎 Ara tıklanıyor...", Renk.TURKUAZ))
-                    self.driver.execute_script("tcAraButtonPressed()")
-                    time.sleep(3)
-                    print(renkli("   ✅ Üretici bilgileri yüklendi", Renk.YESIL))
-
-                    matrah_tam = int(record['matrah'])
-                    matrah_kurus = round((record['matrah'] - matrah_tam) * 100)
-                    # Kuruş HER ZAMAN 2 haneli yazılır (ör: 9 -> '09', 5 -> '05', 90 -> '90')
-                    # '9' yazılırsa site bunu 0.9 (13014,90) olarak algılar!
-                    matrah_kurus_str = f"{matrah_kurus:02d}"
-
-                    # Matrah yazı - SİSTEM FONKSİYONLARINI TETIKLE
-                    self.driver.execute_script(f"""
-                        var input = document.kesinti.urunAlimBedeliTam;
-                        input.value = '{matrah_tam}';
-                        textFocus(input);
-                        formatCurrency(input);
-                        hesaplaYaz(input);
-                    """)
-                    time.sleep(0.5)
-
-                    # Kuruş yazılır; sitenin formatCurrency/hesaplaYaz fonksiyonları
-                    # baştaki sıfırı silebileceği için değer EN SONDA tekrar '09' olarak
-                    # yazılır ve hesaplama bir kez daha tetiklenir.
-                    self.driver.execute_script(f"""
-                        var input = document.kesinti.urunAlimBedeliKrs;
-                        input.value = '{matrah_kurus_str}';
-                        textFocus(input);
-                        formatCurrency(input);
-                        hesaplaYaz(input);
-                        input.value = '{matrah_kurus_str}';
-                        hesaplaYaz(input);
-                    """)
-                    time.sleep(0.5)
-                    print(renkli(f"   💰 Matrah yazıldı: {matrah_tam}.{matrah_kurus_str} (RENK DEĞİŞTİ)", Renk.YESIL))
-
-                    print(f"   🔢 Kesinti Tutarı: {record['kesinti']}")
-
-                    print(renkli("   ➕ EKLE tıklanıyor...", Renk.TURKUAZ))
-                    self.driver.execute_script("kesintiKaydet('9999999999.00')")
-                    time.sleep(2)
-
-                    basarili = True
-                    break
-                except Exception as e:
-                    son_hata = e
-                    if deneme < MAX_DENEME:
-                        print(renkli(f"   ⚠️ Hata ({deneme}. deneme): {hata_aciklamasi(e)}", Renk.SARI))
-                        print(renkli(f"   🔄 {deneme + 1}. deneme yapılıyor...", Renk.TURKUAZ))
-                        time.sleep(2)
-            if basarili:
-                print(renkli("   ✅ TC başarıyla işlendi!", Renk.YESIL, kalin=True))
-                success += 1
-            else:
-                mesaj = hata_aciklamasi(son_hata)
-                print(renkli(f"   ❌ Hata ({MAX_DENEME} deneme): {mesaj}", Renk.KIRMIZI))
-                hatali.append({'tc': record['tc'], 'hata': mesaj})
+        # Hatali kayitlar icin bir kez daha deneme turu (oturum dususu gibi gecici
+        # hatalardan kaynaklanan kayitlar bu sayede kurtarilir)
+        if hatali and not self.test_modu:
+            try:
+                cevap = input(renkli(
+                    f"\n🔁 {len(hatali)} kayıt hatalı. Bir kez daha denenmesini ister misiniz? (E/H): ",
+                    Renk.SARI, kalin=True)).strip().lower()
+            except EOFError:
+                cevap = "h"
+            if cevap.startswith("e"):
+                print(renkli("\n🔄 Hatalı kayıtlar tekrar deneniyor...", Renk.SARI, kalin=True))
+                s2, hatali = self._toplu_isle(hatali, odeme_tarihi)
+                success += s2
 
         sure = time.time() - baslangic
         print("\n" + "="*60)
@@ -582,7 +749,23 @@ def excel_dosyasi_sec():
 
 
 if __name__ == "__main__":
-    guncelleme_kontrol_goster()
+    # Otomatik guncelleme: yeni surum varsa sorar, onaylanirsa indirip uygular
+    if "--test" not in sys.argv:
+        yeni_surum, zip_url = guncelleme_var_mi()
+        if yeni_surum and zip_url:
+            print(renkli(f"\n🔄 YENİ SÜRÜM VAR: v{yeni_surum} (senin sürüm: v{BOT_SURUM})", Renk.SARI, kalin=True))
+            try:
+                cevap = input(renkli("   Şimdi otomatik güncellensin mi? (E/H): ", Renk.SARI)).strip().lower()
+            except EOFError:
+                cevap = "h"
+            if cevap in ("e", "evet", ""):
+                try:
+                    otomatik_guncelle(zip_url)
+                    print(renkli(f"   ✅ v{yeni_surum} güncellendi! Bot yeniden başlatılıyor...", Renk.YESIL, kalin=True))
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                except Exception as e:
+                    print(renkli(f"   ❌ Otomatik güncelleme başarısız: {e}", Renk.KIRMIZI))
+                    print(renkli("   Elle güncellemek için siteden ZIP'i indirip dosyaları değiştirin.", Renk.SARI))
     test_modu = "--test" in sys.argv
     # Kullanıcı Excel dosyası verirse onu kullan, vermezse klasördeki Excel'i otomatik bul
     # Kullanım:  python sgk_bot.py [excel_dosya.xlsx]  veya  dosyayı BAT_BASLAT.bat üzerine sürükle

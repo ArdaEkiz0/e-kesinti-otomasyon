@@ -73,7 +73,7 @@ PYTHON_INDIR = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.e
 CHROME_INDIR = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
 PAKETLER = ["selenium", "pandas", "openpyxl", "webdriver-manager"]
 
-SURUM = "1.3.0"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
+SURUM = "1.7.3"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -186,7 +186,12 @@ def guncelleme_kontrol():
     uzak_surum = str(veri.get("tag_name", "")).lstrip("v")
     indirme = None
     for a in veri.get("assets", []):
-        if a.get("name", "").lower() == "kurulum.exe":
+        ad = a.get("name", "").lower()
+        # Once yeni ZIP paketi, yoksa eski KURULUM.exe
+        if ad == "sgk_e_kesinti_otomasyon.zip":
+            indirme = a.get("browser_download_url")
+            break
+        if ad == "kurulum.exe" and not indirme:
             indirme = a.get("browser_download_url")
     if not uzak_surum or not indirme:
         yaz("   ⚠️  Sürüm bilgisi eksik, güncelleme kontrol edilemedi.", Renk.SARI)
@@ -201,11 +206,33 @@ def guncelleme_kontrol():
 
 
 def guncelle_uygula(url):
-    """Yeni KURULUM.exe'yi indirir ve eski dosyayla değiştirir."""
-    if not getattr(sys, "frozen", False):
+    """Yeni surumu indirip uygular. ZIP ise dosyalari klasore acar, exe ise eskisiyle degistirir."""
+    if not getattr(sys, "frozen", False) and not url.lower().endswith(".zip"):
         yaz("   📄 Kaynaktan çalışıyorsunuz — güncel dosyaları (KURULUM.py ve KURULUM.exe)"
             " elle değiştirmeniz gerekir.", Renk.SARI)
         return
+
+    if url.lower().endswith(".zip"):
+        # Yeni dagitim sekli: ZIP paketini indir, kurulum klasorune ac
+        hedef_zip = os.path.join(BASE_DIR, "_guncelleme.zip")
+        indir(url, hedef_zip)
+        import zipfile
+        try:
+            with zipfile.ZipFile(hedef_zip) as z:
+                z.extractall(BASE_DIR)
+        finally:
+            try:
+                os.remove(hedef_zip)
+            except OSError:
+                pass
+        yaz("   ✅ Güncelleme uygulandı! Tüm dosyalar en yeni sürüme güncellendi.", Renk.YESIL, kalin=True)
+        yaz("   ℹ️  Bundan sonra botu başlatmak için: BAT_BASLAT.bat", Renk.TURKUAZ)
+        try:
+            os.startfile(BASE_DIR)
+        except Exception:
+            pass
+        sys.exit(0)
+
     eski = os.path.abspath(sys.argv[0])
     klasor = os.path.dirname(eski)
     yeni = os.path.join(klasor, "KURULUM_yeni.exe")
@@ -232,26 +259,26 @@ SGK_BOT_RAW = "https://raw.githubusercontent.com/ArdaEkiz0/e-kesinti-otomasyon/m
 
 BOT_BASLAT_ICERIK = r"""@echo off
 chcp 65001 > nul
+rem Calisan gercek Python bul (Windows Store sahte python.exe taklidini atlar)
 set "PY="
-where python >nul 2>nul && set "PY=python"
-if not defined PY (
-    where py >nul 2>nul && set "PY=py -3"
+for %%C in ("py -3" "python") do (
+    if not defined PY (
+        %%~C --version >nul 2>nul && set "PY=%%~C"
+    )
 )
+if not defined PY if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PY=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+if not defined PY if exist "%LOCALAPPDATA%\Programs\Python\Python313\python.exe" set "PY=%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
+if not defined PY if exist "%LOCALAPPDATA%\Programs\Python\Python314\python.exe" set "PY=%LOCALAPPDATA%\Programs\Python\Python314\python.exe"
+if not defined PY if exist "%ProgramFiles%\Python312\python.exe" set "PY=%ProgramFiles%\Python312\python.exe"
 if not defined PY (
-    if exist "%LOCALAPPDATA%\Programs\Python\Python312\python.exe" set "PY=%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
-)
-if not defined PY (
-    if exist "%ProgramFiles%\Python312\python.exe" set "PY=%ProgramFiles%\Python312\python.exe"
-)
-if not defined PY (
-    echo HATA: Python bulunamadi! Once KURULUM.exe calistirin.
+    echo HATA: Python bulunamadi! Once BAT_KURULUM.bat calistirin.
     pause
     exit /b 1
 )
 if "%~1"=="" (
     %PY% "%~dp0sgk_bot.py"
 ) else (
-    echo Seçilen Excel: %~nx1
+    echo Secilen Excel: %~nx1
     %PY% "%~dp0sgk_bot.py" "%~1"
 )
 pause"""

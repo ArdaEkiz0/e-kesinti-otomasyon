@@ -34,9 +34,9 @@ if not exist "%~dp0app_logo.ico" goto KISAYOL_OK
 powershell -NoProfile -Command "$w=New-Object -ComObject WScript.Shell;$d=[Environment]::GetFolderPath('Desktop');$s=$w.CreateShortcut($d+'\SGK Bot.lnk');$s.TargetPath='%~dp0BAT_BASLAT.bat';$s.WorkingDirectory='%~dp0';$s.IconLocation='%~dp0app_logo.ico';$s.Description='SGK E-Kesinti Otomasyon';$s.Save()" >nul 2>nul
 :KISAYOL_OK
 if "%~1"=="" (
-    %PY% "%~dp0sgk_bot.py"
+    %PY% "%~dp0sgk_app.py"
 ) else (
     echo Secilen Excel: %~nx1
-    %PY% "%~dp0sgk_bot.py" "%~1"
+    %PY% "%~dp0sgk_app.py" "%~1"
 )
 pause

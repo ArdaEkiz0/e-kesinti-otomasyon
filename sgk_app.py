@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.25"
+SURUM = "1.7.26"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -389,6 +389,9 @@ class SGKApp(QMainWindow):
         self.setWindowTitle(f"{UYGULAMA_ADI} v{SURUM}")
         self.setMinimumSize(1000, 700)
         self.resize(1100, 780)
+        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "app_logo.ico")
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
         self.hardware_id = get_hardware_id()
         self.bot_thread = None
         self.is_authorized = False

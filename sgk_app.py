@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.27"
+SURUM = "1.7.28"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -389,9 +389,12 @@ class SGKApp(QMainWindow):
         self.setWindowTitle(f"{UYGULAMA_ADI} v{SURUM}")
         self.setMinimumSize(1000, 700)
         self.resize(1100, 780)
-        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "app_logo.ico")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
+        base = os.path.dirname(os.path.abspath(__file__))
+        for icon_candidate in ["app_logo.ico", os.path.join("docs", "app_logo.ico")]:
+            icon_path = os.path.join(base, icon_candidate)
+            if os.path.exists(icon_path):
+                self.setWindowIcon(QIcon(icon_path))
+                break
         self.hardware_id = get_hardware_id()
         self.bot_thread = None
         self.is_authorized = False
@@ -1641,9 +1644,12 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 
-    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "app_logo.ico")
-    if os.path.exists(icon_path):
-        app.setWindowIcon(QIcon(icon_path))
+    base = os.path.dirname(os.path.abspath(__file__))
+    for icon_candidate in ["app_logo.ico", os.path.join("docs", "app_logo.ico")]:
+        icon_path = os.path.join(base, icon_candidate)
+        if os.path.exists(icon_path):
+            app.setWindowIcon(QIcon(icon_path))
+            break
 
     font = QFont("Segoe UI", int(11 * _scale))
     font.setHintingPreference(QFont.PreferFullHinting)

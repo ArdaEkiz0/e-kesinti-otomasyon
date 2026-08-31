@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.32"
+SURUM = "1.7.33"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -1489,7 +1489,7 @@ class SGKApp(QMainWindow):
         form.addWidget(self.cred_name_input, 1)
 
         self.cred_tc_input = QLineEdit()
-        self.cred_tc_input.setPlaceholderText("TC Kimlik No")
+        self.cred_tc_input.setPlaceholderText("Kullanici Kodu")
         self.cred_tc_input.setMaxLength(11)
         self.cred_tc_input.setMinimumHeight(40)
         form.addWidget(self.cred_tc_input, 1)
@@ -1595,8 +1595,8 @@ class SGKApp(QMainWindow):
         if not name or not tc or not pw:
             QMessageBox.warning(self, "Uyari", "Tum alanlari doldurun (Isim, TC, Sifre).")
             return
-        if len(tc) != 11 or not tc.isdigit():
-            QMessageBox.warning(self, "Uyari", "TC Kimlik No 11 haneli ve sadece rakam olmali.")
+        if len(tc) != 12 or not tc.isdigit():
+            QMessageBox.warning(self, "Uyari", "Kullanici Kodu 12 haneli ve sadece rakam olmali.")
             return
 
         _add_credential(name, tc, pw)

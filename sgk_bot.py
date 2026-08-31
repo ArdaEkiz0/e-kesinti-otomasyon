@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import time, os, sys, re, json, urllib.request, urllib.error, subprocess
 
 # Uygulama sürümü ve güncelleme kontrolü
-BOT_SURUM = "1.7.32"  # GitHub release etiketiyle karsilastirilir
+BOT_SURUM = "1.7.33"  # GitHub release etiketiyle karsilastirilir
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -332,7 +332,7 @@ class SGKBot:
             if deger and str(deger).strip():
                 ad = str(deger).strip()
                 # Şablon başlığı gibi görünen değerleri kooperatif adı sanma
-                if ad not in ("Ünvan", "Unvan", "TC Kimlik No", "Matrah", "Bağ-Kur", "Bağkur"):
+                if ad not in ("Ünvan", "Unvan", "Kullanici Kodu", "Matrah", "Bağ-Kur", "Bağkur"):
                     return ad
         except Exception:
             pass
@@ -345,7 +345,7 @@ class SGKBot:
             data = []
             bolunen_sayisi = 0
             for idx, row in df.iterrows():
-                if pd.notna(row.iloc[1]) and len(str(row.iloc[1])) == 11:
+                if pd.notna(row.iloc[1]) and len(str(row.iloc[1])) == 12:
                     try:
                         tc_no = str(int(row.iloc[1]))
                         matrah = self._sayiya_cevir(row.iloc[2])
@@ -396,7 +396,7 @@ class SGKBot:
         ws["A2"] = f"Tarih: 01.{simdi.month:02d}.{simdi.year} -> {son_gun.day:02d}.{simdi.month:02d}.{simdi.year}"
         ws["A3"] = "Total sahaların hepsi sıfır ise alınmasın"
         ws["A4"] = "Toplu Alım Makbuz Raporu_bağkur_tevk"
-        for i, baslik in enumerate(["Ünvan", "TC Kimlik No", "Matrah", "Bağ-Kur"], start=1):
+        for i, baslik in enumerate(["Ünvan", "Kullanici Kodu", "Matrah", "Bağ-Kur"], start=1):
             hucre = ws.cell(row=5, column=i, value=baslik)
             hucre.font = Font(bold=True)
         ws.column_dimensions["A"].width = 40
@@ -606,7 +606,7 @@ class SGKBot:
         print(renkli("\n📊 Excel dosyası okunuyor...", Renk.TURKUAZ))
         if self.excel_sablonu_hazirla(excel_file):
             print(renkli(f"   ✅ {os.path.basename(excel_file)} bulunamadı, standart şablon oluşturuldu!", Renk.YESIL))
-            print(renkli("   ⚠️  Lütfen şablonu doldurun (Ünvan, TC Kimlik No, Matrah, Bağ-Kur) ve tekrar çalıştırın.", Renk.SARI))
+            print(renkli("   ⚠️  Lütfen şablonu doldurun (Ünvan, Kullanici Kodu, Matrah, Bağ-Kur) ve tekrar çalıştırın.", Renk.SARI))
             return
         data = self.load_excel_data(excel_file)
         if not data:

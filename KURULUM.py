@@ -73,7 +73,7 @@ PYTHON_INDIR = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.e
 CHROME_INDIR = "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
 PAKETLER = ["selenium", "pandas", "openpyxl", "webdriver-manager"]
 
-SURUM = "1.7.32"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
+SURUM = "1.7.33"  # bu kurulum aracının sürümü (GitHub release etiketiyle karşılaştırılır)
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
@@ -615,7 +615,7 @@ def excel_sablonu_hazirla(komut):
     if not os.path.exists(yol):
         raise RuntimeError("Şablon oluşturulamadı: " + (r.stderr or r.stdout or "").strip()[-300:])
     yaz("   ✅ Standart şablon oluşturuldu (çalışmaaaa.xlsx)", Renk.YESIL)
-    yaz("   ⚠️  Şablonu Excel'de açıp Ünvan, TC Kimlik No, Matrah, Bağ-Kur sütunlarını doldurun.", Renk.SARI)
+    yaz("   ⚠️  Şablonu Excel'de açıp Ünvan, Kullanici Kodu, Matrah, Bağ-Kur sütunlarını doldurun.", Renk.SARI)
 
 
 # ---------- Bot doğrulama ----------

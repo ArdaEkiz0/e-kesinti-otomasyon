@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.31"
+SURUM = "1.7.32"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -947,7 +947,7 @@ class SGKApp(QMainWindow):
         info_icon.setStyleSheet(f"color: #1a1a1a; background-color: #c9a86c; border-radius: 14px; font-size: 14px; font-weight: bold;")
         info_icon.setAlignment(Qt.AlignCenter)
         ic.addWidget(info_icon)
-        info_text = QLabel("Excel formati: Satir 1 = kooperatif adi, Satir 5 = basliklar (Unvan | TC Kimlik No | Matrah | Kesinti), Satir 6+ = veriler. Verileri duzenleyip kaydedebilirsiniz.")
+        info_text = QLabel("Excel formati: Satir 1 = kooperatif adi, Satir 5 = basliklar (Unvan | Kullanici Kodu | Matrah | Kesinti), Satir 6+ = veriler. Verileri duzenleyip kaydedebilirsiniz.")
         info_text.setStyleSheet(f"color: #cccccc; font-size: 12px; background: transparent;")
         info_text.setWordWrap(True)
         ic.addWidget(info_text, 1)
@@ -1084,7 +1084,7 @@ class SGKApp(QMainWindow):
 
         self.excel_table = QTableWidget()
         self.excel_table.setColumnCount(4)
-        self.excel_table.setHorizontalHeaderLabels(["Unvan", "TC Kimlik No", "Matrah", "Kesinti"])
+        self.excel_table.setHorizontalHeaderLabels(["Unvan", "Kullanici Kodu", "Matrah", "Kesinti"])
         self.excel_table.horizontalHeader().setStyleSheet(f"""
             QHeaderView::section {{
                 background-color: #1a1a1a;
@@ -1177,11 +1177,11 @@ class SGKApp(QMainWindow):
             self.excel_table.setRowCount(0)
             self.excel_table.setColumnCount(max(df.shape[1], 4))
 
-            default_headers = ["Unvan", "TC Kimlik No", "Matrah", "Kesinti"]
+            default_headers = ["Unvan", "Kullanici Kodu", "Matrah", "Kesinti"]
             headers = list(default_headers)
             if df.shape[0] > 0:
                 row0 = [str(v).strip() if pd.notna(v) else "" for v in df.iloc[0]]
-                known = {"unvan", "tc", "tc kimlik", "tc kimlik no", "matrah", "kesinti", "bag-kur", "bagkur"}
+                known = {"unvan", "tc", "tc kimlik", "tc kimlik no", "kullanici kodu", "kullanici", "matrah", "kesinti", "bag-kur", "bagkur"}
                 if any(v.lower() in known for v in row0 if v):
                     for c in range(min(df.shape[1], 4)):
                         if row0[c]:

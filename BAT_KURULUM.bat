@@ -52,8 +52,8 @@ echo    OK - Python kuruldu.
 :PAKETLER
 REM ---------- 2/3: Paketler ----------
 echo.
-echo [2/3] Gerekli paketler yukleniyor/kontrol ediliyor (selenium, pandas, openpyxl, webdriver-manager)...
-%PY% -m pip install --quiet --disable-pip-version-check selenium pandas openpyxl webdriver-manager
+echo [2/3] Gerekli paketler yukleniyor/kontrol ediliyor (selenium, pandas, openpyxl, webdriver-manager, PyQt5)...
+%PY% -m pip install --quiet --disable-pip-version-check selenium pandas openpyxl webdriver-manager PyQt5
 if errorlevel 1 (
     echo    HATA: Paket kurulumu basarisiz! Internet baglantinizi kontrol edin.
     goto SON

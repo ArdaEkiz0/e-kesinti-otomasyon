@@ -14,7 +14,7 @@ from selenium.common.exceptions import (
 )
 import pandas as pd
 from datetime import datetime, timedelta
-import time, os, sys, re, json, urllib.request, urllib.error
+import time, os, sys, re, json, urllib.request, urllib.error, subprocess
 
 # Uygulama sürümü ve güncelleme kontrolü
 BOT_SURUM = "1.7.4"  # GitHub release etiketiyle karsilastirilir

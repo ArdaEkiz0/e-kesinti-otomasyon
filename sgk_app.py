@@ -36,7 +36,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
 # --- Sabitler ---
-SURUM = "1.7.24"
+SURUM = "1.7.25"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
 SIRKET = "Arda M. Ekiz"
 
@@ -225,14 +225,19 @@ class BotThread(QThread):
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             import sgk_bot
             self.log_signal.emit("sgk_bot modulu yuklendi.")
-            if hasattr(sgk_bot, 'main'):
-                sgk_bot.main(self.excel_path, self.log_signal.emit, self.progress_signal, lambda: self._running)
-            else:
-                self.log_signal.emit("Uyari: sgk_bot.main() fonksiyonu bulunamadi.")
-                self._simulate_work()
-        except ImportError:
-            self.log_signal.emit("sgk_bot.py bulunamadi, demo mod calistiriliyor...")
-            self._simulate_work()
+
+            import io, contextlib
+            buf = io.StringIO()
+
+            bot = sgk_bot.SGKBot(test_modu=False)
+
+            with contextlib.redirect_stdout(buf):
+                bot.run(self.excel_path)
+
+            for line in buf.getvalue().splitlines():
+                if line.strip():
+                    self.log_signal.emit(line)
+
         except Exception as e:
             self.log_signal.emit(f"Hata: {str(e)}")
         finally:

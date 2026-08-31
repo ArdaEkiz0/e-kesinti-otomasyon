@@ -1432,7 +1432,8 @@ class SGKApp(QMainWindow):
                 _otomatik_guncelle(zip_url)
                 QMessageBox.information(self, "Guncelleme Tamamlandi",
                     f"v{yeni_surum} basariyla yuklendi!\nUygulama yeniden baslatilacak.")
-                subprocess.Popen([sys.executable] + sys.argv)
+                script_yol = os.path.abspath(__file__)
+                subprocess.Popen([sys.executable, script_yol] + sys.argv[1:])
                 sys.exit(0)
         except Exception as e:
             QMessageBox.warning(self, "Guncelleme Hatasi",

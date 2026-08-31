@@ -762,7 +762,8 @@ if __name__ == "__main__":
                 try:
                     otomatik_guncelle(zip_url)
                     print(renkli(f"   ✅ v{yeni_surum} güncellendi! Bot yeniden başlatılıyor...", Renk.YESIL, kalin=True))
-                    subprocess.Popen([sys.executable] + sys.argv)
+                    script_yol = os.path.abspath(__file__)
+                    subprocess.Popen([sys.executable, script_yol] + sys.argv[1:])
                     sys.exit(0)
                 except Exception as e:
                     print(renkli(f"   ❌ Otomatik güncelleme başarısız: {e}", Renk.KIRMIZI))

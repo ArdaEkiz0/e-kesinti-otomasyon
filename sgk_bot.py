@@ -762,7 +762,8 @@ if __name__ == "__main__":
                 try:
                     otomatik_guncelle(zip_url)
                     print(renkli(f"   ✅ v{yeni_surum} güncellendi! Bot yeniden başlatılıyor...", Renk.YESIL, kalin=True))
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                    subprocess.Popen([sys.executable] + sys.argv)
+                    sys.exit(0)
                 except Exception as e:
                     print(renkli(f"   ❌ Otomatik güncelleme başarısız: {e}", Renk.KIRMIZI))
                     print(renkli("   Elle güncellemek için siteden ZIP'i indirip dosyaları değiştirin.", Renk.SARI))

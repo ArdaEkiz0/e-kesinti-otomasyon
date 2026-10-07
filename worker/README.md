@@ -51,7 +51,7 @@ WORKER_URL = "https://sgk-license-api.CIZGI.workers.dev"
 
 ## Admin Paneli
 `https://sgk-license-api.CIZGI.workers.dev/admin` adresinden erisilebilir.
-Varsayilan sifre: `password`
+Admin sifresi kurulumda belirlenir (§5) ve repoda tutulmaz.
 
 ## Dosya Yapisi
 ```

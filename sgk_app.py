@@ -35,6 +35,17 @@ except ImportError:
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QSize
 from PyQt5.QtGui import QFont, QColor, QIcon, QPixmap, QPainter, QPen
 
+
+
+def _taban_dizin():
+    """PyInstaller EXE'sinde exe'nin yanindaki klasor, kaynakta dosyanin klasoru."""
+    import sys as _sys
+    import os as _os
+    if getattr(_sys, "frozen", False):
+        return _os.path.dirname(_sys.executable)
+    return _os.path.dirname(_os.path.abspath(__file__))
+
+
 # --- Sabitler ---
 SURUM = "1.7.34"
 UYGULAMA_ADI = "SGK E-Kesinti Otomasyon"
@@ -122,7 +133,7 @@ def _guncelleme_var_mi():
 
 def _otomatik_guncelle(zip_url, progress_callback=None):
     """Yeni ZIP paketini indirip uygulama klasorune acar."""
-    hedef_klasor = os.path.dirname(os.path.abspath(__file__))
+    hedef_klasor = _taban_dizin()
     zip_yol = os.path.join(hedef_klasor, "_guncelleme.zip")
     istek = urllib.request.Request(zip_url, headers={"User-Agent": "SGK-App"})
     with urllib.request.urlopen(istek, timeout=180) as r:
@@ -169,14 +180,14 @@ def _save_credentials(credentials):
     raw = json.dumps(credentials, ensure_ascii=False).encode("utf-8")
     encrypted = _xor_crypt(raw, key)
     b64 = base64.b64encode(encrypted).decode("ascii")
-    cred_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), _CRED_FILE)
+    cred_path = os.path.join(_taban_dizin(), _CRED_FILE)
     with open(cred_path, "w", encoding="utf-8") as f:
         f.write(b64)
 
 
 def _load_credentials():
     """Sifreli dosyadan kimlik bilgilerini okur. Dosya yoksa veya bozuksa bos doner."""
-    cred_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), _CRED_FILE)
+    cred_path = os.path.join(_taban_dizin(), _CRED_FILE)
     if not os.path.exists(cred_path):
         return []
     try:
@@ -222,7 +233,7 @@ class BotThread(QThread):
     def run(self):
         self.log_signal.emit("Bot baslatiliyor...")
         try:
-            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            sys.path.insert(0, _taban_dizin())
             import sgk_bot
             self.log_signal.emit("sgk_bot modulu yuklendi.")
 
@@ -389,7 +400,7 @@ class SGKApp(QMainWindow):
         self.setWindowTitle(f"{UYGULAMA_ADI} v{SURUM}")
         self.setMinimumSize(1000, 700)
         self.resize(1100, 780)
-        base = os.path.dirname(os.path.abspath(__file__))
+        base = _taban_dizin()
         for icon_candidate in ["app_logo.ico", os.path.join("docs", "app_logo.ico")]:
             icon_path = os.path.join(base, icon_candidate)
             if os.path.exists(icon_path):
@@ -1961,7 +1972,7 @@ class SGKApp(QMainWindow):
             "wait_time": self.wait_spin.value(),
             "language": self.lang_combo.currentText(),
         }
-        settings_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.json")
+        settings_path = os.path.join(_taban_dizin(), "settings.json")
         try:
             with open(settings_path, "w", encoding="utf-8") as f:
                 json.dump(settings, f, ensure_ascii=False, indent=2)
@@ -1970,7 +1981,7 @@ class SGKApp(QMainWindow):
             QMessageBox.warning(self, "Hata", f"Ayarlar kaydedilemedi:\n{str(e)}")
 
     def _load_settings(self):
-        settings_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.json")
+        settings_path = os.path.join(_taban_dizin(), "settings.json")
         if os.path.exists(settings_path):
             try:
                 with open(settings_path, "r", encoding="utf-8") as f:
@@ -2014,7 +2025,7 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 
-    base = os.path.dirname(os.path.abspath(__file__))
+    base = _taban_dizin()
     for icon_candidate in ["app_logo.ico", os.path.join("docs", "app_logo.ico")]:
         icon_path = os.path.join(base, icon_candidate)
         if os.path.exists(icon_path):

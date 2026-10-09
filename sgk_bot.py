@@ -19,6 +19,17 @@ import time, os, sys, re, json, urllib.request, urllib.error, subprocess
 # Uygulama sürümü ve güncelleme kontrolü
 BOT_SURUM = "1.7.34"  # GitHub release etiketiyle karsilastirilir
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
+
+
+def _taban_dizin():
+    """PyInstaller EXE'sinde exe'nin yanindaki klasor, kaynakta dosyanin klasoru."""
+    import sys as _sys
+    import os as _os
+    if getattr(_sys, "frozen", False):
+        return _os.path.dirname(_sys.executable)
+    return _os.path.dirname(_os.path.abspath(__file__))
+
+
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # Türkçe karakterler ve emojiler hangi konsolda olursa olsun yazılabilsin
@@ -138,7 +149,7 @@ def guncelleme_var_mi():
 def otomatik_guncelle(zip_url):
     """Yeni ZIP paketini indirip bot klasorune acar (dosyalari gunceller)."""
     import zipfile
-    hedef_klasor = os.path.dirname(os.path.abspath(__file__))
+    hedef_klasor = _taban_dizin()
     zip_yol = os.path.join(hedef_klasor, "_guncelleme.zip")
     yaz_ilerleme = True
     print(renkli("   ⬇️ Yeni sürüm indiriliyor...", Renk.SARI))
@@ -291,7 +302,7 @@ class SGKBot:
                 if "lock" in str(e).lower():
                     # Yarıda kalan indirme kilidi kalmış: hepsini temizle, bir kez daha dene
                     self._temizle_eski_kilitler(en_fazla_dk=0)
-        yerel = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chromedriver.exe")
+        yerel = os.path.join(_taban_dizin(), "chromedriver.exe")
         if os.path.exists(yerel):
             try:
                 driver = webdriver.Chrome(service=Service(yerel), options=chrome_options)
@@ -721,7 +732,7 @@ def excel_dosyasi_sec():
     """Klasördeki Excel dosyasını otomatik bulur.
     Tek dosya varsa adı ne olursa olsun onu seçer,
     birden fazlaysa kullanıcıya seçtirir, hiç yoksa şablon adını döner."""
-    klasor = os.path.dirname(os.path.abspath(__file__))
+    klasor = _taban_dizin()
     varsayilan = os.path.join(klasor, "çalışmaaaa.xlsx")
     dosyalar = sorted(
         f for f in os.listdir(klasor)

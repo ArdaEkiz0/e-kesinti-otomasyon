@@ -19,17 +19,6 @@ import time, os, sys, re, json, urllib.request, urllib.error, subprocess
 # Uygulama sürümü ve güncelleme kontrolü
 BOT_SURUM = "1.7.34"  # GitHub release etiketiyle karsilastirilir
 GITHUB_REPO = "ArdaEkiz0/e-kesinti-otomasyon"
-
-
-def _taban_dizin():
-    """PyInstaller EXE'sinde exe'nin yanindaki klasor, kaynakta dosyanin klasoru."""
-    import sys as _sys
-    import os as _os
-    if getattr(_sys, "frozen", False):
-        return _os.path.dirname(_sys.executable)
-    return _os.path.dirname(_os.path.abspath(__file__))
-
-
 GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 # Türkçe karakterler ve emojiler hangi konsolda olursa olsun yazılabilsin
@@ -80,7 +69,12 @@ def renk_aktif_mi():
         return False
     if os.name == "nt":
         os.system("")  # Windows 10+ konsolda ANSI renklerini aktifleştirir
-    return sys.stdout.isatty()
+    try:
+        return sys.stdout is not None and sys.stdout.isatty()
+    except Exception:
+        # GUI/pencereli modda (konsol yok) sys.stdout None olabilir veya isatty
+        # cagrisi hata verebilir - bu durumda renkleri kapali kabul et.
+        return False
 
 
 RENK_ACIK = renk_aktif_mi()
@@ -253,13 +247,75 @@ class OturumHatasi(Exception):
 
 
 class SGKBot:
-    def __init__(self, surucu=None, test_modu=False):
+    def __init__(self, surucu=None, test_modu=False, devam_callback=None, onay_callback=None, giris_bilgisi=None):
         self.test_modu = test_modu
         self.kooperatif_adi = None
+        # GUI (pythonw ile konsolsuz calisan sgk_app.py) bu iki callback'i saglar,
+        # cunku konsol olmadan input() cagirmak coker/asilir. Callback yoksa
+        # (dogrudan `python sgk_bot.py` ile konsoldan calistirilmissa) input()
+        # ile eski davranis aynen calisir.
+        self.devam_callback = devam_callback
+        self.onay_callback = onay_callback
+        # Kayitli SGK giris bilgileri: {"kullanici_kodu": "...", "sifre": "..."}.
+        # Login sayfasinda Kullanici Kodu / Sifre alanlarini otomatik doldurmak
+        # icin kullanilir. Guvenlik Anahtari (CAPTCHA) alanina ASLA dokunulmaz -
+        # onu kullanici resimdeki koda bakarak kendi girer.
+        self.giris_bilgisi = giris_bilgisi
         if surucu is not None:
             self.driver = surucu
         else:
             self.driver = self._start_driver()
+
+    def _devam_bekle(self, mesaj):
+        """Kullanicidan bir eylemi (ornegin SGK'ya login olmayi) tamamladigina dair
+        onay bekler. GUI modunda devam_callback ile arayuzde bekler, konsolda ENTER
+        ile bekler. Konsol da yoksa (ne GUI ne gercek terminal) kisa bir bekleyisle
+        devam eder, coker/asilmaz."""
+        if self.devam_callback:
+            self.devam_callback(mesaj)
+            return
+        try:
+            input(mesaj)
+        except (EOFError, RuntimeError, OSError):
+            print(renkli("   (Konsol bulunamadi - 3 saniye beklenip otomatik devam ediliyor)", Renk.SARI))
+            time.sleep(3)
+
+    def _otomatik_giris_doldur(self):
+        """Kayitli Kullanici Kodu / Sifre bilgisini SGK login formuna otomatik doldurur.
+        Guvenlik Anahtari (resimdeki CAPTCHA kodu) alanina DOKUNMAZ ve Giris'e
+        TIKLAMAZ - bunlari kullanici kendi yapar. Alanlar bulunamazsa (SGK sayfayi
+        degistirmis olabilir) sessizce False doner, akis eski (tamamen manuel
+        login) davranisa duser."""
+        if not self.giris_bilgisi:
+            return False
+        kullanici_kodu = (self.giris_bilgisi.get("kullanici_kodu") or "").strip()
+        sifre = self.giris_bilgisi.get("sifre") or ""
+        if not kullanici_kodu or not sifre:
+            return False
+        try:
+            alan_kod = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.NAME, "mernisNo"))
+            )
+            alan_sifre = self.driver.find_element(By.NAME, "password")
+            alan_kod.clear()
+            alan_kod.send_keys(kullanici_kodu)
+            alan_sifre.clear()
+            alan_sifre.send_keys(sifre)
+            return True
+        except Exception as e:
+            print(renkli(f"   ⚠️  Kullanıcı kodu/şifre otomatik doldurulamadı: {hata_aciklamasi(e)}", Renk.SARI))
+            return False
+
+    def _onay_sor(self, mesaj, varsayilan=False):
+        """Evet/Hayir onayi ister. GUI modunda onay_callback (True/False dondurur),
+        konsolda input() ile 'E'/'H' okunur. Konsol yoksa varsayilan deger kullanilir."""
+        if self.onay_callback:
+            return bool(self.onay_callback(mesaj))
+        try:
+            cevap = input(mesaj).strip().lower()
+            return cevap.startswith("e")
+        except (EOFError, RuntimeError, OSError):
+            return varsayilan
 
     def _temizle_eski_kilitler(self, en_fazla_dk=5):
         """webdriver-manager'ın yarıda kalan indirmelerden bıraktığı eski kilit dosyalarını siler."""
@@ -296,6 +352,7 @@ class SGKBot:
                 driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                     "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
                 })
+                driver.set_page_load_timeout(45)
                 return driver
             except Exception as e:
                 son_hata = e
@@ -309,6 +366,7 @@ class SGKBot:
                 driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                     "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
                 })
+                driver.set_page_load_timeout(45)
                 return driver
             except Exception as e2:
                 son_hata = e2
@@ -356,22 +414,32 @@ class SGKBot:
             data = []
             bolunen_sayisi = 0
             for idx, row in df.iterrows():
-                if pd.notna(row.iloc[1]) and len(str(row.iloc[1])) == 12:
-                    try:
-                        tc_no = str(int(row.iloc[1]))
-                        matrah = self._sayiya_cevir(row.iloc[2])
-                        kesinti = self._sayiya_cevir(row.iloc[3])
-                        # Matrah 1 milyon ve üzeriyse ikiye böl
-                        if matrah >= 1_000_000:
-                            yari_matrah = round(matrah / 2, 2)
-                            yari_kesinti = round(kesinti / 2, 2)
-                            data.append({'tc': tc_no, 'matrah': yari_matrah, 'kesinti': yari_kesinti})
-                            data.append({'tc': tc_no, 'matrah': yari_matrah, 'kesinti': yari_kesinti})
-                            bolunen_sayisi += 1
-                        else:
-                            data.append({'tc': tc_no, 'matrah': matrah, 'kesinti': kesinti})
-                    except Exception:
-                        continue
+                ham_tc = row.iloc[1]
+                if pd.isna(ham_tc):
+                    continue
+                try:
+                    # TC Kimlik No / Kullanici Kodu hucresi Excel'de sayi (int/float)
+                    # ya da metin olarak gelebilir; hepsini tek tipe indirger.
+                    tc_no = str(int(float(str(ham_tc).strip())))
+                except (ValueError, TypeError):
+                    continue
+                # Turkiye TC Kimlik No / kullanici kodu 11 hanelidir.
+                if len(tc_no) != 11 or not tc_no.isdigit():
+                    continue
+                try:
+                    matrah = self._sayiya_cevir(row.iloc[2])
+                    kesinti = self._sayiya_cevir(row.iloc[3])
+                    # Matrah 1 milyon ve üzeriyse ikiye böl
+                    if matrah >= 1_000_000:
+                        yari_matrah = round(matrah / 2, 2)
+                        yari_kesinti = round(kesinti / 2, 2)
+                        data.append({'tc': tc_no, 'matrah': yari_matrah, 'kesinti': yari_kesinti})
+                        data.append({'tc': tc_no, 'matrah': yari_matrah, 'kesinti': yari_kesinti})
+                        bolunen_sayisi += 1
+                    else:
+                        data.append({'tc': tc_no, 'matrah': matrah, 'kesinti': kesinti})
+                except Exception:
+                    continue
             if self.kooperatif_adi:
                 print(f"   🏢 Kooperatif: {renkli(self.kooperatif_adi, Renk.SARI, kalin=True)}")
             print(f"✅ Excel'den {len(data)} kayıt okundu", end="")
@@ -570,10 +638,11 @@ class SGKBot:
                             deneme += 1
                             continue
                         print(renkli("   🔒 SGK oturumu düşmüş görünüyor!", Renk.SARI, kalin=True))
-                        try:
-                            input(renkli("   Tarayıcıdan TEKRAR LOGIN yapın, sonra buraya dönüp ENTER'a basınız...", Renk.SARI))
-                        except EOFError:
-                            pass
+                        if self._otomatik_giris_doldur():
+                            print(renkli("   ✅ Kullanıcı kodu ve şifre otomatik dolduruldu.", Renk.YESIL))
+                            self._devam_bekle(renkli("   Resimdeki Güvenlik Anahtarını girip Giriş'e tıkladıktan sonra buraya dönüp devam edin...", Renk.SARI))
+                        else:
+                            self._devam_bekle(renkli("   Tarayıcıdan TEKRAR LOGIN yapın, sonra buraya dönüp ENTER'a basınız...", Renk.SARI))
                         try:
                             self._form_sayfasina_git()
                             continue  # ayni kaydi tekrar dene, deneme hakkini yakma
@@ -628,9 +697,19 @@ class SGKBot:
             print(renkli("\n🧪 TEST MODU: Tarayıcı açılmadan akış simüle ediliyor...", Renk.SARI, kalin=True))
         else:
             print(renkli("\n🌐 SGK sitesine gidiliyor...", Renk.TURKUAZ))
-            self.driver.get("https://uyg.sgk.gov.tr/TAKEP/Welcome.do")
-            print(renkli("⏳ Lütfen siteye login yapınız...", Renk.SARI))
-            input("   Login yaptıktan sonra ENTER'a basınız...")
+            try:
+                self.driver.get("https://uyg.sgk.gov.tr/TAKEP/Welcome.do")
+            except Exception as e:
+                print(renkli(f"❌ SGK sitesine gidilemedi: {hata_aciklamasi(e)}", Renk.KIRMIZI, kalin=True))
+                print(renkli("   İnternet bağlantınızı kontrol edip tekrar deneyin.", Renk.SARI))
+                return
+            if self._otomatik_giris_doldur():
+                print(renkli("✅ Kullanıcı kodu ve şifre otomatik dolduruldu.", Renk.YESIL))
+                print(renkli("⏳ Lütfen resimdeki Güvenlik Anahtarını girip Giriş'e tıklayınız...", Renk.SARI))
+                self._devam_bekle("   Güvenlik Anahtarını girip Giriş'e tıkladıktan sonra buraya dönüp devam edin...")
+            else:
+                print(renkli("⏳ Lütfen siteye login yapınız...", Renk.SARI))
+                self._devam_bekle("   Login yaptıktan sonra ENTER'a basınız...")
 
             print(renkli("\n📍 Form sayfasına gidiliyor...", Renk.TURKUAZ))
             try:
@@ -694,13 +773,10 @@ class SGKBot:
         # Hatali kayitlar icin bir kez daha deneme turu (oturum dususu gibi gecici
         # hatalardan kaynaklanan kayitlar bu sayede kurtarilir)
         if hatali and not self.test_modu:
-            try:
-                cevap = input(renkli(
-                    f"\n🔁 {len(hatali)} kayıt hatalı. Bir kez daha denenmesini ister misiniz? (E/H): ",
-                    Renk.SARI, kalin=True)).strip().lower()
-            except EOFError:
-                cevap = "h"
-            if cevap.startswith("e"):
+            tekrar_denensin = self._onay_sor(renkli(
+                f"\n🔁 {len(hatali)} kayıt hatalı. Bir kez daha denenmesini ister misiniz? (E/H): ",
+                Renk.SARI, kalin=True))
+            if tekrar_denensin:
                 print(renkli("\n🔄 Hatalı kayıtlar tekrar deneniyor...", Renk.SARI, kalin=True))
                 s2, hatali = self._toplu_isle(hatali, odeme_tarihi)
                 success += s2
@@ -724,8 +800,13 @@ class SGKBot:
             ozet = f"{success}/{len(data)} kayıt başarılı" + (f", {len(hatali)} hatalı" if hatali else ", tümü başarılı!")
             windows_bildirim("SGK Bot - İşlem Tamamlandı", ozet)
 
-        if not self.test_modu:
-            input("\nKapatmak için ENTER'a basınız...")
+        # GUI modunda (devam_callback verilmisse) kapanis icin konsol beklemeye gerek yok;
+        # sonuc zaten arayuzde gorunur. Sadece dogrudan konsoldan calistirildiginda bekle.
+        if not self.test_modu and not self.devam_callback:
+            try:
+                input("\nKapatmak için ENTER'a basınız...")
+            except (EOFError, RuntimeError, OSError):
+                pass
 
 
 def excel_dosyasi_sec():
@@ -798,4 +879,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(renkli(f"\n❌ BOT BAŞLATILAMADI: {e}", Renk.KIRMIZI, kalin=True))
         print(renkli("   Sorunu anlamak için yukarıdaki mesajı okuyun veya BENI_OKU.txt'deki 'Sorun Giderme' bölümüne bakın.", Renk.SARI))
-        input("\nKapatmak için ENTER'a basınız...")
+        try:
+            input("\nKapatmak için ENTER'a basınız...")
+        except (EOFError, RuntimeError, OSError):
+            pass
